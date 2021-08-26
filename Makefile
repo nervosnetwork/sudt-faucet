@@ -21,7 +21,7 @@ fix-lint-lib:
 	yarn eslint packages/*/src/**/*.{ts,tsx} --format=pretty --fix
 
 build-lib:
-	yarn lerna run --ignore *-ui --ignore *-server build
+	yarn lerna run --ignore *-ui --ignore app-* build
 
 clean:
 	yarn rimraf packages/*/dist

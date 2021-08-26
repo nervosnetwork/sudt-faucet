@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@issuer/*": ["packages/*/src"]
+      "@sudt-faucet/*": ["packages/*/src"]
     }
   }
 }

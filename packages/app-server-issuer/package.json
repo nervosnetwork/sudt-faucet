@@ -1,8 +1,9 @@
 {
-  "name": "@sudt-faucet/commons",
+  "name": "@sudt-faucet/app-server-issuer",
   "version": "0.0.0",
   "main": "dist",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "build": "npm run build:js && npm run build:types",
     "clean": "rimraf -rf ./dist",
@@ -11,6 +12,9 @@
     "watch": "yarn run build:js --watch & yarn run build:types --watch"
   },
   "dependencies": {
-    "@ckb-lumos/base": "^0.16.0"
+    "@types/express": "^4.17.13",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "json-rpc-2.0": "^0.2.18"
   }
 }
