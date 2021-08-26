@@ -10,7 +10,8 @@
   "workspaces": [
     "packages/*",
     "apps/ui/*",
-    "apps/server/*"
+    "apps/server/*",
+    "ckit/packages/*"
   ],
   "devDependencies": {
     "@babel/cli": "^7.14.8",
