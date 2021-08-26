@@ -22,4 +22,4 @@ jobs:
         run: yarn install --frozen-lockfile --force
 
       - name: ci
-        run: make ci
+        run: make github-ci

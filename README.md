@@ -10,6 +10,11 @@
 ### Start Development UI
 
 ```
+// init ckit submodule
+// submodule will be removed when ckit published
+git submodule update --init
+
+// install dependencies
 yarn install
 
 // build packages
