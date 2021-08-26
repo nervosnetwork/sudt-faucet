@@ -1,0 +1,3 @@
+[submodule "ckit"]
+	path = ckit
+	url = https://github.com/homura/ckit.git
