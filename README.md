@@ -21,6 +21,6 @@ yarn install
 yarn build:lib
 
 // start apps
-yarn workspace issue-ui start
+yarn workspace @sudt-faucet/app-ui-issuer start
 yarn workspace claim-ui start
 ```

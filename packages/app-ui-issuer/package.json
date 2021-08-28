@@ -1,5 +1,5 @@
 {
-  "name": "issue-ui",
+  "name": "@sudt-faucet/app-ui-issuer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
