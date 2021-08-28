@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@ckit/*": ["ckit/packages/*/src"],
       "@sudt-faucet/*": ["packages/*/src"]
     }
   }
