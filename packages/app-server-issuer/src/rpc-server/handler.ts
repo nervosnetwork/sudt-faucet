@@ -1,47 +1,36 @@
 import { unimplemented } from '@ckit/utils';
 import { rpc } from '@sudt-faucet/commons';
-import {
-  ClaimSudtPayload,
-  DisableClaimSecretPayload,
-  GetClaimableSudtBalancePayload,
-  GetClaimableSudtBalanceResponse,
-  GetIssuedHistoryPayload,
-  GetIssuedHistoryResponse,
-  ListClaimHistoryPayload,
-  ListClaimHistoryResponse,
-  LoginPayload,
-  LoginResponse,
-  SendClaimableMailsPayload,
-} from '@sudt-faucet/commons/src/interfaces/rpc';
 import { DB } from '../db';
 
 export class IssuerRpcHandler implements rpc.IssuerRpc {
-  login(_payload: LoginPayload): Promise<LoginResponse> {
+  login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     unimplemented();
   }
 
-  list_issued_sudt(_payload: GetIssuedHistoryPayload): Promise<GetIssuedHistoryResponse> {
+  list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
     unimplemented();
   }
 
-  send_claimable_mails(payload: SendClaimableMailsPayload): Promise<void> {
+  send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
     if (payload.recipients.length === 0) throw new Error('call send_claimable_mails with empty payload');
     return DB.getInstance().batchInsertMailIssue(payload);
   }
 
-  get_claimable_sudt_balance(_payload: GetClaimableSudtBalancePayload): Promise<GetClaimableSudtBalanceResponse> {
+  get_claimable_sudt_balance(
+    _payload: rpc.GetClaimableSudtBalancePayload,
+  ): Promise<rpc.GetClaimableSudtBalanceResponse> {
     unimplemented();
   }
 
-  list_claim_history(_payload: ListClaimHistoryPayload): Promise<ListClaimHistoryResponse> {
+  list_claim_history(_payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
     unimplemented();
   }
 
-  disable_claim_secret(_payload: DisableClaimSecretPayload): Promise<void> {
-    unimplemented();
+  disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
+    return DB.getInstance().updateStatusBySecret(payload.claimSecret, 'disabled');
   }
 
-  claim_sudt(_payload: ClaimSudtPayload): Promise<void> {
+  claim_sudt(_payload: rpc.ClaimSudtPayload): Promise<void> {
     unimplemented();
   }
 }

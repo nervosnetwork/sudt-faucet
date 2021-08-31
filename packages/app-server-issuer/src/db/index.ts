@@ -3,21 +3,21 @@ import { rpc } from '@sudt-faucet/commons';
 import Knex, { Knex as IKnex } from 'knex';
 import knexConfig from './knexfile';
 
-interface MailIssue {
-  id: number;
-  mailAddress: string;
-  sudtId: string;
-  amount: string;
-  secret: string;
-  mailMessage: string;
-  expireTime: number;
-  claimTime: number;
-  claimAddress: string;
-  txHash: string;
-  confirmNumber: number;
-  confirmTime: number;
-  status: string;
-}
+// interface MailIssue {
+//   id: number;
+//   mail_address: string;
+//   sudt_id: string;
+//   amount: string;
+//   secret: string;
+//   mail_message: string;
+//   expire_time: number;
+//   claim_time: number;
+//   claim_address: string;
+//   tx_hash: string;
+//   confirm_number: number;
+//   confirm_time: number;
+//   status: string;
+// }
 
 export class DB {
   private static instance: DB;
@@ -48,4 +48,12 @@ export class DB {
     });
     await this.knex.batchInsert('mail_issue', recordsWithSecret, recordsWithSecret.length);
   }
+
+  public async updateStatusBySecret(secret: string, status: string): Promise<void> {
+    await this.knex('mail_issue').where({ secret: secret }).update({ status: status });
+  }
+
+  // public async getRecords(): Promise<MailIssue[]> {
+  //   return this.knex.select('*').from<MailIssue>('mail_issue');
+  // }
 }

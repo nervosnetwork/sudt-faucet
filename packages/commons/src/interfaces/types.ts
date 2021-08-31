@@ -103,7 +103,7 @@ export interface ClaimHistory {
   /**
    * a claim secret can only be claimed once
    */
-  claimSecret: Id;
+  claimSecret: string;
 
   claimStatus: ClaimStatus;
 }

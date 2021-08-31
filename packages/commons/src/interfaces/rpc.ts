@@ -109,5 +109,5 @@ export interface DisableClaimSecretPayload {
   /**
    * {@link ListClaimHistoryResponse.claimSecret}
    */
-  claimSecret: Id;
+  claimSecret: string;
 }
