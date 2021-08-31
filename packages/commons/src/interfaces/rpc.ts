@@ -1,5 +1,5 @@
 import { Address, HexNumber, HexString } from '@ckb-lumos/base';
-import { ClaimHistory, Id, RcIdentity, SudtInfo, Timestamp } from './types';
+import { ClaimHistory, Id, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
  * client and server are the same interface
@@ -80,27 +80,7 @@ export interface GetIssuedHistoryResponse {
 }
 
 export interface SendClaimableMailsPayload {
-  recipients: Array<{
-    sudtId: Id;
-
-    mail: string;
-    amount: HexString;
-    expiredAt: Timestamp;
-
-    /**
-     * A claimable email will have a fixed string of information, something like this
-     *
-     *```mail
-     * Hi,
-     *
-     * {{additionalMessage}}
-     *
-     * This is an airdrop email from Ins, click this link to claim token.
-     * https://domain.com?claim_secret=abcdefg
-     * ```
-     */
-    additionalMessage: string;
-  }>;
+  recipients: Array<MailIssueInfo>;
 }
 
 export interface ClaimSudtPayload {
@@ -125,7 +105,7 @@ export interface ListClaimHistoryResponse {
   histories: ClaimHistory;
 }
 
-interface DisableClaimSecretPayload {
+export interface DisableClaimSecretPayload {
   /**
    * {@link ListClaimHistoryResponse.claimSecret}
    */

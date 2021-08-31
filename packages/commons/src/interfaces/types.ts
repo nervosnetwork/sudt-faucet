@@ -38,6 +38,28 @@ export interface SudtInfo extends SudtStaticInfo {
   currentIssuedSupply: HexNumber;
 }
 
+export interface MailIssueInfo {
+  sudtId: Id;
+
+  mail: string;
+  amount: HexString;
+  expiredAt: Timestamp;
+
+  /**
+   * A claimable email will have a fixed string of information, something like this
+   *
+   *```mail
+   * Hi,
+   *
+   * {{additionalMessage}}
+   *
+   * This is an airdrop email from Ins, click this link to claim token.
+   * https://domain.com?claim_secret=abcdefg
+   * ```
+   */
+  additionalMessage: string;
+}
+
 // the claimable mail has been sent, but no claim has been made yet
 export interface Unclaimed {
   status: 'unclaimed';

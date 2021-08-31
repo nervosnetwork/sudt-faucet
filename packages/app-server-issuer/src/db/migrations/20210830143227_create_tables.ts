@@ -8,12 +8,12 @@ export async function up(knex: Knex): Promise<void> {
     tableBuilder.string('amount').notNullable();
     tableBuilder.string('secret', 32).notNullable().index();
     tableBuilder.string('mail_message');
-    tableBuilder.timestamp('expire_time').nullable().defaultTo(null);
-    tableBuilder.timestamp('claim_time').nullable().defaultTo(null);
+    tableBuilder.bigInteger('expire_time');
+    tableBuilder.bigInteger('claim_time');
     tableBuilder.string('claim_address');
     tableBuilder.string('tx_hash', 66);
     tableBuilder.integer('confirm_number');
-    tableBuilder.timestamp('confirm_time').nullable().defaultTo(null);
+    tableBuilder.bigInteger('confirm_time');
     tableBuilder.string('status').notNullable();
     tableBuilder.timestamps(true, true);
   });
