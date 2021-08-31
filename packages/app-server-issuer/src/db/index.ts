@@ -1,7 +1,5 @@
 import Knex from 'knex';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
-const knexConfig = require('./knexfile');
+import knexConfig from './knexfile';
 
 export async function testKnex(): Promise<void> {
   const knex = Knex(knexConfig.development);
