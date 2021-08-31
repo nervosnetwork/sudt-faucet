@@ -1,5 +1,4 @@
-import { utils } from '@ckit/ckit';
-import { rpc } from '@sudt-faucet/commons';
+import { rpc, utils } from '@sudt-faucet/commons';
 import Knex, { Knex as IKnex } from 'knex';
 import knexConfig from './knexfile';
 

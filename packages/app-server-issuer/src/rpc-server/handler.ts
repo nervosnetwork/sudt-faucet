@@ -1,14 +1,13 @@
-import { unimplemented } from '@ckit/utils';
-import { rpc } from '@sudt-faucet/commons';
+import { rpc, utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
 
 export class IssuerRpcHandler implements rpc.IssuerRpc {
   login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
-    unimplemented();
+    utils.unimplemented();
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
-    unimplemented();
+    utils.unimplemented();
   }
 
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
@@ -19,11 +18,11 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   get_claimable_sudt_balance(
     _payload: rpc.GetClaimableSudtBalancePayload,
   ): Promise<rpc.GetClaimableSudtBalanceResponse> {
-    unimplemented();
+    utils.unimplemented();
   }
 
   list_claim_history(_payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    unimplemented();
+    utils.unimplemented();
   }
 
   disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
@@ -31,6 +30,6 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   claim_sudt(_payload: rpc.ClaimSudtPayload): Promise<void> {
-    unimplemented();
+    utils.unimplemented();
   }
 }
