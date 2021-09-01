@@ -33,11 +33,12 @@ export class DB {
     await this.knex.batchInsert('mail_issue', recordsWithSecret, recordsWithSecret.length);
   }
 
-  public async getMailsToSend(): Promise<MailToSend[]> {
+  public async getMailsToSend(limit: number): Promise<MailToSend[]> {
     return this.knex
       .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
       .from<MailIssue>('mail_issue')
-      .where({ status: 'unsend' });
+      .where({ status: 'unsend' })
+      .limit(limit);
   }
 
   public async getStatusBySecret(secret: string): Promise<string | undefined> {

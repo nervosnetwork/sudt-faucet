@@ -5,6 +5,7 @@ import { DB } from '../db';
 import { MailToSend } from '../types';
 
 dotenv.config();
+const BATCH_MAIL_LIMIT = 500;
 
 export async function startSendGrid(): Promise<void> {
   if (!process.env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY not set');
@@ -13,7 +14,7 @@ export async function startSendGrid(): Promise<void> {
 
   for (;;) {
     try {
-      const unsendMails = await db.getMailsToSend();
+      const unsendMails = await db.getMailsToSend(BATCH_MAIL_LIMIT);
       if (unsendMails.length > 0) {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
