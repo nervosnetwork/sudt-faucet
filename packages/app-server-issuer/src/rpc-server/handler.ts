@@ -25,8 +25,13 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     utils.unimplemented();
   }
 
-  disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
-    return DB.getInstance().updateStatusBySecret(payload.claimSecret, 'disabled');
+  // TODO resolve concurrency with claim sudt
+  async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
+    const db = DB.getInstance();
+    const status = await db.getStatusBySecret(payload.claimSecret);
+    if (!status) throw new Error('error: secret not found');
+    if (status !== 'unclaimed') throw new Error('error: can not disable claimed secret');
+    return db.updateStatusBySecret(payload.claimSecret, 'disabled');
   }
 
   claim_sudt(_payload: rpc.ClaimSudtPayload): Promise<void> {

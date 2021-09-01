@@ -1,22 +1,7 @@
 import { rpc, utils } from '@sudt-faucet/commons';
 import Knex, { Knex as IKnex } from 'knex';
+import { MailIssue, MailToSend } from '../types';
 import knexConfig from './knexfile';
-
-// interface MailIssue {
-//   id: number;
-//   mail_address: string;
-//   sudt_id: string;
-//   amount: string;
-//   secret: string;
-//   mail_message: string;
-//   expire_time: number;
-//   claim_time: number;
-//   claim_address: string;
-//   tx_hash: string;
-//   confirm_number: number;
-//   confirm_time: number;
-//   status: string;
-// }
 
 export class DB {
   private static instance: DB;
@@ -42,17 +27,26 @@ export class DB {
         secret: utils.randomHexString(32).slice(2),
         mail_message: record.additionalMessage,
         expire_time: record.expiredAt,
-        status: 'unclaimed',
+        status: 'unsend',
       };
     });
     await this.knex.batchInsert('mail_issue', recordsWithSecret, recordsWithSecret.length);
   }
 
+  public async getMailsToSend(): Promise<MailToSend[]> {
+    return this.knex
+      .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
+      .from<MailIssue>('mail_issue')
+      .where({ status: 'unsend' });
+  }
+
+  public async getStatusBySecret(secret: string): Promise<string | undefined> {
+    const ret = await this.knex.select('status').from<MailIssue>('mail_issue').where({ secret: secret });
+    if (ret.length > 1) throw new Error('exception: secret not unique');
+    return ret[0]?.status;
+  }
+
   public async updateStatusBySecret(secret: string, status: string): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status });
   }
-
-  // public async getRecords(): Promise<MailIssue[]> {
-  //   return this.knex.select('*').from<MailIssue>('mail_issue');
-  // }
 }

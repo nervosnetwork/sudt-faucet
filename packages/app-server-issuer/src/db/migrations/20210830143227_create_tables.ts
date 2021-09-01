@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     tableBuilder.string('mail_address').notNullable();
     tableBuilder.string('sudt_id').notNullable();
     tableBuilder.string('amount').notNullable();
-    tableBuilder.string('secret', 32).notNullable().index();
+    tableBuilder.string('secret', 32).notNullable().unique();
     tableBuilder.string('mail_message');
     tableBuilder.bigInteger('expire_time');
     tableBuilder.bigInteger('claim_time');

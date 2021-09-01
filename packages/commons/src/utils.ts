@@ -17,3 +17,7 @@ export function unimplemented(): never {
 export function randomHexString(lengthWithOut0x: number): HexString {
   return '0x' + [...Array(lengthWithOut0x)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
