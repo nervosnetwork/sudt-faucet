@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Issuer } from './issuer';
+import { Issuer } from './pages/issuer';
 import './App.less';
 
 const App: React.FC = () => {
