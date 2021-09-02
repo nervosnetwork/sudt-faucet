@@ -34,14 +34,11 @@ const verifyLoginMessage = async (signature: string, message: string, address: s
 };
 
 const createToken = (address: string, privateKey: string): string => {
-  const payload = { address };
-  const token = jwt.sign(payload, privateKey, { expiresIn: '1h', algorithm: 'RS256' });
-  return token;
+  return jwt.sign({ address }, privateKey, { expiresIn: '1h', algorithm: 'RS256' });
 };
 
 const verifyToken = (token: string, publicKey: string): JwtPayload | string => {
-  const result = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
-  return result;
+  return jwt.verify(token, publicKey, { algorithms: ['RS256'] });
 };
 
 export { createToken, verifyToken, verifyLoginMessage, createLoginMessage };

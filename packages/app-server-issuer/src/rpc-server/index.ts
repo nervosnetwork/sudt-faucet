@@ -3,7 +3,6 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
 import { IssuerRpcHandler } from './handler';
-
 export function startRpcServer(): void {
   const app = express();
   app.use(bodyParser.json());
@@ -24,7 +23,7 @@ export function startRpcServer(): void {
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
-
+    rpcHandler.get_user_address(req);
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
         res.json(jsonRpcResponse);

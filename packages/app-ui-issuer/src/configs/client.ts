@@ -1,11 +1,21 @@
 import { JSONRPCClient } from 'json-rpc-2.0';
 
-const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) =>
-  fetch('/sudt-issuer/api/v1', {
+type Header = {
+  authorization?: string;
+  'content-type': string;
+};
+
+const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
+  const headers: Header = {
+    'content-type': 'application/json',
+  };
+  const jwt = localStorage.getItem('authorization');
+  if (jwt) {
+    headers.authorization = jwt;
+  }
+  return fetch('/sudt-issuer/api/v1', {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(jsonRPCRequest),
   }).then((response) => {
     if (response.status === 200) {
@@ -14,7 +24,7 @@ const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) =>
     } else if (jsonRPCRequest.id !== undefined) {
       return Promise.reject(new Error(response.statusText));
     }
-  }),
-);
+  });
+});
 
 export default client;
