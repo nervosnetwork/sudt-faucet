@@ -1,8 +1,6 @@
-import fs from 'fs';
-import path from 'path';
 import detectEthereumProvider from '@metamask/detect-provider';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import Web3 from 'web3';
+import * as ethUtil from 'ethereumjs-util';
 import { LoginMessage } from './types';
 
 interface EthereumProvider {
@@ -27,23 +25,22 @@ const createLoginMessage = async (message: string): Promise<LoginMessage> => {
 };
 
 const verifyLoginMessage = async (signature: string, message: string, address: string): Promise<boolean> => {
-  const web3 = new Web3(Web3.givenProvider);
-  const signingAddress = await web3.eth.personal.ecRecover(message, signature);
-  return signingAddress === address;
+  const data = ethUtil.fromUtf8(message);
+  const messageHash = ethUtil.hashPersonalMessage(ethUtil.toBuffer(data));
+  const sigDecoded = ethUtil.fromRpcSig(signature);
+  const recoveredPub = ethUtil.ecrecover(messageHash, sigDecoded.v, sigDecoded.r, sigDecoded.s);
+  const recoveredAddress = '0x' + ethUtil.pubToAddress(recoveredPub).toString('hex');
+  return recoveredAddress === address;
 };
 
-const createToken = (address: string): string => {
-  const rsaPath = path.resolve(__dirname, '../assets');
-  const PRIV_KEY = fs.readFileSync(rsaPath + '/id_rsa_priv.pem', 'utf8');
+const createToken = (address: string, privateKey: string): string => {
   const payload = { address };
-  const token = jwt.sign(payload, PRIV_KEY, { expiresIn: '1h', algorithm: 'RS256' });
+  const token = jwt.sign(payload, privateKey, { expiresIn: '1h', algorithm: 'RS256' });
   return token;
 };
 
-const verifyToken = (token: string): JwtPayload | string => {
-  const rsaPath = path.resolve(__dirname, '../assets');
-  const PUB_KEY = fs.readFileSync(rsaPath + '/id_rsa_pub.pem', 'utf8');
-  const result = jwt.verify(token, PUB_KEY, { algorithms: ['RS256'] });
+const verifyToken = (token: string, publicKey: string): JwtPayload | string => {
+  const result = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
   return result;
 };
 

@@ -1,12 +1,17 @@
 import { rpc, utils, verifyLoginMessage, createToken } from '@sudt-faucet/commons';
 import { DB } from '../db';
+import fs from 'fs';
+import path from 'path';
 
+const rsaPath = path.resolve(__dirname, '../assets');
+const privateKey = fs.readFileSync(rsaPath + '/id_rsa_priv.pem', 'utf8');
+const publicKey = fs.readFileSync(rsaPath + '/id_rsa_pub.pem', 'utf8');
 export class IssuerRpcHandler implements rpc.IssuerRpc {
   async login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     const { message, sig, address } = _payload;
     const result = await verifyLoginMessage(sig, message, address);
     if (result) {
-      const token = createToken(address);
+      const token = createToken(address, privateKey);
       return { jwt: token };
     }
     return { jwt: '' };

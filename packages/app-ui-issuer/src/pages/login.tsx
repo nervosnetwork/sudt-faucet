@@ -3,6 +3,7 @@ import { Button } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 import client from '../configs/client';
+import { useHistory } from 'react-router-dom';
 
 const LoginWrapper = styled.div`
   height: calc(90% - 40px);
@@ -17,11 +18,16 @@ const LoginWrapper = styled.div`
 `;
 
 const Login: React.FC = () => {
+  const history = useHistory();
+  const goToTokenList = () => {
+    history.push('/token-list');
+  };
   const handleLogin = async () => {
     const message = `Login:${Date.now()}`;
     const { signature, address } = await createLoginMessage(message);
-    const response = await client.request('login', { address, message, signature });
-    console.log(response);
+    const response = await client.request('login', { address, message, sig: signature });
+    localStorage.setItem('authorization', response.jwt);
+    goToTokenList();
   };
 
   return (
