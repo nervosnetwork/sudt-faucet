@@ -18,8 +18,9 @@ const LoginWrapper = styled.div`
 
 const Login: React.FC = () => {
   const handleLogin = async () => {
-    const result = await createLoginMessage(`Login:${Date.now}`);
-    const response = await client.request('login', { address: result });
+    const message = `Login:${Date.now()}`;
+    const { signature, address } = await createLoginMessage(message);
+    const response = await client.request('login', { address, message, signature });
     console.log(response);
   };
 

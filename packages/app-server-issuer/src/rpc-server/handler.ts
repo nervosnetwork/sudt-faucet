@@ -1,9 +1,15 @@
-import { rpc, utils } from '@sudt-faucet/commons';
+import { rpc, utils, verifyLoginMessage, createToken } from '@sudt-faucet/commons';
 import { DB } from '../db';
 
 export class IssuerRpcHandler implements rpc.IssuerRpc {
-  login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
-    utils.unimplemented();
+  async login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
+    const { message, sig, address } = _payload;
+    const result = await verifyLoginMessage(sig, message, address);
+    if (result) {
+      const token = createToken(address);
+      return { jwt: token };
+    }
+    return { jwt: '' };
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {

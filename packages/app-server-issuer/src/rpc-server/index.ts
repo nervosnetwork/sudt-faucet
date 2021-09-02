@@ -18,6 +18,7 @@ export function startRpcServer(): void {
   rpcServer.addMethod('disable_claim_secret', (params) =>
     rpcHandler.disable_claim_secret(params as rpc.DisableClaimSecretPayload),
   );
+  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
 
   rpcServer.addMethod('claim_sudt', (params) => rpcHandler.claim_sudt(params as rpc.ClaimSudtPayload));
 
