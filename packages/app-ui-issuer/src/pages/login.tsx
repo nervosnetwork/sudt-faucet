@@ -1,7 +1,8 @@
+import { createLoginMessage } from '@sudt-faucet/commons';
 import { Button } from 'antd';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import client from '../configs/client';
 
 const LoginWrapper = styled.div`
   height: calc(90% - 40px);
@@ -16,13 +17,17 @@ const LoginWrapper = styled.div`
 `;
 
 const Login: React.FC = () => {
+  const handleLogin = async () => {
+    const result = await createLoginMessage(`Login:${Date.now}`);
+    const response = await client.request('login', { address: result });
+    console.log(response);
+  };
+
   return (
     <LoginWrapper>
-      <Link to="/token-list" className="login">
-        <Button className="login-btn" type="primary">
-          Connect To MetaMask
-        </Button>
-      </Link>
+      <Button className="login-btn" type="primary" onClick={handleLogin}>
+        Connect To MetaMask
+      </Button>
     </LoginWrapper>
   );
 };
