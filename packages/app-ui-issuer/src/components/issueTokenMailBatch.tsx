@@ -3,7 +3,7 @@ import { Button, Upload, Table, Modal, Input } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { emailIssue } from './types';
+import { emailIssue } from '../types';
 
 const StyleWrapper = styled.div`
   padding: 20px;

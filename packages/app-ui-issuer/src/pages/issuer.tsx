@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Header from '../components/header';
 import CreateToken from './createToken';
-import Header from './header';
 import IssueToken from './issueToken';
 import Login from './login';
 import TokenDetail from './tokenDetail';

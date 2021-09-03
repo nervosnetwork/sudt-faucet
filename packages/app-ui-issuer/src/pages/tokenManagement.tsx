@@ -2,7 +2,7 @@ import { Typography, Button, Table, Form, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React from 'react';
 import styled from 'styled-components';
-import { account } from './types';
+import { account } from '../types';
 
 const StyleWrapper = styled.div`
   padding: 20px;
