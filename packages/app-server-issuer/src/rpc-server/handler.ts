@@ -1,4 +1,5 @@
-import { rpc, utils, verifyLoginMessage, createToken, verifyToken, genKeyPair } from '@sudt-faucet/commons';
+import { rpc, utils, verifyLoginMessage, createToken, verifyToken } from '@sudt-faucet/commons';
+import { genKeyPair } from '../util/createKey';
 import { Request } from 'express';
 import { DB } from '../db';
 import dotenv from 'dotenv';
