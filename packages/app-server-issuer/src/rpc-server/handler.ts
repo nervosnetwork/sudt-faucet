@@ -1,17 +1,21 @@
 import { rpc, utils, verifyLoginMessage, createToken, verifyToken, genKeyPair } from '@sudt-faucet/commons';
 import { Request } from 'express';
 import { DB } from '../db';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const keyPair = genKeyPair();
 export class IssuerRpcHandler implements rpc.IssuerRpc {
-  async login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
-    const { message, sig, address } = _payload;
+  async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
+    if (!process.env.USER_ADDRESS) throw new Error('USER_ADDRESS not set');
+    const address = process.env.USER_ADDRESS;
+    const { message, sig } = payload;
     const result = await verifyLoginMessage(sig, message, address);
     if (result) {
       const token = createToken(address, keyPair.privateKey);
       return { jwt: token };
     }
-    return { jwt: '' };
+    throw new Error('Only the owner is allowed to access');
   }
 
   get_user_address(req: Request): string {
