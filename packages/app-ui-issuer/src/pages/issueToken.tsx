@@ -1,9 +1,9 @@
 import { Tabs } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
-import IssueTokenAddress from './issueTokenAddress';
-import IssueTokenMail from './issueTokenMail';
-import IssueTokenMailBatch from './issueTokenMailBatch';
+import IssueTokenAddress from '../components/issueTokenAddress';
+import IssueTokenMail from '../components/issueTokenMail';
+import IssueTokenMailBatch from '../components/issueTokenMailBatch';
 
 const StyleWrapper = styled.div`
   padding: 20px;

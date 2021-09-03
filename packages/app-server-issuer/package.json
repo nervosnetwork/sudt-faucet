@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "start": "nodemon src/index.ts",
     "build": "npm run build:js && npm run build:types",
     "clean": "rimraf -rf ./dist",
     "build:js": "babel --root-mode upward --extensions '.ts' --out-dir dist src",
@@ -20,5 +21,8 @@
     "json-rpc-2.0": "^0.2.18",
     "knex": "^0.95.10",
     "mysql2": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }

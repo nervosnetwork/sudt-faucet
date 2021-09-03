@@ -2,7 +2,7 @@ import { Typography, Button } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { token } from './types';
+import { token } from '../types';
 
 const StyleWrapper = styled.div`
   padding: 20px;

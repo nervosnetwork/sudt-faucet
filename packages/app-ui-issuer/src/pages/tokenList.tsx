@@ -3,7 +3,7 @@ import { List, Typography, Button } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { token } from './types';
+import { token } from '../types';
 
 const StyleWrapper = styled.div`
   height: calc(100% - 40px);

@@ -3,7 +3,6 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
 import { IssuerRpcHandler } from './handler';
-
 export function startRpcServer(): void {
   const app = express();
   app.use(bodyParser.json());
@@ -18,12 +17,14 @@ export function startRpcServer(): void {
   rpcServer.addMethod('disable_claim_secret', (params) =>
     rpcHandler.disable_claim_secret(params as rpc.DisableClaimSecretPayload),
   );
+  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
 
   rpcServer.addMethod('claim_sudt', (params) => rpcHandler.claim_sudt(params as rpc.ClaimSudtPayload));
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
-
+    //TODO handle auth
+    // rpcHandler.get_user_address(req);
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
         res.json(jsonRpcResponse);

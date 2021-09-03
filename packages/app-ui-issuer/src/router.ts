@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import CreateToken from './createToken';
-import IssueToken from './issueToken';
-import Login from './login';
-import TokenDetail from './tokenDetail';
-import TokenList from './tokenList';
-import TokenManagement from './tokenManagement';
+import CreateToken from './pages/createToken';
+import IssueToken from './pages/issueToken';
+import Login from './pages/login';
+import TokenDetail from './pages/tokenDetail';
+import TokenList from './pages/tokenList';
+import TokenManagement from './pages/tokenManagement';
 
 type RouteConfig = {
   path: string;

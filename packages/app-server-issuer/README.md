@@ -12,6 +12,8 @@ SENDGRID_API_KEY='your_api_key'
 SENDGRID_VERIFIED_SENDER='your_verified_sender'
 ```
 
+To login with matemask, relase the `USER_ADDRESS`in `.env` file to your matemask address
+
 ### Start Server
 
 ```bash
