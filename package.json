@@ -41,6 +41,7 @@
   "scripts": {
     "build:lib": "make build-lib",
     "lint": "make lint",
+    "lint:fix": "make fix-lint",
     "clean": "make clean"
   }
 }
