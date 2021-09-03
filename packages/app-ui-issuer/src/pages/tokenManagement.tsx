@@ -57,6 +57,12 @@ const TokenManagement: React.FC = () => {
       title: 'claimCode',
       dataIndex: 'claimCode',
     },
+    {
+      key: 'action',
+      title: 'action',
+      dataIndex: 'action',
+      render: () => <Button size="small">disable</Button>,
+    },
   ];
   const data: account[] = [
     {
@@ -96,8 +102,11 @@ const TokenManagement: React.FC = () => {
   return (
     <StyleWrapper>
       <div className="account">
-        <Typography className="description">Account balance for claim</Typography>
-        <Typography className="number">54,321.12345</Typography>
+        <Typography className="description">
+          Account balance for claim <Button size="small">charge</Button>
+        </Typography>
+        <Typography className="number">54,321.12345 CKB</Typography>
+        <Typography className="number">54,321.12345 INS</Typography>
       </div>
       <div className="accountList">
         <div className="filter">
