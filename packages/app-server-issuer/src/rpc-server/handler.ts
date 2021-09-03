@@ -1,19 +1,14 @@
-import fs from 'fs';
-import path from 'path';
-import { rpc, utils, verifyLoginMessage, createToken, verifyToken } from '@sudt-faucet/commons';
+import { rpc, utils, verifyLoginMessage, createToken, verifyToken, genKeyPair } from '@sudt-faucet/commons';
 import { Request } from 'express';
 import { DB } from '../db';
 
-const rsaPath = path.resolve(__dirname, '../assets');
-const privateKey = fs.readFileSync(rsaPath + '/id_rsa_priv.pem', 'utf8');
-const publicKey = fs.readFileSync(rsaPath + '/id_rsa_pub.pem', 'utf8');
-
+const keyPair = genKeyPair();
 export class IssuerRpcHandler implements rpc.IssuerRpc {
   async login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     const { message, sig, address } = _payload;
     const result = await verifyLoginMessage(sig, message, address);
     if (result) {
-      const token = createToken(address, privateKey);
+      const token = createToken(address, keyPair.privateKey);
       return { jwt: token };
     }
     return { jwt: '' };
@@ -21,7 +16,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   get_user_address(req: Request): string {
     const token = req.get('authorization') || '';
-    return verifyToken(token, publicKey);
+    return verifyToken(token, keyPair.publicKey);
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
