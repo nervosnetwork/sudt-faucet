@@ -3,6 +3,7 @@ import { ColumnsType } from 'antd/es/table';
 import React from 'react';
 import styled from 'styled-components';
 import { account } from '../types';
+import { useHistory } from 'react-router-dom';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -99,11 +100,19 @@ const TokenManagement: React.FC = () => {
     },
   ];
 
+  const history = useHistory();
+  const goCharge = () => {
+    history.push('/token-charge');
+  };
+
   return (
     <StyleWrapper>
       <div className="account">
         <Typography className="description">
-          Account balance for claim <Button size="small">charge</Button>
+          Account balance for claim{' '}
+          <Button size="small" onClick={goCharge}>
+            charge
+          </Button>
         </Typography>
         <Typography className="number">54,321.12345 CKB</Typography>
         <Typography className="number">54,321.12345 INS</Typography>

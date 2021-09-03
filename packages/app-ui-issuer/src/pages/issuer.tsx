@@ -4,6 +4,7 @@ import Header from '../components/header';
 import CreateToken from './createToken';
 import IssueToken from './issueToken';
 import Login from './login';
+import TokenCharge from './tokenCharge';
 import TokenDetail from './tokenDetail';
 import TokenList from './tokenList';
 import TokenManagement from './tokenManagement';
@@ -31,6 +32,9 @@ export const Issuer: React.FC = () => {
           </Route>
           <Route path="/token-management">
             <TokenManagement />
+          </Route>
+          <Route path="/token-charge">
+            <TokenCharge />
           </Route>
           <Route path="/">
             <Login />
