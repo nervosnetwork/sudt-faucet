@@ -1,6 +1,6 @@
 import { rpc, utils } from '@sudt-faucet/commons';
 import Knex, { Knex as IKnex } from 'knex';
-import { MailIssue, MailToSend } from '../types';
+import { MailIssue, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -33,6 +33,14 @@ export class DB {
     await this.knex.batchInsert('mail_issue', recordsWithSecret, recordsWithSecret.length);
   }
 
+  public async getTransactionsToSend(limit: number): Promise<TransactionToSend[]> {
+    return this.knex
+      .select('sudt_id', 'amount', 'claim_address', 'secret')
+      .from<MailIssue>('mail_issue')
+      .where({ status: 'claimed' })
+      .limit(limit);
+  }
+
   public async getMailsToSend(limit: number): Promise<MailToSend[]> {
     return this.knex
       .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
@@ -47,7 +55,15 @@ export class DB {
     return ret[0]?.status;
   }
 
-  public async updateStatusBySecret(secret: string, status: string): Promise<void> {
-    await this.knex('mail_issue').where({ secret: secret }).update({ status: status });
+  public async updateStatusBySecrets(secrets: string[], status: string): Promise<void> {
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ status: status });
+  }
+
+  public async updateTxHashBySecrets(secrets: string[], txHash: string, status: string): Promise<void> {
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
+  }
+
+  public async claimBySecret(secret: string, address: string, status: string): Promise<void> {
+    await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
   }
 }

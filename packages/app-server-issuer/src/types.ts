@@ -15,3 +15,5 @@ export interface MailIssue {
 }
 
 export type MailToSend = Pick<MailIssue, 'mail_address' | 'amount' | 'secret' | 'mail_message' | 'expire_time'>;
+
+export type TransactionToSend = Pick<MailIssue, 'sudt_id' | 'amount' | 'claim_address' | 'secret'>;

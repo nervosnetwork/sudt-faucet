@@ -31,10 +31,14 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const status = await db.getStatusBySecret(payload.claimSecret);
     if (!status) throw new Error('error: secret not found');
     if (status !== 'unclaimed') throw new Error('error: can not disable claimed secret');
-    return db.updateStatusBySecret(payload.claimSecret, 'disabled');
+    return db.updateStatusBySecrets([payload.claimSecret], 'disabled');
   }
 
-  claim_sudt(_payload: rpc.ClaimSudtPayload): Promise<void> {
-    utils.unimplemented();
+  async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
+    const db = DB.getInstance();
+    const status = await db.getStatusBySecret(payload.claimSecret);
+    if (!status) throw new Error('error: secret not found');
+    if (status !== 'unclaimed') throw new Error('error: status not unclaimed');
+    return db.claimBySecret(payload.claimSecret, payload.address, 'claimed');
   }
 }

@@ -18,9 +18,8 @@ export async function startSendGrid(): Promise<void> {
       if (unsendMails.length > 0) {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
-        for (const mail of unsendMails) {
-          await db.updateStatusBySecret(mail.secret, 'unclaimed');
-        }
+        const secrets = unsendMails.map((value) => value.secret);
+        await db.updateStatusBySecrets(secrets, 'unclaimed');
       }
     } catch (e) {
       // TODO use log
