@@ -23,7 +23,8 @@ export function startRpcServer(): void {
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
-    rpcHandler.get_user_address(req);
+    //TODO handle auth
+    // rpcHandler.get_user_address(req);
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
         res.json(jsonRpcResponse);

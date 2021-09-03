@@ -21,9 +21,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   get_user_address(req: Request): string {
     const token = req.get('authorization') || '';
-    //TODO fix type
-    // const result = verifyToken(token, publicKey);
-    return token;
+    return verifyToken(token, publicKey);
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
