@@ -1,7 +1,7 @@
 import { LeftOutlined } from '@ant-design/icons';
 import React from 'react';
-import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 
 interface IProps {
   title?: string;

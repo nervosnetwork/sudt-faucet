@@ -1,9 +1,9 @@
 import { Typography, Button, Table, Form, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { account } from '../types';
-import { useHistory } from 'react-router-dom';
 
 const StyleWrapper = styled.div`
   padding: 20px;
