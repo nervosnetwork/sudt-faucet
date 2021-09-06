@@ -1,3 +1,10 @@
 {
-  "extends": "../../tsconfig.json"
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@ckitjs/*": ["../../../ckit/packages/*/src"],
+      "@sudt-faucet/*": ["../../../sudt-faucet/packages/*/src"]
+    }
+  },
+  "include": ["src"]
 }

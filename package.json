@@ -43,5 +43,8 @@
     "lint": "make lint",
     "lint:fix": "make fix-lint",
     "clean": "make clean"
+  },
+  "resolutions": {
+    "buffer": "^6.0.3"
   }
 }
