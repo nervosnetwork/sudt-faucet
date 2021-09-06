@@ -4,7 +4,7 @@ import { ColumnsType } from 'antd/es/table';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import client from '../configs/client';
-import { emailIssue } from '../types';
+import { EmailIssue } from '../types';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -47,7 +47,7 @@ const IssueTokenMailBatch: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpired] = useState('');
   const [additionalMessage, setAdditionalMessage] = useState('');
-  const [userList, setUserList] = useState<emailIssue[]>([]);
+  const [userList, setUserList] = useState<EmailIssue[]>([]);
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -56,7 +56,7 @@ const IssueTokenMailBatch: React.FC = () => {
     setIsExpiredModalVisible(true);
   };
 
-  const showAddnationModal = () => {
+  const showAddtionalModal = () => {
     setIsAddtionalModalVisible(true);
   };
 
@@ -121,21 +121,21 @@ const IssueTokenMailBatch: React.FC = () => {
   };
 
   const updateAmount = (amount: string) => {
-    const newUserList = userList.map((user: emailIssue) => {
+    const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ amount: amount } };
     });
     setUserList(newUserList);
   };
 
   const updateExpired = (expiredDate: string) => {
-    const newUserList = userList.map((user: emailIssue) => {
+    const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ expiredDate: expiredDate } };
     });
     setUserList(newUserList);
   };
 
   const updateAddtional = (additionalMessage: string) => {
-    const newUserList = userList.map((user: emailIssue) => {
+    const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ additionalMessage: additionalMessage } };
     });
     setUserList(newUserList);
@@ -145,7 +145,7 @@ const IssueTokenMailBatch: React.FC = () => {
     setAmount(e.target.value);
   };
 
-  const handelExpiredChange = (dateValue: unknown, dateString: string) => {
+  const handleExpiredChange = (dateValue: unknown, dateString: string) => {
     setExpired(dateString);
   };
 
@@ -153,7 +153,7 @@ const IssueTokenMailBatch: React.FC = () => {
     setAdditionalMessage(e.target.value);
   };
 
-  const columns: ColumnsType<emailIssue> = [
+  const columns: ColumnsType<EmailIssue> = [
     {
       key: 'mail-key',
       title: 'mail',
@@ -206,13 +206,13 @@ const IssueTokenMailBatch: React.FC = () => {
       </div>
       <Table rowKey="mail" columns={columns} dataSource={userList} />
       <div className="footer">
-        <Button onClick={showAddnationModal}>Send Claimable E-mails</Button>
+        <Button onClick={showAddtionalModal}>Send Claimable E-mails</Button>
       </div>
       <Modal title="Edit" visible={isModalVisible} onOk={handleAmountSubmit} onCancel={handleCancel}>
         <Input value={amount} onChange={handleAmountChange} />
       </Modal>
       <Modal title="Edit" visible={isExpiredModalVisible} onOk={handleExpiredSubmit} onCancel={handleExpiredCancel}>
-        <DatePicker onChange={handelExpiredChange} />
+        <DatePicker onChange={handleExpiredChange} />
       </Modal>
       <Modal
         title="E-Mali Content"

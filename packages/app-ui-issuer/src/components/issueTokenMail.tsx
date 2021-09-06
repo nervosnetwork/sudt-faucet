@@ -1,6 +1,8 @@
-import { Form, Input, Button } from 'antd';
-import React from 'react';
+import { Form, Input, Button, Modal, DatePicker } from 'antd';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { EmailIssue } from '../types';
+import client from '../configs/client';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -15,11 +17,54 @@ const StyleWrapper = styled.div`
 `;
 
 const IssueTokenMail: React.FC = () => {
+  const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
+  const [additionalMessage, setAdditionalMessage] = useState('');
+  const [mail, setMail] = useState('');
+  const [amount, setAmount] = useState('');
+  const [expiredDate, setExpiredDate] = useState('');
+  const [addtionalMessage, setAddtionalMessage] = useState('');
+
+  const showAddtionalModal = () => {
+    setIsAddtionalModalVisible(true);
+  };
+
+  const handleAddtionalSubmit = () => {
+    const user: EmailIssue = {
+      sudtId: 'randomdsd',
+      mail,
+      amount,
+      expiredDate,
+      addtionalMessage,
+    };
+    const response = client.request('send_claimable_mails', { recipients: [user] });
+    console.log(response);
+  };
+
+  const handleAddtionalCancel = () => {
+    setIsAddtionalModalVisible(false);
+  };
+
+  const handleMailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMail(e.target.value);
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+  };
+
+  const handleAdditionMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setAdditionalMessage(e.target.value);
+  };
+
+  const handleExpiredChange = (dateValue: unknown, dateString: string) => {
+    setExpiredDate(dateString);
+  };
+
   return (
     <StyleWrapper>
       <Form name="basic">
         <Form.Item label="e-mail" name="e-mail" rules={[{ required: true, message: 'Please input your e-mail!' }]}>
-          <Input />
+          <Input value={mail} onChange={handleMailChange} />
         </Form.Item>
 
         <Form.Item
@@ -27,23 +72,31 @@ const IssueTokenMail: React.FC = () => {
           name="amount"
           rules={[{ required: true, message: 'Please input your token amount!' }]}
         >
-          <Input />
+          <Input value={amount} onChange={handleAmountChange} />
         </Form.Item>
 
         <Form.Item
-          label="Exoired Time"
+          label="Expired Time"
           name="expiredTime"
           rules={[{ required: true, message: 'Please input your token expired time!' }]}
         >
-          <Input />
+          <DatePicker onChange={handleExpiredChange} />
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" onClick={showAddtionalModal}>
             Send An Claimable E-mail
           </Button>
         </Form.Item>
       </Form>
+      <Modal
+        title="E-Mali Content"
+        visible={isAddtionalModalVisible}
+        onOk={handleAddtionalSubmit}
+        onCancel={handleAddtionalCancel}
+      >
+        <Input.TextArea value={additionalMessage} onChange={handleAdditionMessageChange} rows={10} />
+      </Modal>
     </StyleWrapper>
   );
 };
