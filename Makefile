@@ -21,7 +21,7 @@ build-lib:
 	yarn lerna run --ignore @sudt-faucet/app-* build
 
 github-ci-build-lib:
-	yarn lerna run --ignore @sudt-faucet/app-* --ignore @ckit/* build
+	yarn lerna run --ignore @sudt-faucet/app-* --ignore @ckitjs/* build
 
 clean:
 	yarn rimraf packages/*/dist
