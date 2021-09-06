@@ -1,6 +1,6 @@
 import detectEthereumProvider from '@metamask/detect-provider';
-import jwt, { JwtPayload } from 'jsonwebtoken';
 import * as ethUtil from 'ethereumjs-util';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { LoginMessage } from './types';
 
 interface EthereumProvider {

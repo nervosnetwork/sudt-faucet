@@ -1,9 +1,9 @@
 import { createLoginMessage } from '@sudt-faucet/commons';
 import { Button } from 'antd';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
-import { useHistory } from 'react-router-dom';
 
 const LoginWrapper = styled.div`
   height: calc(90% - 40px);
