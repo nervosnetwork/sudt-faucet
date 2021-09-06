@@ -1,20 +1,16 @@
 import sgMail from '@sendgrid/mail';
 import { utils } from '@sudt-faucet/commons';
-import dotenv from 'dotenv';
 import { DB } from '../db';
 import { MailToSend } from '../types';
 
-dotenv.config();
-const BATCH_MAIL_LIMIT = 500;
-
 export async function startSendGrid(): Promise<void> {
-  if (!process.env.SENDGRID_API_KEY) throw new Error('SENDGRID_API_KEY not set');
+  if (!process.env.SENDGRID_API_KEY) throw new Error('env SENDGRID_API_KEY not set');
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const db = DB.getInstance();
 
   for (;;) {
     try {
-      const unsendMails = await db.getMailsToSend(BATCH_MAIL_LIMIT);
+      const unsendMails = await db.getMailsToSend((process.env.BATCH_MAIL_LIMIT as unknown as number) ?? 500);
       if (unsendMails.length > 0) {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
