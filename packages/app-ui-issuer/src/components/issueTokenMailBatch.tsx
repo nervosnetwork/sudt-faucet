@@ -1,8 +1,9 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Upload, Table, Modal, Input } from 'antd';
+import { Button, Table, Modal, Input, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import client from '../configs/client';
 import { emailIssue } from '../types';
 
 const StyleWrapper = styled.div`
@@ -14,29 +15,144 @@ const StyleWrapper = styled.div`
     display: flex;
     justify-content: space-between;
   }
+  .footer {
+    padding-top: 20px;
+  }
+  .file-input {
+    display: none;
+  }
+  .file-upload-button {
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    border-color: #d9d9d9;
+    height: 32px;
+    padding: 4px 15px;
+    font-size: 14px;
+    line-height: 1.5;
+    span {
+      padding-right: 10px;
+    }
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 const IssueTokenMailBatch: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
+  const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [expiredDate, setExpired] = useState('');
+  const [additionalMessage, setAdditionalMessage] = useState('');
+  const [userList, setUserList] = useState<emailIssue[]>([]);
   const showModal = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const showExpiredModal = () => {
+    setIsExpiredModalVisible(true);
+  };
+
+  const showAddnationModal = () => {
+    setIsAddtionalModalVisible(true);
+  };
+
+  const handleAmountSubmit = () => {
     setIsModalVisible(false);
+    updateAmount(amount);
+  };
+
+  const handleExpiredSubmit = () => {
+    setIsExpiredModalVisible(false);
+    updateExpired(expiredDate);
+  };
+
+  const handleAddtionalSubmit = () => {
+    updateAddtional(additionalMessage);
+    const response = client.request('send_claimable_mails', { recipients: userList });
+    // const response = await client.request('login', { address, message, sig: signature });
+    console.log(response);
+  };
+
+  const handleAddtionalCancel = () => {
+    setIsAddtionalModalVisible(false);
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const changeExpiredDate = () => {
-    showModal();
+  const handleExpiredCancel = () => {
+    setIsExpiredModalVisible(false);
   };
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const changeAmount = () => {};
+
+  const handleFileChange = (files: FileList) => {
+    function csvJSON(csv: string) {
+      const lines: string[] = csv.split('\n');
+      const result = [];
+      for (let i = 1; i < lines.length; i++) {
+        const email = lines[i]?.split(',')[0];
+        email && result.push(email);
+      }
+      return result;
+    }
+    const fileReader = new FileReader();
+    files[0] && fileReader.readAsText(files[0]);
+    fileReader.addEventListener('loadend', (e) => {
+      const mailList: string[] = csvJSON(fileReader.result as string);
+      updateEmailList(mailList);
+    });
+  };
+
+  const updateEmailList = (mailList: string[]) => {
+    const newUserList = mailList.map((mail: string) => {
+      return {
+        sudtId: 'randomSudtID', //TODO get sudt id
+        mail,
+        amount: '',
+        expiredDate: '',
+        addtionalMessage: '',
+      };
+    });
+    setUserList(newUserList);
+  };
+
+  const updateAmount = (amount: string) => {
+    const newUserList = userList.map((user: emailIssue) => {
+      return { ...user, ...{ amount: amount } };
+    });
+    setUserList(newUserList);
+  };
+
+  const updateExpired = (expiredDate: string) => {
+    const newUserList = userList.map((user: emailIssue) => {
+      return { ...user, ...{ expiredDate: expiredDate } };
+    });
+    setUserList(newUserList);
+  };
+
+  const updateAddtional = (additionalMessage: string) => {
+    const newUserList = userList.map((user: emailIssue) => {
+      return { ...user, ...{ additionalMessage: additionalMessage } };
+    });
+    setUserList(newUserList);
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+  };
+
+  const handelExpiredChange = (dateValue: unknown, dateString: string) => {
+    setExpired(dateString);
+  };
+
+  const handelAdditionMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setAdditionalMessage(e.target.value);
+  };
+
   const columns: ColumnsType<emailIssue> = [
     {
       key: 'mail-key',
@@ -49,7 +165,7 @@ const IssueTokenMailBatch: React.FC = () => {
         return (
           <div className="column-header">
             amount{' '}
-            <Button onClick={changeAmount} size="small">
+            <Button onClick={showModal} size="small">
               set
             </Button>
           </div>
@@ -63,7 +179,7 @@ const IssueTokenMailBatch: React.FC = () => {
         return (
           <div className="column-header">
             expired date{' '}
-            <Button size="small" onClick={changeExpiredDate}>
+            <Button size="small" onClick={showExpiredModal}>
               set
             </Button>
           </div>
@@ -72,49 +188,40 @@ const IssueTokenMailBatch: React.FC = () => {
       dataIndex: 'expiredDate',
     },
   ];
-  const data: emailIssue[] = [
-    {
-      mail: 'wangximing1@cryptape.com',
-      amount: 100,
-      expiredDate: '2023-01-02',
-    },
-    {
-      mail: 'wangximing2@cryptape.com',
-      amount: 100,
-      expiredDate: '2023-01-02',
-    },
-    {
-      mail: 'wangximing3@cryptape.com',
-      amount: 100,
-      expiredDate: '2023-01-02',
-    },
-    {
-      mail: 'wangximing4@cryptape.com',
-      amount: 100,
-      expiredDate: '2023-01-02',
-    },
-    {
-      mail: 'wangximing5@cryptape.com',
-      amount: 100,
-      expiredDate: '2023-01-02',
-    },
-  ];
+
   return (
     <StyleWrapper>
       <div className="header">
-        <Upload>
-          <Button icon={<UploadOutlined />}>import data</Button>
-        </Upload>
-        <Button></Button>
+        <label>
+          <input
+            type="file"
+            className="file-input"
+            onChange={(e) => e.target.files && handleFileChange(e.target.files)}
+          />
+          <div className="file-upload-button">
+            <UploadOutlined />
+            import data
+          </div>
+        </label>
       </div>
-      <Table rowKey="mail" columns={columns} dataSource={data} />
+      <Table rowKey="mail" columns={columns} dataSource={userList} />
       <div className="footer">
-        <Button>Send Claimable E-mails</Button>
+        <Button onClick={showAddnationModal}>Send Claimable E-mails</Button>
       </div>
-      <Modal title="Edit" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        <Input />
+      <Modal title="Edit" visible={isModalVisible} onOk={handleAmountSubmit} onCancel={handleCancel}>
+        <Input value={amount} onChange={handleAmountChange} />
       </Modal>
-      ;
+      <Modal title="Edit" visible={isExpiredModalVisible} onOk={handleExpiredSubmit} onCancel={handleExpiredCancel}>
+        <DatePicker onChange={handelExpiredChange} />
+      </Modal>
+      <Modal
+        title="E-Mali Content"
+        visible={isAddtionalModalVisible}
+        onOk={handleAddtionalSubmit}
+        onCancel={handleAddtionalCancel}
+      >
+        <Input.TextArea value={additionalMessage} onChange={handelAdditionMessageChange} rows={10} />
+      </Modal>
     </StyleWrapper>
   );
 };

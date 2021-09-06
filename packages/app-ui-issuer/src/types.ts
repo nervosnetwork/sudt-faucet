@@ -18,7 +18,9 @@ export type account = {
 };
 
 export type emailIssue = {
+  sudtId: string;
   mail: string;
-  amount: number;
+  amount: string;
   expiredDate: string;
+  addtionalMessage: string;
 };
