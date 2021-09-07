@@ -64,6 +64,7 @@ export interface LoginPayload {
   message: string;
   // personal_sign(hash(String(timestamp), 'login')) via MetaMask
   sig: HexString;
+  address: HexString;
 }
 
 export interface LoginResponse {
