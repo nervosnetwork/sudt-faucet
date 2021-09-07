@@ -43,6 +43,10 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     utils.unimplemented();
   }
 
+  get_claimable_account_address(): Promise<string> {
+    utils.unimplemented();
+  }
+
   // TODO resolve concurrency with claim sudt
   async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
     const db = DB.getInstance();
