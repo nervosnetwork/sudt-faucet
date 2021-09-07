@@ -1,8 +1,9 @@
 import { Form, Input, Button, Modal, DatePicker } from 'antd';
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { EmailIssue } from '../types';
 import client from '../configs/client';
+import { EmailIssue } from '../types';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -21,8 +22,9 @@ const IssueTokenMail: React.FC = () => {
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [mail, setMail] = useState('');
   const [amount, setAmount] = useState('');
-  const [expiredDate, setExpiredDate] = useState('');
-  const [addtionalMessage, setAddtionalMessage] = useState('');
+  const [expiredDate, setExpiredDate] = useState(0);
+
+  const { udtId } = useParams<{ udtId: string }>();
 
   const showAddtionalModal = () => {
     setIsAddtionalModalVisible(true);
@@ -30,11 +32,11 @@ const IssueTokenMail: React.FC = () => {
 
   const handleAddtionalSubmit = () => {
     const user: EmailIssue = {
-      sudtId: 'randomdsd',
+      sudtId: udtId,
       mail,
       amount,
-      expiredDate,
-      addtionalMessage,
+      expiredAt: expiredDate,
+      additionalMessage,
     };
     const response = client.request('send_claimable_mails', { recipients: [user] });
     console.log(response);
@@ -57,7 +59,7 @@ const IssueTokenMail: React.FC = () => {
   };
 
   const handleExpiredChange = (dateValue: unknown, dateString: string) => {
-    setExpiredDate(dateString);
+    setExpiredDate(new Date(dateString).getTime());
   };
 
   return (
@@ -80,7 +82,7 @@ const IssueTokenMail: React.FC = () => {
           name="expiredTime"
           rules={[{ required: true, message: 'Please input your token expired time!' }]}
         >
-          <DatePicker onChange={handleExpiredChange} />
+          <DatePicker showTime onChange={handleExpiredChange} />
         </Form.Item>
 
         <Form.Item>

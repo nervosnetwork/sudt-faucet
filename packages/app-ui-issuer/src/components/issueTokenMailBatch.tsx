@@ -2,6 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Table, Modal, Input, DatePicker } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
 import { EmailIssue } from '../types';
@@ -45,9 +46,12 @@ const IssueTokenMailBatch: React.FC = () => {
   const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
   const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
-  const [expiredDate, setExpired] = useState('');
+  const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [userList, setUserList] = useState<EmailIssue[]>([]);
+
+  const { udtId } = useParams<{ udtId: string }>();
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -71,7 +75,6 @@ const IssueTokenMailBatch: React.FC = () => {
   };
 
   const handleAddtionalSubmit = () => {
-    updateAddtional(additionalMessage);
     const response = client.request('send_claimable_mails', { recipients: userList });
     // const response = await client.request('login', { address, message, sig: signature });
     console.log(response);
@@ -110,11 +113,11 @@ const IssueTokenMailBatch: React.FC = () => {
   const updateEmailList = (mailList: string[]) => {
     const newUserList = mailList.map((mail: string) => {
       return {
-        sudtId: 'randomSudtID', //TODO get sudt id
+        sudtId: udtId,
         mail,
         amount: '',
-        expiredDate: '',
-        addtionalMessage: '',
+        expiredAt: 0,
+        additionalMessage: '',
       };
     });
     setUserList(newUserList);
@@ -127,7 +130,7 @@ const IssueTokenMailBatch: React.FC = () => {
     setUserList(newUserList);
   };
 
-  const updateExpired = (expiredDate: string) => {
+  const updateExpired = (expiredDate: number) => {
     const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ expiredDate: expiredDate } };
     });
@@ -146,7 +149,7 @@ const IssueTokenMailBatch: React.FC = () => {
   };
 
   const handleExpiredChange = (dateValue: unknown, dateString: string) => {
-    setExpired(dateString);
+    setExpired(new Date(dateString).getTime());
   };
 
   const handelAdditionMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -212,7 +215,7 @@ const IssueTokenMailBatch: React.FC = () => {
         <Input value={amount} onChange={handleAmountChange} />
       </Modal>
       <Modal title="Edit" visible={isExpiredModalVisible} onOk={handleExpiredSubmit} onCancel={handleExpiredCancel}>
-        <DatePicker onChange={handleExpiredChange} />
+        <DatePicker showTime onChange={handleExpiredChange} />
       </Modal>
       <Modal
         title="E-Mali Content"
