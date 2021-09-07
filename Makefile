@@ -20,15 +20,12 @@ fix-lint-lib:
 build-lib:
 	yarn lerna run --ignore @sudt-faucet/app-* build
 
-github-ci-build-lib:
-	yarn lerna run --ignore @sudt-faucet/app-* --ignore @ckitjs/* build
-
 clean:
 	yarn rimraf packages/*/dist
 	yarn rimraf apps/ui/*/dist
 	yarn rimraf apps/server/*/dist
 
-github-ci: github-ci-build-lib lint
+github-ci: build-lib lint
 
 watch-lib: build-lib
 	yarn lerna exec --parallel yarn run watch
