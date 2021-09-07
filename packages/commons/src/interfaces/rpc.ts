@@ -109,7 +109,7 @@ export interface ListClaimHistoryPayload {
 }
 
 export interface ListClaimHistoryResponse {
-  histories: ClaimHistory;
+  histories: ClaimHistory[];
 }
 
 export interface DisableClaimSecretPayload {
