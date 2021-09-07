@@ -1,9 +1,11 @@
+import { rpc, ClaimHistory } from '@sudt-faucet/commons';
 import { Typography, Button, Table, Form, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { account } from '../types';
+import client from '../configs/client';
+import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -27,16 +29,23 @@ const StyleWrapper = styled.div`
 `;
 
 const TokenManagement: React.FC = () => {
-  const columns: ColumnsType<account> = [
+  const columns: ColumnsType<ClaimHistory> = [
     {
       key: 'mail',
       title: 'mail',
       dataIndex: 'mail',
     },
     {
-      key: 'date',
-      title: 'date',
-      dataIndex: 'date',
+      key: 'createdAt',
+      title: 'createdAt',
+      dataIndex: 'createdAt',
+      render: (createdAt) => <div>{formatTimeSpan(createdAt)}</div>,
+    },
+    {
+      key: 'expiredAt',
+      title: 'expiredAt',
+      dataIndex: 'expiredAt',
+      render: (expiredAt) => <div>{formatTimeSpan(expiredAt)}</div>,
     },
     {
       key: 'amount',
@@ -44,19 +53,15 @@ const TokenManagement: React.FC = () => {
       dataIndex: 'amount',
     },
     {
-      key: 'address',
-      title: 'address',
-      dataIndex: 'address',
+      key: 'claimSecret',
+      title: 'claimSecret',
+      dataIndex: 'claimSecret',
     },
     {
-      key: 'status',
-      title: 'status',
-      dataIndex: 'status',
-    },
-    {
-      key: 'claimCode',
-      title: 'claimCode',
-      dataIndex: 'claimCode',
+      key: 'claimStatus',
+      title: 'claimStatus',
+      dataIndex: 'claimStatus',
+      render: (claimStatus) => <div>{claimStatus.status}</div>,
     },
     {
       key: 'action',
@@ -65,46 +70,24 @@ const TokenManagement: React.FC = () => {
       render: () => <Button size="small">disable</Button>,
     },
   ];
-  const data: account[] = [
-    {
-      mail: 'wangximing@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing1@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing2@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing3@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-  ];
 
   const history = useHistory();
   const goCharge = () => {
     history.push('/token-charge');
   };
-
+  const { udtId } = useParams<{ udtId: string }>();
+  const [mailList, setmailList] = useState<ClaimHistory[]>([]);
+  useEffect(() => {
+    const getData = async () => {
+      const response: rpc.ListClaimHistoryResponse = await client.list_claim_history({ sudtId: udtId });
+      setmailList(response.histories);
+    };
+    void getData();
+  }, []);
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
   return (
     <StyleWrapper>
       <div className="account">
@@ -119,9 +102,9 @@ const TokenManagement: React.FC = () => {
       </div>
       <div className="accountList">
         <div className="filter">
-          <Form name="customized_form_controls" layout="inline">
-            <Form.Item name="price" label="Price">
-              <Input />
+          <Form {...layout} name="customized_form_controls" layout="inline">
+            <Form.Item name="price" label="Filter:">
+              <Input placeholder="email/address" />
             </Form.Item>
             <Form.Item>
               <Select defaultValue="All" style={{ width: 120 }}>
@@ -138,7 +121,7 @@ const TokenManagement: React.FC = () => {
             </Form.Item>
           </Form>
         </div>
-        <Table rowKey="mail" columns={columns} dataSource={data} />
+        <Table rowKey="mail" columns={columns} dataSource={mailList} pagination={false} />
       </div>
     </StyleWrapper>
   );

@@ -1,5 +1,5 @@
 import { JSONRPCClient } from 'json-rpc-2.0';
-import * as rpc from '../../../commons/dist/interfaces/rpc';
+import { ClaimHistory, rpc } from '@sudt-faucet/commons';
 
 type Header = {
   authorization?: string;
@@ -50,7 +50,52 @@ class Client implements rpc.IssuerRpc {
   }
 
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    return rpcClient.request('list_claim_history', payload);
+    const histories: ClaimHistory[] = [
+      {
+        mail: 'wangximing@cryptape.com',
+        createdAt: 1631160474000,
+        expiredAt: 1631160474000,
+        amount: '100',
+        // address: 'ckbxxxxx',
+        claimStatus: {
+          status: 'claiming',
+          claimedStartAt: 1631160474000,
+          txHash: 'HexString',
+          confirmation: 2,
+        },
+        claimSecret: 'dajskldfj',
+      },
+      {
+        mail: 'wangximing@cryptape.com',
+        createdAt: 1631160474000,
+        expiredAt: 1631160474000,
+        amount: '100',
+        // address: 'ckbxxxxx',
+        claimStatus: {
+          status: 'unclaimed',
+        },
+        claimSecret: 'dajskldfj',
+      },
+      {
+        mail: 'wangximing@cryptape.com',
+        createdAt: 1631160474000,
+        expiredAt: 1631160474000,
+        amount: '100',
+        // address: 'ckbxxxxx',
+        claimStatus: {
+          status: 'claimed',
+          claimedStartAt: 1631160474000,
+          claimedAt: 1631160474000,
+          txHash: 'HexString',
+        },
+        claimSecret: 'dajskldfj',
+      },
+    ];
+    const data: rpc.ListClaimHistoryResponse = {
+      histories: histories,
+    };
+    return Promise.resolve(data);
+    // return rpcClient.request('list_claim_history', payload);
   }
 
   async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {

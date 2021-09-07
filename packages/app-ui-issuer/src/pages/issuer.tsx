@@ -38,7 +38,7 @@ export const Issuer: React.FC = () => {
           <Route path="/issue-token/:udtId">
             <IssueToken />
           </Route>
-          <Route path="/token-management">
+          <Route path="/token-management/:udtId">
             <TokenManagement />
           </Route>
           <Route path="/">
