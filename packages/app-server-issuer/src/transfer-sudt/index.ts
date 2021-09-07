@@ -1,7 +1,6 @@
 import { CkitProvider, RcSupplyLockHelper, internal, predefined, RcIdentityFlag } from '@ckit/ckit';
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
-import { TransactionToSend } from '../types';
 import { TransactionManage } from './TransactionManage';
 
 export async function startTransferSudt(): Promise<void> {
@@ -17,16 +16,12 @@ export async function startTransferSudt(): Promise<void> {
         unsendTransactions.map((value) => value.secret),
         'sending',
       );
-      const transactionsGroup = transactionsGroupBySudtId(unsendTransactions);
-      const sendTransactionPromises = new Array(0);
-      transactionsGroup.forEach((group) => sendTransactionPromises.push(txManage.sendTransaction(group)));
-      const txHashes = await Promise.all(sendTransactionPromises);
-      transactionsGroup.forEach(async (group, index) => {
-        const secrets = group.map((value) => value.secret);
-        await db.updateTxHashBySecrets(secrets, txHashes[index], 'sended');
-      });
 
-      await txManage.waitForCommit(txHashes);
+      const txHash = await txManage.sendTransaction(unsendTransactions);
+      const secrets = unsendTransactions.map((value) => value.secret);
+      await db.updateTxHashBySecrets(secrets, txHash, 'sended');
+
+      await txManage.waitForCommit(txHash);
     } else {
       await utils.sleep(15000);
     }
@@ -74,19 +69,4 @@ async function initTransactionManage(): Promise<TransactionManage> {
     flag: rcIdFlag,
     pubkeyHash: process.env.SUDT_ISSUER_PUBKEY_HASH,
   });
-}
-
-function transactionsGroupBySudtId(txs: TransactionToSend[]): TransactionToSend[][] {
-  const ret = new Array(0);
-
-  const sudtIds = new Array(0);
-  txs.forEach((tx) => {
-    if (!sudtIds.find((id) => id === tx.sudt_id)) sudtIds.push(tx.sudt_id);
-  });
-  sudtIds.forEach((id) => {
-    const txsWithSameId = txs.filter((tx) => tx.sudt_id === id);
-    ret.push(txsWithSameId);
-  });
-
-  return ret;
 }
