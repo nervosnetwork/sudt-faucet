@@ -66,23 +66,42 @@ const TokenManagement: React.FC = () => {
     {
       key: 'action',
       title: 'action',
-      dataIndex: 'action',
-      render: () => <Button size="small">disable</Button>,
+      dataIndex: 'claimSecret',
+      render: (claimSecret) => (
+        <Button
+          size="small"
+          onClick={() => {
+            disableCliam(claimSecret);
+          }}
+        >
+          disable
+        </Button>
+      ),
     },
   ];
+
+  const disableCliam = (claimSecret: string) => {
+    void client.disable_claim_secret({ claimSecret });
+  };
 
   const history = useHistory();
   const goCharge = () => {
     history.push('/token-charge');
   };
   const { udtId } = useParams<{ udtId: string }>();
-  const [mailList, setmailList] = useState<ClaimHistory[]>([]);
+  const [mailList, setMailList] = useState<ClaimHistory[]>([]);
+  const [sudtBalance, setSudtBalance] = useState<string>();
   useEffect(() => {
-    const getData = async () => {
+    const getClaimHistoryData = async () => {
       const response: rpc.ListClaimHistoryResponse = await client.list_claim_history({ sudtId: udtId });
-      setmailList(response.histories);
+      setMailList(response.histories);
     };
-    void getData();
+    const getBalance = async () => {
+      const response: rpc.GetClaimableSudtBalanceResponse = await client.get_claimable_sudt_balance({ sudtId: udtId });
+      setSudtBalance(response.amount);
+    };
+    void getBalance();
+    void getClaimHistoryData();
   }, []);
   const layout = {
     labelCol: { span: 8 },
@@ -98,7 +117,7 @@ const TokenManagement: React.FC = () => {
           </Button>
         </Typography>
         <Typography className="number">54,321.12345 CKB</Typography>
-        <Typography className="number">54,321.12345 INS</Typography>
+        <Typography className="number">{sudtBalance} INS</Typography>
       </div>
       <div className="accountList">
         <div className="filter">
@@ -110,7 +129,7 @@ const TokenManagement: React.FC = () => {
               <Select defaultValue="All" style={{ width: 120 }}>
                 <Select.Option value="wait-form-claim">wait form claim</Select.Option>
                 <Select.Option value="expired">expired</Select.Option>
-                <Select.Option value="expired">expired</Select.Option>
+                <Select.Option value="claimed">claimed</Select.Option>
                 <Select.Option value="all">all</Select.Option>
               </Select>
             </Form.Item>
@@ -121,7 +140,12 @@ const TokenManagement: React.FC = () => {
             </Form.Item>
           </Form>
         </div>
-        <Table rowKey="mail" columns={columns} dataSource={mailList} pagination={false} />
+        <Table
+          rowKey={(item) => item.mail + item.expiredAt}
+          columns={columns}
+          dataSource={mailList}
+          pagination={false}
+        />
       </div>
     </StyleWrapper>
   );

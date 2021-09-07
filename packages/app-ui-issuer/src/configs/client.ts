@@ -1,5 +1,5 @@
-import { JSONRPCClient } from 'json-rpc-2.0';
 import { ClaimHistory, rpc } from '@sudt-faucet/commons';
+import { JSONRPCClient } from 'json-rpc-2.0';
 
 type Header = {
   authorization?: string;
@@ -46,6 +46,10 @@ class Client implements rpc.IssuerRpc {
   async get_claimable_sudt_balance(
     payload: rpc.GetClaimableSudtBalancePayload,
   ): Promise<rpc.GetClaimableSudtBalanceResponse> {
+    return Promise.resolve({
+      address: 'Address',
+      amount: 'HexNumber7788',
+    });
     return rpcClient.request('get_claimable_sudt_balance', payload);
   }
 
@@ -53,13 +57,13 @@ class Client implements rpc.IssuerRpc {
     const histories: ClaimHistory[] = [
       {
         mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474000,
-        expiredAt: 1631160474000,
+        createdAt: 1631160474001,
+        expiredAt: 1631160474002,
         amount: '100',
         // address: 'ckbxxxxx',
         claimStatus: {
           status: 'claiming',
-          claimedStartAt: 1631160474000,
+          claimedStartAt: 1631160474003,
           txHash: 'HexString',
           confirmation: 2,
         },
@@ -67,8 +71,8 @@ class Client implements rpc.IssuerRpc {
       },
       {
         mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474000,
-        expiredAt: 1631160474000,
+        createdAt: 1631160474004,
+        expiredAt: 1631160474005,
         amount: '100',
         // address: 'ckbxxxxx',
         claimStatus: {
@@ -78,14 +82,14 @@ class Client implements rpc.IssuerRpc {
       },
       {
         mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474000,
-        expiredAt: 1631160474000,
+        createdAt: 1631160474006,
+        expiredAt: 1631160474007,
         amount: '100',
         // address: 'ckbxxxxx',
         claimStatus: {
           status: 'claimed',
-          claimedStartAt: 1631160474000,
-          claimedAt: 1631160474000,
+          claimedStartAt: 1631160474008,
+          claimedAt: 1631160474009,
           txHash: 'HexString',
         },
         claimSecret: 'dajskldfj',
