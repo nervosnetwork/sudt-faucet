@@ -24,6 +24,8 @@ const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
     } else if (jsonRPCRequest.id !== undefined) {
       return Promise.reject(new Error(response.statusText));
     }
+
+    return Promise.reject(response);
   });
 });
 

@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
-    "@ckit/base": "*",
-    "@ckit/ckit": "*",
+    "@ckitjs/base": "*",
+    "@ckitjs/ckit": "*",
     "@rehooks/local-storage": "2.4.0",
     "@sudt-faucet/commons": "*",
     "@testing-library/jest-dom": "^5.11.4",
@@ -26,6 +26,7 @@
     "react-query": "^3.19.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "react-use": "^17.3.1",
     "styled-components": "^5.2.3",
     "unstated-next": "^1.1.0",
     "web-vitals": "^1.0.1"
@@ -53,5 +54,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "buffer": "^6.0.3"
   }
 }

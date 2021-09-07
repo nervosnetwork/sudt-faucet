@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import CreateToken from './pages/createToken';
 import IssueToken from './pages/issueToken';
 import Login from './pages/login';
