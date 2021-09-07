@@ -1,9 +1,9 @@
 import { RightOutlined } from '@ant-design/icons';
-import { List, Typography, Button } from 'antd';
+import { Button, List, Typography } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { token } from '../types';
+import { useListRcSupplyLockUdtQuery } from '../hooks';
 
 const StyleWrapper = styled.div`
   height: calc(100% - 40px);
@@ -15,44 +15,17 @@ const StyleWrapper = styled.div`
   }
 `;
 
-const tokenList: Array<token> = [
-  {
-    id: '1',
-    name: 'token1',
-    symbol: 'symbol1',
-    unissued: 'unissued1',
-    issued: 'issued1',
-    decimals: 1,
-    description: 'description1',
-  },
-  {
-    id: '2',
-    name: 'token2',
-    symbol: 'symbol2',
-    unissued: 'unissued2',
-    issued: 'issued2',
-    decimals: 2,
-    description: 'description2',
-  },
-  {
-    id: '3',
-    name: 'token3',
-    symbol: 'symbol3',
-    unissued: 'unissued3',
-    issued: 'issued3',
-    decimals: 3,
-    description: 'description3',
-  },
-];
-
-const Login: React.FC = () => {
+const TokenList: React.FC = () => {
   const history = useHistory();
+
+  const { data, isLoading } = useListRcSupplyLockUdtQuery();
+
   const goToCreateToken = () => {
     history.push('/create-token');
   };
 
-  const goToTokenDetail = (item: token) => {
-    history.push(`/token-detail/${item.id}`);
+  const goToTokenDetail = (id: string) => {
+    history.push(`/token-detail/${id}`);
   };
 
   return (
@@ -63,10 +36,11 @@ const Login: React.FC = () => {
         </Button>
       </div>
       <List
+        loading={isLoading}
         bordered
-        dataSource={tokenList}
+        dataSource={data}
         renderItem={(item) => (
-          <List.Item onClick={() => goToTokenDetail(item)}>
+          <List.Item onClick={() => goToTokenDetail(item.udtId)}>
             <Typography.Text>{item.name}</Typography.Text>
             <RightOutlined />
           </List.Item>
@@ -75,4 +49,4 @@ const Login: React.FC = () => {
     </StyleWrapper>
   );
 };
-export default Login;
+export default TokenList;

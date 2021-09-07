@@ -1,8 +1,8 @@
-import { Typography, Button } from 'antd';
+import { Button, Spin, Typography } from 'antd';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { token } from '../types';
+import { useListRcSupplyLockUdtQuery } from '../hooks/';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -14,20 +14,15 @@ const StyleWrapper = styled.div`
   }
 `;
 
-const tokenDetail: token = {
-  id: '1',
-  name: 'token1',
-  symbol: 'symbol1',
-  unissued: 'unissued1',
-  issued: 'issued1',
-  decimals: 1,
-  description: 'description1',
-};
-
 const TokenDetail: React.FC = () => {
   const history = useHistory();
+  const { udtId } = useParams<{ udtId: string }>();
+  const { data: udts, isLoading } = useListRcSupplyLockUdtQuery(udtId);
+
+  const foundUdtInfo = udts?.[0];
+
   const goToIssus = () => {
-    history.push('/issue-token');
+    history.push(`/issue-token/${udtId}`);
   };
   const goToManagement = () => {
     history.push('/token-management');
@@ -38,12 +33,18 @@ const TokenDetail: React.FC = () => {
         <Button onClick={goToIssus}>Issue</Button>
         <Button onClick={goToManagement}>Management</Button>
       </div>
-      <Typography>Name: {tokenDetail.name}</Typography>
-      <Typography>Symbol: {tokenDetail.symbol}</Typography>
-      <Typography>Unissued: {tokenDetail.unissued}</Typography>
-      <Typography>Issued: {tokenDetail.issued}</Typography>
-      <Typography>Decimals: {tokenDetail.decimals}</Typography>
-      <Typography>Description: {tokenDetail.description}</Typography>
+      {isLoading || !foundUdtInfo ? (
+        <Spin />
+      ) : (
+        <>
+          <Typography>Name: {foundUdtInfo.name}</Typography>
+          <Typography>Symbol: {foundUdtInfo.symbol}</Typography>
+          <Typography>Unissued: {foundUdtInfo.maxSupply}</Typography>
+          <Typography>Issued: {foundUdtInfo.currentSupply}</Typography>
+          <Typography>Decimals: {foundUdtInfo.decimals}</Typography>
+          <Typography>Description: {foundUdtInfo.description}</Typography>
+        </>
+      )}
     </StyleWrapper>
   );
 };
