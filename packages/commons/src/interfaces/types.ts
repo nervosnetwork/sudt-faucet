@@ -1,4 +1,4 @@
-import { HexString, HexNumber } from '@ckb-lumos/base';
+import { HexString, HexNumber, Address } from '@ckb-lumos/base';
 import { RcIdentity } from '@ckitjs/rc-lock';
 
 /* primitive */
@@ -71,6 +71,7 @@ export interface Claiming {
   claimedStartAt: Timestamp;
   txHash: HexString;
   confirmation: number;
+  address: Address;
 }
 
 // claimed after 15 confirmations
@@ -79,6 +80,7 @@ export interface Claimed {
   claimedStartAt: Timestamp;
   claimedAt: Timestamp;
   txHash: HexString;
+  address: Address;
 }
 
 export type ClaimStatus = Unclaimed | Claiming | Claimed;
