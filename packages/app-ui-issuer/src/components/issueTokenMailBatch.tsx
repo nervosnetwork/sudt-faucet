@@ -78,7 +78,7 @@ const IssueTokenMailBatch: React.FC = () => {
   const handleAddtionalSubmit = async () => {
     updateAdditional(additionalMessage);
     try {
-      await client.request('send_claimable_mails', { recipients: userList });
+      await client.send_claimable_mails({ recipients: userList });
       setIsAddtionalModalVisible(false);
     } catch (error) {
       void message.error('Email send error');

@@ -45,10 +45,9 @@ const Login: React.FC = () => {
     history.push('/token-list');
   };
   const handleLogin = async () => {
-    // TODO remove me when server ready
     const message = `Login:${Date.now()}`;
     const { signature, address } = await createLoginMessage(message);
-    const response = await client.request('login', { address, message, sig: signature });
+    const response = await client.login({ address, message, sig: signature });
     localStorage.setItem('authorization', response.jwt);
     goToTokenList();
   };

@@ -1,11 +1,12 @@
 import { JSONRPCClient } from 'json-rpc-2.0';
+import * as rpc from '../../../commons/dist/interfaces/rpc';
 
 type Header = {
   authorization?: string;
   'content-type': string;
 };
 
-const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
+const rpcClient: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
   const headers: Header = {
     'content-type': 'application/json',
   };
@@ -20,7 +21,7 @@ const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
   }).then((response) => {
     if (response.status === 200) {
       // Use client.receive when you received a JSON-RPC response.
-      return response.json().then((jsonRPCResponse) => client.receive(jsonRPCResponse));
+      return response.json().then((jsonRPCResponse) => rpcClient.receive(jsonRPCResponse));
     } else if (jsonRPCRequest.id !== undefined) {
       return Promise.reject(new Error(response.statusText));
     }
@@ -28,5 +29,38 @@ const client: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
     return Promise.reject(response);
   });
 });
+
+class Client implements rpc.IssuerRpc {
+  async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
+    return rpcClient.request('login', payload);
+  }
+
+  async list_issued_sudt(payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
+    return rpcClient.request('list_issued_sudt', payload);
+  }
+
+  async send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
+    return rpcClient.request('send_claimable_mails', payload);
+  }
+
+  async get_claimable_sudt_balance(
+    payload: rpc.GetClaimableSudtBalancePayload,
+  ): Promise<rpc.GetClaimableSudtBalanceResponse> {
+    return rpcClient.request('get_claimable_sudt_balance', payload);
+  }
+
+  async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
+    return rpcClient.request('list_claim_history', payload);
+  }
+
+  async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
+    return rpcClient.request('disable_claim_secret', payload);
+  }
+
+  async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
+    return rpcClient.request('claim_sudt', payload);
+  }
+}
+const client: Client = new Client();
 
 export default client;
