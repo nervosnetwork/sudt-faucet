@@ -1,6 +1,7 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Input, DatePicker } from 'antd';
+import { Button, Table, Modal, Input, DatePicker, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import moment from 'moment';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -74,10 +75,14 @@ const IssueTokenMailBatch: React.FC = () => {
     updateExpired(expiredDate);
   };
 
-  const handleAddtionalSubmit = () => {
-    const response = client.request('send_claimable_mails', { recipients: userList });
-    // const response = await client.request('login', { address, message, sig: signature });
-    console.log(response);
+  const handleAddtionalSubmit = async () => {
+    updateAdditional(additionalMessage);
+    try {
+      await client.request('send_claimable_mails', { recipients: userList });
+      setIsAddtionalModalVisible(false);
+    } catch (error) {
+      void message.error('Email send error');
+    }
   };
 
   const handleAddtionalCancel = () => {
@@ -132,12 +137,13 @@ const IssueTokenMailBatch: React.FC = () => {
 
   const updateExpired = (expiredDate: number) => {
     const newUserList = userList.map((user: EmailIssue) => {
-      return { ...user, ...{ expiredDate: expiredDate } };
+      return { ...user, ...{ expiredAt: expiredDate } };
     });
+    console.log(newUserList);
     setUserList(newUserList);
   };
 
-  const updateAddtional = (additionalMessage: string) => {
+  const updateAdditional = (additionalMessage: string) => {
     const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ additionalMessage: additionalMessage } };
     });
@@ -188,7 +194,8 @@ const IssueTokenMailBatch: React.FC = () => {
           </div>
         );
       },
-      dataIndex: 'expiredDate',
+      dataIndex: 'expiredAt',
+      render: (expiredAt) => <div>{moment(expiredAt).format('YYYY-MM-DD HH:mm')}</div>,
     },
   ];
 

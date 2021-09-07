@@ -1,4 +1,4 @@
-import { Form, Input, Button, Modal, DatePicker } from 'antd';
+import { Form, Input, Button, Modal, DatePicker, message } from 'antd';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -30,7 +30,7 @@ const IssueTokenMail: React.FC = () => {
     setIsAddtionalModalVisible(true);
   };
 
-  const handleAddtionalSubmit = () => {
+  const handleAddtionalSubmit = async () => {
     const user: EmailIssue = {
       sudtId: udtId,
       mail,
@@ -38,8 +38,12 @@ const IssueTokenMail: React.FC = () => {
       expiredAt: expiredDate,
       additionalMessage,
     };
-    const response = client.request('send_claimable_mails', { recipients: [user] });
-    console.log(response);
+    try {
+      await client.request('send_claimable_mails', { recipients: [user] });
+      setIsAddtionalModalVisible(false);
+    } catch (error) {
+      void message.error('Email send error');
+    }
   };
 
   const handleAddtionalCancel = () => {
