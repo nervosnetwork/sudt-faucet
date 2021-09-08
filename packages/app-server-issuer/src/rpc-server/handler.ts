@@ -47,8 +47,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const recordsWithSecret: InsertMailIssue[] = payload.recipients.map((recipient) => {
       return {
         mail_address: recipient.mail,
-        sudt_issuer_pubkey_hash: recipient.rcIdentity.pubkeyHash,
-        sudt_issuer_rc_id_flag: Number(recipient.rcIdentity.flag),
+        sudt_issuer_pubkey_hash: payload.rcIdentity.pubkeyHash,
+        sudt_issuer_rc_id_flag: Number(payload.rcIdentity.flag),
         sudt_id: recipient.sudtId,
         amount: recipient.amount,
         secret: utils.randomHexString(32).slice(2),
