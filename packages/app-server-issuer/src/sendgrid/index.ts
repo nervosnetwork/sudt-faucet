@@ -33,6 +33,6 @@ function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
     to: mail.mail_address,
     from: process.env.SENDGRID_VERIFIED_SENDER,
     subject: 'Claim token with secret',
-    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${expireDate}:\n<a href='https://www.baidu.com?claim_secret=${mail.secret}' target='_blank'></a>`,
+    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${expireDate}:\nhttps://www.baidu.com?claim_secret=${mail.secret}`,
   };
 }

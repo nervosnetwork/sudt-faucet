@@ -92,7 +92,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
       })();
       return {
         mail: record.mail_address,
-        createdAt: new Date(record.created_at).getMilliseconds(),
+        createdAt: new Date(record.created_at).getTime(),
         expiredAt: record.expire_time,
         amount: record.amount,
         claimSecret: record.secret,
