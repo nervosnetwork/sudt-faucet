@@ -25,3 +25,5 @@ yarn-error.log*
 # temp files, for testing and debuggin
 tmp
 tmp-*
+
+todo.md

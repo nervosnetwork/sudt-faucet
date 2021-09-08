@@ -1,5 +1,5 @@
 import { Address, HexNumber, HexString } from '@ckb-lumos/base';
-import { ClaimHistory, Id, MailIssueInfo, RcIdentity, SudtInfo } from './types';
+import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
  * client and server are the same interface
@@ -22,7 +22,13 @@ export interface IssuerRpc {
    * @permission [owner]
    * @param payload
    */
-  list_issued_sudt(payload: GetIssuedHistoryPayload): Promise<GetIssuedHistoryResponse>;
+  // list_issued_sudt(payload: GetIssuedHistoryPayload): Promise<GetIssuedHistoryResponse>;
+
+  /**
+   * the address corresponding to the private key hosted on the server,
+   * which is generally the account used to automatically transfer to claim users
+   */
+  get_claimable_account_address(): Promise<Address>;
 
   /**
    * create claim secret and send claimable invitation email
@@ -81,6 +87,7 @@ export interface GetIssuedHistoryResponse {
 }
 
 export interface SendClaimableMailsPayload {
+  rcIdentity: RcIdentity;
   recipients: Array<MailIssueInfo>;
 }
 
@@ -90,7 +97,7 @@ export interface ClaimSudtPayload {
 }
 
 export interface GetClaimableSudtBalancePayload {
-  sudtId: Id;
+  sudtId: string;
 }
 
 export interface GetClaimableSudtBalanceResponse {
@@ -99,11 +106,11 @@ export interface GetClaimableSudtBalanceResponse {
 }
 
 export interface ListClaimHistoryPayload {
-  sudtId: Id;
+  sudtId: string;
 }
 
 export interface ListClaimHistoryResponse {
-  histories: ClaimHistory;
+  histories: ClaimHistory[];
 }
 
 export interface DisableClaimSecretPayload {

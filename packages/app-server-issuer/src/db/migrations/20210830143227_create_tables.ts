@@ -4,6 +4,8 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('mail_issue', (tableBuilder) => {
     tableBuilder.increments();
     tableBuilder.string('mail_address').notNullable();
+    tableBuilder.string('sudt_issuer_pubkey_hash', 66).notNullable();
+    tableBuilder.integer('sudt_issuer_rc_id_flag').notNullable();
     tableBuilder.string('sudt_id').notNullable();
     tableBuilder.decimal('amount', 36, 0).unsigned().notNullable();
     tableBuilder.string('secret', 32).notNullable().unique();
@@ -20,6 +22,7 @@ export async function up(knex: Knex): Promise<void> {
       .dateTime('updated_at')
       .notNullable()
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+    tableBuilder.charset('utf8mb4');
   });
 }
 
