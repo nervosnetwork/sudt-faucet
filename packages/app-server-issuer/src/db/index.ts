@@ -1,5 +1,5 @@
 import Knex, { Knex as IKnex } from 'knex';
-import { InsertMailIssue, MailIssue, MailToSend, TransactionToSend } from '../types';
+import { InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -37,21 +37,21 @@ export class DB {
       .limit(limit);
   }
 
-  public async getStatusBySecret(secret: string): Promise<string | undefined> {
+  public async getStatusBySecret(secret: string): Promise<MailIssueStatus | undefined> {
     const ret = await this.knex.select('status').from<MailIssue>('mail_issue').where({ secret: secret });
     if (ret.length > 1) throw new Error('exception: secret not unique');
     return ret[0]?.status;
   }
 
-  public async updateStatusBySecrets(secrets: string[], status: string): Promise<void> {
+  public async updateStatusBySecrets(secrets: string[], status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').whereIn('secret', secrets).update({ status: status });
   }
 
-  public async updateTxHashBySecrets(secrets: string[], txHash: string, status: string): Promise<void> {
+  public async updateTxHashBySecrets(secrets: string[], txHash: string, status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
   }
 
-  public async claimBySecret(secret: string, address: string, status: string): Promise<void> {
+  public async claimBySecret(secret: string, address: string, status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
   }
 
