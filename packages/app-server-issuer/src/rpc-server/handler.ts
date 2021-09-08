@@ -7,6 +7,7 @@ import {
   ClaimStatus,
   Unclaimed,
   Claimed,
+  Disabled,
 } from '@sudt-faucet/commons';
 import dotenv from 'dotenv';
 import { Request } from 'express';
@@ -85,6 +86,11 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
               claimedAt: 0,
               address: record.claim_address,
             } as Claimed;
+          }
+          case 'Disabled': {
+            return {
+              status: 'disabled',
+            } as Disabled;
           }
           default:
             throw new Error('exception: unknown record status');
