@@ -1,3 +1,10 @@
+import { CkitProvider, internal } from '@ckitjs/ckit';
+
+export interface ServerContext {
+  ckitProvider: CkitProvider;
+  txSigner: InstanceType<typeof internal['Secp256k1Signer']>;
+}
+
 export interface MailIssue {
   id: number;
   mail_address: string;
@@ -13,7 +20,9 @@ export interface MailIssue {
   tx_hash: string;
   confirm_number: number;
   confirm_time: number;
+  // WaitForSendMail, WaitForClaim, WaitForTransfer, SendingTransaction, WaitForTransactionCommit, WaitForTransactionConfirm, Done
   status: string;
+  created_at: string;
 }
 
 export type InsertMailIssue = Pick<

@@ -15,7 +15,7 @@ export async function startSendGrid(): Promise<void> {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
         const secrets = unsendMails.map((value) => value.secret);
-        await db.updateStatusBySecrets(secrets, 'unclaimed');
+        await db.updateStatusBySecrets(secrets, 'WaitForClaim');
       }
     } catch (e) {
       // TODO use log
@@ -28,12 +28,11 @@ export async function startSendGrid(): Promise<void> {
 function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.SENDGRID_VERIFIED_SENDER) throw new Error('SENDGRID_VERIFIED_SENDER not set');
   const expireDate = new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' });
-  console.log('debug', expireDate);
 
   return {
     to: mail.mail_address,
     from: process.env.SENDGRID_VERIFIED_SENDER,
     subject: 'Claim token with secret',
-    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${expireDate}:\nhttps://www.baidu.com?claim_secret=${mail.secret}`,
+    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${expireDate}:\n<a href='https://www.baidu.com?claim_secret=${mail.secret}' target='_blank'></a>`,
   };
 }

@@ -25,7 +25,7 @@ export class DB {
     return this.knex
       .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
       .from<MailIssue>('mail_issue')
-      .where({ status: 'unsend' })
+      .where({ status: 'WaitForSendMail' })
       .limit(limit);
   }
 
@@ -33,7 +33,7 @@ export class DB {
     return this.knex
       .select('sudt_issuer_pubkey_hash', 'sudt_issuer_rc_id_flag', 'sudt_id', 'amount', 'claim_address', 'secret')
       .from<MailIssue>('mail_issue')
-      .where({ status: 'claimed' })
+      .where({ status: 'WaitForTransfer' })
       .limit(limit);
   }
 
@@ -53,5 +53,9 @@ export class DB {
 
   public async claimBySecret(secret: string, address: string, status: string): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
+  }
+
+  public async getRecordsBySudtId(sudtId: string): Promise<MailIssue[]> {
+    return this.knex.select('*').from<MailIssue>('mail_issue').where({ sudt_id: sudtId });
   }
 }
