@@ -22,7 +22,13 @@ export interface IssuerRpc {
    * @permission [owner]
    * @param payload
    */
-  list_issued_sudt(payload: GetIssuedHistoryPayload): Promise<GetIssuedHistoryResponse>;
+  // list_issued_sudt(payload: GetIssuedHistoryPayload): Promise<GetIssuedHistoryResponse>;
+
+  /**
+   * the address corresponding to the private key hosted on the server,
+   * which is generally the account used to automatically transfer to claim users
+   */
+  get_claimable_account_address(): Promise<Address>;
 
   /**
    * create claim secret and send claimable invitation email
@@ -64,6 +70,7 @@ export interface LoginPayload {
   message: string;
   // personal_sign(hash(String(timestamp), 'login')) via MetaMask
   sig: HexString;
+  address: HexString;
 }
 
 export interface LoginResponse {
@@ -102,7 +109,7 @@ export interface ListClaimHistoryPayload {
 }
 
 export interface ListClaimHistoryResponse {
-  histories: ClaimHistory;
+  histories: ClaimHistory[];
 }
 
 export interface DisableClaimSecretPayload {

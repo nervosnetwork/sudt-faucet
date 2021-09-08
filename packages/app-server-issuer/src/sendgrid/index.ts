@@ -25,14 +25,15 @@ export async function startSendGrid(): Promise<void> {
   }
 }
 
-// TODO optimize mail context
 function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.SENDGRID_VERIFIED_SENDER) throw new Error('SENDGRID_VERIFIED_SENDER not set');
+  const expireDate = new Date(mail.expire_time);
+  expireDate.toLocaleString('en-US', { timeZone: 'UTC' });
 
   return {
     to: mail.mail_address,
     from: process.env.SENDGRID_VERIFIED_SENDER,
     subject: 'Claim token with secret',
-    text: `Hi, ${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${mail.expire_time}:\nhttps://xx.com?claim_secret=${mail.secret}`,
+    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} tokens before ${expireDate}:\nhttps://www.baidu.com?claim_secret=${mail.secret}`,
   };
 }

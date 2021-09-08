@@ -1,9 +1,27 @@
-import { rpc, utils } from '@sudt-faucet/commons';
+import { rpc, utils, verifyLoginMessage, createToken, verifyToken } from '@sudt-faucet/commons';
+import dotenv from 'dotenv';
+import { Request } from 'express';
 import { DB } from '../db';
+import { genKeyPair } from '../util/createKey';
+dotenv.config();
 
+const keyPair = genKeyPair();
 export class IssuerRpcHandler implements rpc.IssuerRpc {
-  login(_payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
-    utils.unimplemented();
+  async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
+    if (!process.env.USER_ADDRESS) throw new Error('USER_ADDRESS not set');
+    const address = process.env.USER_ADDRESS;
+    const { message, sig } = payload;
+    const result = await verifyLoginMessage(sig, message, address);
+    if (result) {
+      const token = createToken(address, keyPair.privateKey);
+      return { jwt: token };
+    }
+    throw new Error('Only the owner is allowed to access');
+  }
+
+  get_user_address(req: Request): string {
+    const token = req.get('authorization') || '';
+    return verifyToken(token, keyPair.publicKey);
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
@@ -22,6 +40,10 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   list_claim_history(_payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
+    utils.unimplemented();
+  }
+
+  get_claimable_account_address(): Promise<string> {
     utils.unimplemented();
   }
 
