@@ -1,19 +1,28 @@
-import { Message } from '@sudt-faucet/commons';
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { GlobalConfigContainer, ProviderContainer, WalletContainer } from './containers';
+import Cliamer from './pages/cliamer';
+import './App.less';
+
+const AppEntry: React.FC = ({ children }) => {
+  return (
+    <GlobalConfigContainer.Provider>
+      <ProviderContainer.Provider>
+        <WalletContainer.Provider>{children}</WalletContainer.Provider>
+      </ProviderContainer.Provider>
+    </GlobalConfigContainer.Provider>
+  );
+};
 
 const App: React.FC = () => {
+  const queryClient = new QueryClient();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{Message}</p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppEntry>
+      <QueryClientProvider client={queryClient}>
+        <Cliamer />
+      </QueryClientProvider>
+    </AppEntry>
   );
 };
 
