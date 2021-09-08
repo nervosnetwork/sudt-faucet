@@ -11,6 +11,7 @@
     "watch": "yarn run build:js --watch & yarn run build:types --watch"
   },
   "dependencies": {
+    "@ckitjs/rc-lock": "*",
     "@ckb-lumos/base": "^0.16.0",
     "@metamask/detect-provider": "^1.2.0",
     "@types/jsonwebtoken": "^8.5.5",
