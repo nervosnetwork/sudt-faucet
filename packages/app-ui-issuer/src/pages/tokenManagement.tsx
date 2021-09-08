@@ -1,5 +1,6 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { rpc, ClaimHistory } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select } from 'antd';
+import { Typography, Button, Table, Form, Input, Select, Modal } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
@@ -81,7 +82,14 @@ const TokenManagement: React.FC = () => {
   ];
 
   const disableCliam = (claimSecret: string) => {
-    void client.disable_claim_secret({ claimSecret });
+    Modal.confirm({
+      title: 'Do you Want to disable this item?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'user can not claim this token after disable',
+      onOk() {
+        void client.disable_claim_secret({ claimSecret });
+      },
+    });
   };
 
   const history = useHistory();

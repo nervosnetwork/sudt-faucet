@@ -80,6 +80,7 @@ const IssueTokenMailBatch: React.FC = () => {
     try {
       await client.send_claimable_mails({ recipients: userList });
       setIsAddtionalModalVisible(false);
+      void message.success('Email send success');
     } catch (error) {
       void message.error('Email send error');
     }
@@ -139,7 +140,6 @@ const IssueTokenMailBatch: React.FC = () => {
     const newUserList = userList.map((user: EmailIssue) => {
       return { ...user, ...{ expiredAt: expiredDate } };
     });
-    console.log(newUserList);
     setUserList(newUserList);
   };
 
@@ -195,7 +195,7 @@ const IssueTokenMailBatch: React.FC = () => {
         );
       },
       dataIndex: 'expiredAt',
-      render: (expiredAt) => <div>{moment(expiredAt).format('YYYY-MM-DD HH:mm')}</div>,
+      render: (expiredAt) => <div>{expiredAt ? moment(expiredAt).format('YYYY-MM-DD HH:mm') : ''}</div>,
     },
   ];
 
