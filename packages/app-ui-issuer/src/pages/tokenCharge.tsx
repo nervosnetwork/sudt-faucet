@@ -44,21 +44,20 @@ const TokenCharge: React.FC = () => {
     if (!values.capaticy) {
       errors.capaticy = 'Capaticy is Required';
     }
-    const leftAmount = Number(foundUdtInfo.maxSupply) - Number(foundUdtInfo.currentSupply);
+    const leftAmount = BigInt(foundUdtInfo.maxSupply) - BigInt(foundUdtInfo.currentSupply);
     if (!values.amount) {
       errors.amount = 'Capaticy is Required';
-    } else if (Number(values.amount) > leftAmount) {
-      errors.amount = `Must be ${leftAmount} or smaller`;
+    } else if (BigInt(values.amount) >= leftAmount) {
+      errors.amount = `Must be less than or equal to ${leftAmount}`;
     }
     return errors;
   };
 
   function charge() {
     if (!chargeAddress) {
-      void message.error('Charge address is loaded');
-      return;
+      return Promise.reject('Charge address is not loaded');
     }
-    void new MintRcUdtBuilder(
+    return new MintRcUdtBuilder(
       {
         udtId,
         rcIdentity,
@@ -88,7 +87,13 @@ const TokenCharge: React.FC = () => {
     validate,
     onSubmit: (values: FormValues) => {
       history.push('/token-list');
-      charge();
+      charge()
+        .then(() => {
+          history.push('/token-list');
+        })
+        .catch((e) => {
+          void message.error(e);
+        });
     },
   });
 

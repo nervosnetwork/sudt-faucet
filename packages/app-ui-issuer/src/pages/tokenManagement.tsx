@@ -88,9 +88,9 @@ const TokenManagement: React.FC = () => {
 
   const disableCliam = (claimSecret: string) => {
     Modal.confirm({
-      title: 'Do you Want to disable this item?',
+      title: 'Disable',
       icon: <ExclamationCircleOutlined />,
-      content: 'user can not claim this token after disable',
+      content: 'Would you want to disable the claim secret?',
       onOk() {
         void client.disable_claim_secret({ claimSecret });
       },
