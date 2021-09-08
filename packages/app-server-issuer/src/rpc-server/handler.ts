@@ -1,12 +1,26 @@
-import { rpc, utils, verifyLoginMessage, createToken, verifyToken } from '@sudt-faucet/commons';
+import {
+  rpc,
+  utils,
+  verifyLoginMessage,
+  createToken,
+  verifyToken,
+  ClaimStatus,
+  Unclaimed,
+  Claimed,
+} from '@sudt-faucet/commons';
 import dotenv from 'dotenv';
 import { Request } from 'express';
 import { DB } from '../db';
+import { InsertMailIssue, ServerContext } from '../types';
 import { genKeyPair } from '../util/createKey';
+
 dotenv.config();
 
 const keyPair = genKeyPair();
+
 export class IssuerRpcHandler implements rpc.IssuerRpc {
+  constructor(private context: ServerContext) {}
+
   async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     if (!process.env.USER_ADDRESS) throw new Error('USER_ADDRESS not set');
     const address = process.env.USER_ADDRESS;
@@ -30,7 +44,20 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
     if (payload.recipients.length === 0) throw new Error('call send_claimable_mails with empty payload');
-    return DB.getInstance().batchInsertMailIssue(payload);
+    const recordsWithSecret: InsertMailIssue[] = payload.recipients.map((recipient) => {
+      return {
+        mail_address: recipient.mail,
+        sudt_issuer_pubkey_hash: payload.rcIdentity.pubkeyHash,
+        sudt_issuer_rc_id_flag: Number(payload.rcIdentity.flag),
+        sudt_id: recipient.sudtId,
+        amount: recipient.amount,
+        secret: utils.randomHexString(32).slice(2),
+        mail_message: recipient.additionalMessage,
+        expire_time: recipient.expiredAt,
+        status: 'WaitForSendMail',
+      };
+    });
+    return DB.getInstance().batchInsertMailIssue(recordsWithSecret);
   }
 
   get_claimable_sudt_balance(
@@ -39,12 +66,44 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     utils.unimplemented();
   }
 
-  list_claim_history(_payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    utils.unimplemented();
+  async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
+    const records = await DB.getInstance().getRecordsBySudtId(payload.sudtId);
+    const claimHistories = records.map((record) => {
+      const claimStatus: ClaimStatus = (() => {
+        switch (record.status) {
+          case 'WaitForSendMail':
+          case 'WaitForClaim':
+            return { status: 'unclaimed' } as Unclaimed;
+          case 'WaitForTransfer':
+          case 'SendingTransaction':
+          case 'WaitForTransactionCommit':
+          case 'WaitForTransactionConfirm': {
+            return {
+              status: 'claimed',
+              claimedStartAt: 0,
+              txHash: 'undo',
+              claimedAt: 0,
+              address: record.claim_address,
+            } as Claimed;
+          }
+          default:
+            throw new Error('exception: unknown record status');
+        }
+      })();
+      return {
+        mail: record.mail_address,
+        createdAt: new Date(record.created_at).getMilliseconds(),
+        expiredAt: record.expire_time,
+        amount: record.amount,
+        claimSecret: record.secret,
+        claimStatus,
+      };
+    });
+    return { histories: claimHistories };
   }
 
   get_claimable_account_address(): Promise<string> {
-    utils.unimplemented();
+    return this.context.txSigner.getAddress();
   }
 
   // TODO resolve concurrency with claim sudt
@@ -52,11 +111,15 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
     if (!status) throw new Error('error: secret not found');
-    if (status !== 'unclaimed') throw new Error('error: can not disable claimed secret');
-    return db.updateStatusBySecret(payload.claimSecret, 'disabled');
+    if (status !== 'WaitForClaim') throw new Error('error: can not disable claimed secret');
+    return db.updateStatusBySecrets([payload.claimSecret], 'Disabled');
   }
 
-  claim_sudt(_payload: rpc.ClaimSudtPayload): Promise<void> {
-    utils.unimplemented();
+  async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
+    const db = DB.getInstance();
+    const status = await db.getStatusBySecret(payload.claimSecret);
+    if (!status) throw new Error('error: secret not found');
+    if (status !== 'WaitForClaim') throw new Error('error: status not unclaimed');
+    return db.claimBySecret(payload.claimSecret, payload.address, 'WaitForTransfer');
   }
 }

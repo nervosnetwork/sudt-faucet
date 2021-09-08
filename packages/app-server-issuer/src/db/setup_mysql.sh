@@ -5,4 +5,4 @@ sleep 15
 docker exec sudt-faucet-mysql mysql -uroot -p123456 --protocol=tcp -e "create database sudt_faucet"
 
 DB_DIR="$(dirname "${BASH_SOURCE[0]}")"
-knex migrate:latest --knexfile "${DB_DIR}"/knexfile.ts --env development
+npx knex migrate:latest --knexfile "${DB_DIR}"/knexfile.ts --env development
