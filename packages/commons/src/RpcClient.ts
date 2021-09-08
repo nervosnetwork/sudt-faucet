@@ -1,5 +1,5 @@
 import { JSONRPCClient } from 'json-rpc-2.0';
-import { ClaimHistory, rpc } from './interfaces';
+import { rpc } from './interfaces';
 
 type Header = {
   authorization?: string;
@@ -31,9 +31,10 @@ const rpcClient: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
 });
 
 export class RpcClient implements rpc.IssuerRpc {
-  get_claimable_account_address(): Promise<string> {
-    throw new Error('Method not implemented.');
+  async get_claimable_account_address(): Promise<string> {
+    return rpcClient.request('get_claimable_account_address');
   }
+
   async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     return rpcClient.request('login', payload);
   }
@@ -56,55 +57,8 @@ export class RpcClient implements rpc.IssuerRpc {
     return rpcClient.request('get_claimable_sudt_balance', payload);
   }
 
-  async list_claim_history(_payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    const histories: ClaimHistory[] = [
-      {
-        mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474001,
-        expiredAt: 1631160474002,
-        amount: '100',
-        // address: 'ckbxxxxx',
-        claimStatus: {
-          status: 'claiming',
-          claimedStartAt: 1631160474003,
-          txHash: 'HexString',
-          confirmation: 2,
-          address: '',
-        },
-        claimSecret: 'dajskldfj',
-      },
-      {
-        mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474004,
-        expiredAt: 1631160474005,
-        amount: '100',
-        // address: 'ckbxxxxx',
-        claimStatus: {
-          status: 'unclaimed',
-        },
-        claimSecret: 'dajskldfj',
-      },
-      {
-        mail: 'wangximing@cryptape.com',
-        createdAt: 1631160474006,
-        expiredAt: 1631160474007,
-        amount: '100',
-        // address: 'ckbxxxxx',
-        claimStatus: {
-          status: 'claimed',
-          claimedStartAt: 1631160474008,
-          claimedAt: 1631160474009,
-          txHash: 'HexString',
-          address: '',
-        },
-        claimSecret: 'dajskldfj',
-      },
-    ];
-    const data: rpc.ListClaimHistoryResponse = {
-      histories: histories,
-    };
-    return Promise.resolve(data);
-    // return rpcClient.request('list_claim_history', payload);
+  async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
+    return rpcClient.request('list_claim_history', payload);
   }
 
   async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
