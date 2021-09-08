@@ -1,6 +1,5 @@
-import { rpc, utils } from '@sudt-faucet/commons';
 import Knex, { Knex as IKnex } from 'knex';
-import { MailIssue, MailToSend, TransactionToSend } from '../types';
+import { InsertMailIssue, MailIssue, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -18,27 +17,8 @@ export class DB {
     return DB.instance;
   }
 
-  public async batchInsertMailIssue(records: rpc.SendClaimableMailsPayload): Promise<void> {
-    const recordsWithSecret = records.recipients.map((record) => {
-      return {
-        mail_address: record.mail,
-        sudt_id: record.sudtId,
-        amount: record.amount,
-        secret: utils.randomHexString(32).slice(2),
-        mail_message: record.additionalMessage,
-        expire_time: record.expiredAt,
-        status: 'unsend',
-      };
-    });
-    await this.knex.batchInsert('mail_issue', recordsWithSecret, recordsWithSecret.length);
-  }
-
-  public async getTransactionsToSend(limit: number): Promise<TransactionToSend[]> {
-    return this.knex
-      .select('sudt_id', 'amount', 'claim_address', 'secret')
-      .from<MailIssue>('mail_issue')
-      .where({ status: 'claimed' })
-      .limit(limit);
+  public async batchInsertMailIssue(records: InsertMailIssue[]): Promise<void> {
+    await this.knex.batchInsert('mail_issue', records, records.length);
   }
 
   public async getMailsToSend(limit: number): Promise<MailToSend[]> {
@@ -46,6 +26,14 @@ export class DB {
       .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
       .from<MailIssue>('mail_issue')
       .where({ status: 'unsend' })
+      .limit(limit);
+  }
+
+  public async getTransactionsToSend(limit: number): Promise<TransactionToSend[]> {
+    return this.knex
+      .select('sudt_issuer_pubkey_hash', 'sudt_issuer_rc_id_flag', 'sudt_id', 'amount', 'claim_address', 'secret')
+      .from<MailIssue>('mail_issue')
+      .where({ status: 'claimed' })
       .limit(limit);
   }
 

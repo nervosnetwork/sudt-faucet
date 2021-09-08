@@ -1,4 +1,4 @@
-import { CkitProvider, RcSupplyLockHelper, internal, predefined, RcIdentityFlag } from '@ckit/ckit';
+import { CkitProvider, RcSupplyLockHelper, internal, predefined, RcIdentityFlag } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
 import { TransactionManage } from './TransactionManage';
@@ -16,17 +16,14 @@ export async function startTransferSudt(): Promise<void> {
         unsendTransactions.map((value) => value.secret),
         'sending',
       );
-
       const txHash = await txManage.sendTransaction(unsendTransactions);
       const secrets = unsendTransactions.map((value) => value.secret);
       await db.updateTxHashBySecrets(secrets, txHash, 'sended');
-
       await txManage.waitForCommit(txHash);
     } else {
       await utils.sleep(15000);
     }
-
-    await txManage.syncConfirmNumber();
+    // await txManage.syncConfirmNumber();
   }
 }
 

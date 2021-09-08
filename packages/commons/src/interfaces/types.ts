@@ -3,10 +3,6 @@ import { RcIdentity } from '@ckitjs/rc-lock';
 
 /* primitive */
 /**
- * object identity
- */
-export type Id = string | number;
-/**
  * millisecond timestamp
  */
 export type Timestamp = number;
@@ -39,7 +35,7 @@ export interface SudtInfo extends SudtStaticInfo {
 
 export interface MailIssueInfo {
   rcIdentity: RcIdentity;
-  sudtId: Id;
+  sudtId: string;
 
   mail: string;
   amount: HexString;

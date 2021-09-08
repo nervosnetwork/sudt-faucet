@@ -1,5 +1,5 @@
 import { Hash, Transaction } from '@ckb-lumos/base';
-import { AcpTransferSudtBuilder, CkitProvider, EntrySigner, RcIdentity, RcSupplyLockHelper } from '@ckit/ckit';
+import { AcpTransferSudtBuilder, CkitProvider, EntrySigner, RcIdentity, RcSupplyLockHelper } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import { TransactionToSend } from '../types';
 
@@ -17,10 +17,14 @@ export class TransactionManage {
       recipient: tx.claim_address,
       sudt: sudtScript,
       amount: tx.amount,
-      policy: 'findOrCreate',
+      policy: 'findOrCreate' as const,
     }));
     // FIXME AcpTransferSudtBuilder doesn't support batch transfer
-    const txBuilder = new AcpTransferSudtBuilder(builderOptions, this.provider, this.signer);
+    const txBuilder = new AcpTransferSudtBuilder(
+      { recipients: builderOptions },
+      this.provider,
+      await this.signer.getAddress(),
+    );
     const signedTx = await this.signer.seal(await txBuilder.build());
     return this.provider.sendTransaction(signedTx);
   }

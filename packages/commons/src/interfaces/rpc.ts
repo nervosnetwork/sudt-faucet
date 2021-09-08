@@ -1,5 +1,5 @@
 import { Address, HexNumber, HexString } from '@ckb-lumos/base';
-import { ClaimHistory, Id, MailIssueInfo, RcIdentity, SudtInfo } from './types';
+import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
  * client and server are the same interface
@@ -96,7 +96,7 @@ export interface ClaimSudtPayload {
 }
 
 export interface GetClaimableSudtBalancePayload {
-  sudtId: Id;
+  sudtId: string;
 }
 
 export interface GetClaimableSudtBalanceResponse {
@@ -105,7 +105,7 @@ export interface GetClaimableSudtBalanceResponse {
 }
 
 export interface ListClaimHistoryPayload {
-  sudtId: Id;
+  sudtId: string;
 }
 
 export interface ListClaimHistoryResponse {

@@ -2,10 +2,13 @@ import { rpc, utils, verifyLoginMessage, createToken, verifyToken } from '@sudt-
 import dotenv from 'dotenv';
 import { Request } from 'express';
 import { DB } from '../db';
+import { InsertMailIssue } from '../types';
 import { genKeyPair } from '../util/createKey';
+
 dotenv.config();
 
 const keyPair = genKeyPair();
+
 export class IssuerRpcHandler implements rpc.IssuerRpc {
   async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
     if (!process.env.USER_ADDRESS) throw new Error('USER_ADDRESS not set');
@@ -30,7 +33,20 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
     if (payload.recipients.length === 0) throw new Error('call send_claimable_mails with empty payload');
-    return DB.getInstance().batchInsertMailIssue(payload);
+    const recordsWithSecret: InsertMailIssue[] = payload.recipients.map((recipient) => {
+      return {
+        mail_address: recipient.mail,
+        sudt_issuer_pubkey_hash: recipient.rcIdentity.pubkeyHash,
+        sudt_issuer_rc_id_flag: Number(recipient.rcIdentity.flag),
+        sudt_id: recipient.sudtId,
+        amount: recipient.amount,
+        secret: utils.randomHexString(32).slice(2),
+        mail_message: recipient.additionalMessage,
+        expire_time: recipient.expiredAt,
+        status: 'unsend',
+      };
+    });
+    return DB.getInstance().batchInsertMailIssue(recordsWithSecret);
   }
 
   get_claimable_sudt_balance(

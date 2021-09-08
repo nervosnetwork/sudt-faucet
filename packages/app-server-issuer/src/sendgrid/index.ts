@@ -27,8 +27,8 @@ export async function startSendGrid(): Promise<void> {
 
 function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.SENDGRID_VERIFIED_SENDER) throw new Error('SENDGRID_VERIFIED_SENDER not set');
-  const expireDate = new Date(mail.expire_time);
-  expireDate.toLocaleString('en-US', { timeZone: 'UTC' });
+  const expireDate = new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' });
+  console.log('debug', expireDate);
 
   return {
     to: mail.mail_address,
