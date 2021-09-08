@@ -1,28 +1,18 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { GlobalConfigContainer, ProviderContainer, WalletContainer } from './containers';
-import Cliamer from './pages/cliamer';
 import './App.less';
-
-const AppEntry: React.FC = ({ children }) => {
-  return (
-    <GlobalConfigContainer.Provider>
-      <ProviderContainer.Provider>
-        <WalletContainer.Provider>{children}</WalletContainer.Provider>
-      </ProviderContainer.Provider>
-    </GlobalConfigContainer.Provider>
-  );
-};
+import { ClaimContainer } from './ClaimContainer';
+import Cliamer from './pages/cliamer';
 
 const App: React.FC = () => {
   const queryClient = new QueryClient();
 
   return (
-    <AppEntry>
+    <ClaimContainer.Provider>
       <QueryClientProvider client={queryClient}>
         <Cliamer />
       </QueryClientProvider>
-    </AppEntry>
+    </ClaimContainer.Provider>
   );
 };
 
