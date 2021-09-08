@@ -1,0 +1,38 @@
+version: '3.2'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: sudt-faucet-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: sudt_faucet
+    ports:
+      - 3306:3306
+    volumes:
+      - "./mysql/schema.sql:/docker-entrypoint-initdb.d/schema.sql"
+    networks:
+      - sudt_faucet_network
+
+  issuer-server:
+    build:
+      context: issuer/
+    container_name: sudt-faucet-issuer
+    environment:
+      MYSQL_HOST: sudt-faucet-mysql
+      MYSQL_PORT: 3306
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: sudt_faucet
+      SENDGRID_API_KEY: 'your token api'
+      SENDGRID_VERIFIED_SENDER: 'your email'
+      USER_ADDRESS: '0x9104bD0fcd2C86F81407F6aa098182cc7621b6d0'
+    ports:
+      - "3046:1570"
+    networks:
+      - sudt_faucet_network
+    depends_on:
+      - mysql
+
+networks:
+  sudt_faucet_network:
+    driver: bridge
