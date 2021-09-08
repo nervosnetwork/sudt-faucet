@@ -9,6 +9,7 @@ import Login from './login';
 import TokenDetail from './tokenDetail';
 import TokenList from './tokenList';
 import TokenManagement from './tokenManagement';
+import TokenCharge from './tokenCharge';
 
 export const Issuer: React.FC = () => {
   const wallet = WalletContainer.useContainer();
@@ -38,8 +39,11 @@ export const Issuer: React.FC = () => {
           <Route path="/issue-token/:udtId">
             <IssueToken />
           </Route>
-          <Route path="/token-management">
+          <Route path="/token-management/:udtId">
             <TokenManagement />
+          </Route>
+          <Route path="/token-charge">
+            <TokenCharge></TokenCharge>
           </Route>
           <Route path="/">
             <Login />
