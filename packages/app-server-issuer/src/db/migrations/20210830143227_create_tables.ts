@@ -20,6 +20,7 @@ export async function up(knex: Knex): Promise<void> {
       .dateTime('updated_at')
       .notNullable()
       .defaultTo(knex.raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+    tableBuilder.charset('utf8mb4');
   });
 }
 
