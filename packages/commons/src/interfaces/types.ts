@@ -1,4 +1,5 @@
-import { HexString, HexNumber } from '@ckb-lumos/base';
+import { HexString, HexNumber, Address } from '@ckb-lumos/base';
+import { RcIdentity } from '@ckitjs/rc-lock';
 
 /* primitive */
 /**
@@ -13,10 +14,8 @@ export type Timestamp = number;
  * type id {@link https://xuejie.space/2020_02_03_introduction_to_ckb_script_programming_type_id/}
  */
 export type TypeId = HexString;
-/**
- * rc lock identity
- */
-export type RcIdentity = HexString;
+
+export { RcIdentity };
 
 export interface SudtStaticInfo {
   name: string;
@@ -39,6 +38,7 @@ export interface SudtInfo extends SudtStaticInfo {
 }
 
 export interface MailIssueInfo {
+  rcIdentity: RcIdentity;
   sudtId: Id;
 
   mail: string;
@@ -71,6 +71,7 @@ export interface Claiming {
   claimedStartAt: Timestamp;
   txHash: HexString;
   confirmation: number;
+  address: Address;
 }
 
 // claimed after 15 confirmations
@@ -79,6 +80,7 @@ export interface Claimed {
   claimedStartAt: Timestamp;
   claimedAt: Timestamp;
   txHash: HexString;
+  address: Address;
 }
 
 export type ClaimStatus = Unclaimed | Claiming | Claimed;
