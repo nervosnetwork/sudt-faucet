@@ -1,9 +1,11 @@
+import { rpc, ClaimHistory } from '@sudt-faucet/commons';
 import { Typography, Button, Table, Form, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { account } from '../types';
+import client from '../configs/client';
+import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -27,16 +29,23 @@ const StyleWrapper = styled.div`
 `;
 
 const TokenManagement: React.FC = () => {
-  const columns: ColumnsType<account> = [
+  const columns: ColumnsType<ClaimHistory> = [
     {
       key: 'mail',
       title: 'mail',
       dataIndex: 'mail',
     },
     {
-      key: 'date',
-      title: 'date',
-      dataIndex: 'date',
+      key: 'createdAt',
+      title: 'createdAt',
+      dataIndex: 'createdAt',
+      render: (createdAt) => <div>{formatTimeSpan(createdAt)}</div>,
+    },
+    {
+      key: 'expiredAt',
+      title: 'expiredAt',
+      dataIndex: 'expiredAt',
+      render: (expiredAt) => <div>{formatTimeSpan(expiredAt)}</div>,
     },
     {
       key: 'amount',
@@ -44,67 +53,60 @@ const TokenManagement: React.FC = () => {
       dataIndex: 'amount',
     },
     {
-      key: 'address',
-      title: 'address',
-      dataIndex: 'address',
+      key: 'claimSecret',
+      title: 'claimSecret',
+      dataIndex: 'claimSecret',
     },
     {
-      key: 'status',
-      title: 'status',
-      dataIndex: 'status',
-    },
-    {
-      key: 'claimCode',
-      title: 'claimCode',
-      dataIndex: 'claimCode',
+      key: 'claimStatus',
+      title: 'claimStatus',
+      dataIndex: 'claimStatus',
+      render: (claimStatus) => <div>{claimStatus.status}</div>,
     },
     {
       key: 'action',
       title: 'action',
-      dataIndex: 'action',
-      render: () => <Button size="small">disable</Button>,
+      dataIndex: 'claimSecret',
+      render: (claimSecret) => (
+        <Button
+          size="small"
+          onClick={() => {
+            disableCliam(claimSecret);
+          }}
+        >
+          disable
+        </Button>
+      ),
     },
   ];
-  const data: account[] = [
-    {
-      mail: 'wangximing@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing1@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing2@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-    {
-      mail: 'wangximing3@cryptape.com',
-      date: '2020-09-09',
-      amount: 100,
-      address: 'ckbxxxxx',
-      status: 'expired',
-      claimCode: 'dajskldfj',
-    },
-  ];
+
+  const disableCliam = (claimSecret: string) => {
+    void client.disable_claim_secret({ claimSecret });
+  };
 
   const history = useHistory();
   const goCharge = () => {
     history.push('/token-charge');
   };
-
+  const { udtId } = useParams<{ udtId: string }>();
+  const [mailList, setMailList] = useState<ClaimHistory[]>([]);
+  const [sudtBalance, setSudtBalance] = useState<string>();
+  useEffect(() => {
+    const getClaimHistoryData = async () => {
+      const response: rpc.ListClaimHistoryResponse = await client.list_claim_history({ sudtId: udtId });
+      setMailList(response.histories);
+    };
+    const getBalance = async () => {
+      const response: rpc.GetClaimableSudtBalanceResponse = await client.get_claimable_sudt_balance({ sudtId: udtId });
+      setSudtBalance(response.amount);
+    };
+    void getBalance();
+    void getClaimHistoryData();
+  }, []);
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
   return (
     <StyleWrapper>
       <div className="account">
@@ -115,19 +117,19 @@ const TokenManagement: React.FC = () => {
           </Button>
         </Typography>
         <Typography className="number">54,321.12345 CKB</Typography>
-        <Typography className="number">54,321.12345 INS</Typography>
+        <Typography className="number">{sudtBalance} INS</Typography>
       </div>
       <div className="accountList">
         <div className="filter">
-          <Form name="customized_form_controls" layout="inline">
-            <Form.Item name="price" label="Price">
-              <Input />
+          <Form {...layout} name="customized_form_controls" layout="inline">
+            <Form.Item name="price" label="Filter:">
+              <Input placeholder="email/address" />
             </Form.Item>
             <Form.Item>
               <Select defaultValue="All" style={{ width: 120 }}>
                 <Select.Option value="wait-form-claim">wait form claim</Select.Option>
                 <Select.Option value="expired">expired</Select.Option>
-                <Select.Option value="expired">expired</Select.Option>
+                <Select.Option value="claimed">claimed</Select.Option>
                 <Select.Option value="all">all</Select.Option>
               </Select>
             </Form.Item>
@@ -138,7 +140,12 @@ const TokenManagement: React.FC = () => {
             </Form.Item>
           </Form>
         </div>
-        <Table rowKey="mail" columns={columns} dataSource={data} />
+        <Table
+          rowKey={(item) => item.mail + item.expiredAt}
+          columns={columns}
+          dataSource={mailList}
+          pagination={false}
+        />
       </div>
     </StyleWrapper>
   );

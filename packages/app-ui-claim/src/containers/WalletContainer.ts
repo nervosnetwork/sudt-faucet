@@ -1,12 +1,7 @@
 import { ConnectStatus, RcOwnerWallet, RcPwSigner } from '@ckitjs/ckit';
-import memoize from 'memoizee';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { ProviderContainer } from './CkitProviderContainer';
-
-// when the signature messages are all the same
-// memoize can be used to avoid MetaMask multiple popups
-RcPwSigner.prototype.signMessage = memoize(RcPwSigner.prototype.signMessage, { promise: true });
 
 export interface UnreadyWallet {
   stage: 'uninitialized';

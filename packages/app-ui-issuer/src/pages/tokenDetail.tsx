@@ -25,7 +25,7 @@ const TokenDetail: React.FC = () => {
     history.push(`/issue-token/${udtId}`);
   };
   const goToManagement = () => {
-    history.push('/token-management');
+    history.push(`/token-management/${udtId}`);
   };
   return (
     <StyleWrapper>

@@ -17,8 +17,10 @@ export type account = {
   claimCode: string;
 };
 
-export type emailIssue = {
+export type EmailIssue = {
+  sudtId: string;
   mail: string;
-  amount: number;
-  expiredDate: string;
+  amount: string;
+  expiredAt: number;
+  additionalMessage: string;
 };
