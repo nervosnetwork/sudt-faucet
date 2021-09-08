@@ -1,27 +1,31 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { message, Spin } from 'antd';
+import React, { useMemo } from 'react';
+import { ClaimContainer } from '../ClaimContainer';
 import Claim from './claim';
 import Header from './header';
 import Login from './login';
-import Success from './success';
 
 const Claimer: React.FC = () => {
+  const { wallet, address, claimSecret } = ClaimContainer.useContainer();
+
+  const view = useMemo(() => {
+    if (!wallet) return null;
+
+    if (!claimSecret) {
+      void message.error('Please click the claim link to reach this site, the claim needed a claim secret');
+      return null;
+    }
+
+    if (address && claimSecret) return <Claim address={address} claimSecret={claimSecret} />;
+    return <Login />;
+  }, [address, claimSecret, wallet]);
+
+  if (!wallet) return <Spin />;
+
   return (
     <div className="app">
       <Header title="UDT Cliamer" />
-      <Router>
-        <Switch>
-          <Route path="/login">
-            <Login />
-          </Route>
-          <Route path="/claim">
-            <Claim />
-          </Route>
-          <Route path="/scccess">
-            <Success />
-          </Route>
-        </Switch>
-      </Router>
+      {view}
     </div>
   );
 };
