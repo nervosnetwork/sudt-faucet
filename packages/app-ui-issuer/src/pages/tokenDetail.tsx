@@ -18,7 +18,6 @@ const TokenDetail: React.FC = () => {
   const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
   const { data: udts, isLoading } = useListRcSupplyLockUdtQuery(udtId);
-
   const foundUdtInfo = udts?.[0];
 
   const goToIssus = () => {

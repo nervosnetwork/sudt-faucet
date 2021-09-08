@@ -94,7 +94,7 @@ const TokenManagement: React.FC = () => {
 
   const history = useHistory();
   const goCharge = () => {
-    history.push('/token-charge');
+    history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
   const [mailList, setMailList] = useState<ClaimHistory[]>([]);

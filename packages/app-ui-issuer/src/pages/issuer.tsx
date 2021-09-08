@@ -42,7 +42,7 @@ export const Issuer: React.FC = () => {
           <Route path="/token-management/:udtId">
             <TokenManagement />
           </Route>
-          <Route path="/token-charge">
+          <Route path="/token-charge/:udtId">
             <TokenCharge></TokenCharge>
           </Route>
           <Route path="/">
