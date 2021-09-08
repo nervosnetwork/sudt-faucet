@@ -31,7 +31,7 @@ module.exports = {
   ],
   devServer: {
     proxy: {
-        '/sudt-issuer/api/v1': 'http://localhost:1570'
-    }
-}
+      '/sudt-issuer/api/v1': 'http://localhost:1570',
+    },
+  },
 };

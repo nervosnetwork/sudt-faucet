@@ -29,4 +29,9 @@ module.exports = {
       },
     },
   ],
+  devServer: {
+    proxy: {
+      '/sudt-issuer/api/v1': 'http://localhost:1570/',
+    },
+  },
 };

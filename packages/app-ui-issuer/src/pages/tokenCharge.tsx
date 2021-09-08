@@ -1,9 +1,11 @@
-import { Form, Input, Button, Typography } from 'antd';
+import { MintRcUdtBuilder } from '@ckitjs/ckit';
+import { Form, Input, Button, Typography, message } from 'antd';
 import { useFormik } from 'formik';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { useListRcSupplyLockUdtQuery } from '../hooks';
+import client from '../configs/client';
+import { useListRcSupplyLockUdtQuery, useProvider, useRcSigner, useSendTransaction } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px 60px;
@@ -21,8 +23,20 @@ interface FormError {
 
 const TokenCharge: React.FC = () => {
   const history = useHistory();
+  const provider = useProvider();
   const { udtId } = useParams<{ udtId: string }>();
   const { data: udts } = useListRcSupplyLockUdtQuery(udtId);
+  const { rcIdentity } = useRcSigner();
+  const { mutateAsync: sendTransaction, isLoading } = useSendTransaction();
+
+  const [chargeAddress, setChargeAddress] = useState<string>();
+
+  const [ckbAmount, setCkbAmount] = useState('0');
+  const [sudtAmount, setSudtAmount] = useState('0');
+
+  useEffect(() => {
+    void client.get_claimable_account_address().then(setChargeAddress);
+  }, []);
   const foundUdtInfo = udts?.[0];
   const validate = (values: FormValues) => {
     if (!foundUdtInfo) return;
@@ -39,6 +53,31 @@ const TokenCharge: React.FC = () => {
     return errors;
   };
 
+  function charge() {
+    if (!chargeAddress) {
+      void message.error('Charge address is loaded');
+      return;
+    }
+    void new MintRcUdtBuilder(
+      {
+        udtId,
+        rcIdentity,
+        recipients: [
+          {
+            recipient: chargeAddress,
+            amount: sudtAmount,
+            //TODO findOrCreate
+            capacityPolicy: 'createCell',
+            additionalCapacity: ckbAmount,
+          },
+        ],
+      },
+      provider,
+    )
+      .build()
+      .then(sendTransaction);
+  }
+
   const initialValues: FormValues = {
     capaticy: '',
     amount: '',
@@ -49,23 +88,37 @@ const TokenCharge: React.FC = () => {
     validate,
     onSubmit: (values: FormValues) => {
       history.push('/token-list');
+      charge();
     },
   });
+
+  if (!chargeAddress) return null;
   return (
     <StyleWrapper>
       <Form name="basic">
+        <Form.Item label="to">
+          <div>{chargeAddress}</div>
+        </Form.Item>
         <Form.Item label="Capaticy(CKB)" name="capaticy">
-          <Input {...formik.getFieldProps('capaticy')} />
+          <Input
+            {...formik.getFieldProps('capaticy')}
+            value={ckbAmount}
+            onChange={(e) => setCkbAmount(e.target.value)}
+          />
           <Typography.Text type="danger">{formik.errors.capaticy}</Typography.Text>
         </Form.Item>
 
         <Form.Item label="Amount(Ins)" name="amount">
-          <Input {...formik.getFieldProps('amount')} />
+          <Input
+            {...formik.getFieldProps('amount')}
+            value={sudtAmount}
+            onChange={(e) => setSudtAmount(e.target.value)}
+          />
           <Typography.Text type="danger">{formik.errors.amount}</Typography.Text>
         </Form.Item>
 
         <Form.Item>
-          <Button onClick={() => formik.submitForm()} type="primary">
+          <Button loading={isLoading} onClick={() => formik.submitForm()} type="primary">
             Submit
           </Button>
         </Form.Item>

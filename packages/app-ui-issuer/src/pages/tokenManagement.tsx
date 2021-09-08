@@ -10,20 +10,25 @@ import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
   padding: 20px;
+
   .actions {
     display: flex;
     flex-direction: column;
     padding-bottom: 10px;
+
     button + button {
       margin-top: 10px;
     }
   }
+
   .account {
     padding-bottom: 10px;
   }
+
   .number {
     font-size: 28px;
   }
+
   .filter {
     padding-bottom: 10px;
   }
@@ -110,7 +115,7 @@ const TokenManagement: React.FC = () => {
     };
     void getBalance();
     void getClaimHistoryData();
-  }, []);
+  }, [udtId]);
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
