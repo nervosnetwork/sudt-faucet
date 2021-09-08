@@ -22,7 +22,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
         const secrets = unsendTransactions.map((value) => value.secret);
         await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
         await txManage.waitForCommit(txHash);
-        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionConfrim');
+        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionConfirm');
       } else {
         await utils.sleep(15000);
       }

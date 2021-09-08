@@ -78,7 +78,12 @@ export interface Claimed {
   address: Address;
 }
 
-export type ClaimStatus = Unclaimed | Claiming | Claimed;
+// the claimable secret has been disabled by issuer
+export interface Disabled {
+  status: 'disabled';
+}
+
+export type ClaimStatus = Unclaimed | Claiming | Claimed | Disabled;
 
 export interface ClaimHistory {
   /**
