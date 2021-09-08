@@ -34,7 +34,6 @@ export interface SudtInfo extends SudtStaticInfo {
 }
 
 export interface MailIssueInfo {
-  rcIdentity: RcIdentity;
   sudtId: string;
 
   mail: string;

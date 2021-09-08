@@ -87,6 +87,7 @@ export interface GetIssuedHistoryResponse {
 }
 
 export interface SendClaimableMailsPayload {
+  rcIdentity: RcIdentity;
   recipients: Array<MailIssueInfo>;
 }
 
