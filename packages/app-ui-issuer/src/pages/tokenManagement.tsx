@@ -9,20 +9,25 @@ import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
   padding: 20px;
+
   .actions {
     display: flex;
     flex-direction: column;
     padding-bottom: 10px;
+
     button + button {
       margin-top: 10px;
     }
   }
+
   .account {
     padding-bottom: 10px;
   }
+
   .number {
     font-size: 28px;
   }
+
   .filter {
     padding-bottom: 10px;
   }
@@ -86,7 +91,7 @@ const TokenManagement: React.FC = () => {
 
   const history = useHistory();
   const goCharge = () => {
-    history.push('/token-charge');
+    history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
   const [mailList, setMailList] = useState<ClaimHistory[]>([]);
