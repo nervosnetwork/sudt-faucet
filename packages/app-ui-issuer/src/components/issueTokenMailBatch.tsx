@@ -1,31 +1,36 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Table, Modal, Input, DatePicker, message } from 'antd';
+import { MailIssueInfo } from '@sudt-faucet/commons/dist';
+import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
-import { EmailIssue } from '../types';
+import { useRcSigner } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px;
+
   .header {
     padding-bottom: 10px;
   }
+
   .column-header {
     display: flex;
     justify-content: space-between;
   }
+
   .footer {
     padding-top: 20px;
   }
+
   .file-input {
     display: none;
   }
+
   .file-upload-button {
     display: inline-block;
-    border: 1px solid black;
     border-radius: 4px;
     border: 1px solid transparent;
     border-color: #d9d9d9;
@@ -33,9 +38,11 @@ const StyleWrapper = styled.div`
     padding: 4px 15px;
     font-size: 14px;
     line-height: 1.5;
+
     span {
       padding-right: 10px;
     }
+
     &:hover {
       cursor: pointer;
     }
@@ -43,13 +50,14 @@ const StyleWrapper = styled.div`
 `;
 
 const IssueTokenMailBatch: React.FC = () => {
+  const { rcIdentity } = useRcSigner();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
   const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
-  const [userList, setUserList] = useState<EmailIssue[]>([]);
+  const [userList, setUserList] = useState<MailIssueInfo[]>([]);
 
   const { udtId } = useParams<{ udtId: string }>();
 
@@ -78,7 +86,7 @@ const IssueTokenMailBatch: React.FC = () => {
   const handleAddtionalSubmit = async () => {
     updateAdditional(additionalMessage);
     try {
-      await client.send_claimable_mails({ recipients: userList });
+      await client.send_claimable_mails({ recipients: userList, rcIdentity: rcIdentity });
       setIsAddtionalModalVisible(false);
     } catch (error) {
       void message.error('Email send error');
@@ -107,6 +115,7 @@ const IssueTokenMailBatch: React.FC = () => {
       }
       return result;
     }
+
     const fileReader = new FileReader();
     files[0] && fileReader.readAsText(files[0]);
     fileReader.addEventListener('loadend', (e) => {
@@ -116,7 +125,7 @@ const IssueTokenMailBatch: React.FC = () => {
   };
 
   const updateEmailList = (mailList: string[]) => {
-    const newUserList = mailList.map((mail: string) => {
+    const newUserList = mailList.map<MailIssueInfo>((mail: string) => {
       return {
         sudtId: udtId,
         mail,
@@ -129,22 +138,21 @@ const IssueTokenMailBatch: React.FC = () => {
   };
 
   const updateAmount = (amount: string) => {
-    const newUserList = userList.map((user: EmailIssue) => {
+    const newUserList = userList.map((user) => {
       return { ...user, ...{ amount: amount } };
     });
     setUserList(newUserList);
   };
 
   const updateExpired = (expiredDate: number) => {
-    const newUserList = userList.map((user: EmailIssue) => {
+    const newUserList = userList.map((user) => {
       return { ...user, ...{ expiredAt: expiredDate } };
     });
-    console.log(newUserList);
     setUserList(newUserList);
   };
 
   const updateAdditional = (additionalMessage: string) => {
-    const newUserList = userList.map((user: EmailIssue) => {
+    const newUserList = userList.map((user) => {
       return { ...user, ...{ additionalMessage: additionalMessage } };
     });
     setUserList(newUserList);
@@ -162,7 +170,7 @@ const IssueTokenMailBatch: React.FC = () => {
     setAdditionalMessage(e.target.value);
   };
 
-  const columns: ColumnsType<EmailIssue> = [
+  const columns: ColumnsType<MailIssueInfo> = [
     {
       key: 'mail-key',
       title: 'mail',

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { ClaimContainer } from '../ClaimContainer';
 import { Address } from './address';
-import { WalletContainer } from '../containers';
 
 interface IProps {
   title?: string;
@@ -18,14 +18,14 @@ const HeaderWrapper = styled.div`
 `;
 
 const Header: React.FC<IProps> = (props: IProps) => {
-  const wallet = WalletContainer.useContainer();
+  const { address } = ClaimContainer.useContainer();
 
   return (
     <HeaderWrapper>
       <div>{props.title}</div>
-      {wallet.stage === 'readyToSign' && (
+      {address && (
         <div>
-          <Address address={wallet.address} />
+          <Address address={address} />
         </div>
       )}
     </HeaderWrapper>
