@@ -6,7 +6,7 @@ import { IssuerRpcHandler } from './handler';
 export function startRpcServer(): void {
   const app = express();
   app.use(bodyParser.json());
-
+  app.use(express.static('build'));
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler();
 
