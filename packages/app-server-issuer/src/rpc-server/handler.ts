@@ -34,9 +34,9 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     throw new Error('Only the owner is allowed to access');
   }
 
-  get_user_address(req: Request): string {
+  verify_user(req: Request): void {
     const token = req.get('authorization') || '';
-    return verifyToken(token, keyPair.publicKey);
+    verifyToken(token, keyPair.publicKey);
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
