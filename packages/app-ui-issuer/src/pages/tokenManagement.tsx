@@ -1,7 +1,8 @@
 import { rpc, ClaimHistory } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select } from 'antd';
+import { Typography, Button, Table, Form, Input, Select, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React, { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
@@ -94,20 +95,31 @@ const TokenManagement: React.FC = () => {
     history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
-  const [mailList, setMailList] = useState<ClaimHistory[]>([]);
-  const [sudtBalance, setSudtBalance] = useState<string>();
-  useEffect(() => {
-    const getClaimHistoryData = async () => {
-      const response: rpc.ListClaimHistoryResponse = await client.list_claim_history({ sudtId: udtId });
-      setMailList(response.histories);
-    };
-    const getBalance = async () => {
-      const response: rpc.GetClaimableSudtBalanceResponse = await client.get_claimable_sudt_balance({ sudtId: udtId });
-      setSudtBalance(response.amount);
-    };
-    void getBalance();
-    void getClaimHistoryData();
-  }, []);
+  const historyQuery = useQuery(
+    'getClaimHistoryData',
+    () => {
+      return client.list_claim_history({ sudtId: udtId });
+    },
+    {
+      onError: (error) => {
+        void message.error(error as string);
+        history.push('/login');
+      },
+    },
+  );
+  const balanceQuery = useQuery(
+    'getBalance',
+    () => {
+      return client.get_claimable_sudt_balance({ sudtId: udtId });
+    },
+    {
+      onError: (error) => {
+        void message.error(error as string);
+        history.push('/login');
+      },
+    },
+  );
+
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -122,7 +134,7 @@ const TokenManagement: React.FC = () => {
           </Button>
         </Typography>
         <Typography className="number">54,321.12345 CKB</Typography>
-        <Typography className="number">{sudtBalance} INS</Typography>
+        <Typography className="number">{balanceQuery.data?.amount} INS</Typography>
       </div>
       <div className="accountList">
         <div className="filter">
@@ -148,7 +160,7 @@ const TokenManagement: React.FC = () => {
         <Table
           rowKey={(item) => item.mail + item.expiredAt}
           columns={columns}
-          dataSource={mailList}
+          dataSource={historyQuery.data?.histories}
           pagination={false}
         />
       </div>

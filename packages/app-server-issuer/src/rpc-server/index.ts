@@ -37,6 +37,7 @@ export function startRpcServer(context: ServerContext): void {
       } catch (error) {
         res.status(401);
         res.json(error);
+        return;
       }
     }
     //TODO handle auth
