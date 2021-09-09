@@ -1,0 +1,28 @@
+# upstream sudt.faucet.me {
+#     server 127.0.0.1 max_fails=7 fail_timeout=7s;
+# }
+
+server {
+    listen       1081;
+    # server_name  sudt.faucet.me;
+    location / {
+        root /var/lib/sudt-faucet/packages/app-ui-claim/build;
+    }
+    location /sudt-issuer/api/v1{
+        proxy_pass http://127.0.0.1:1570;
+        proxy_redirect     off;
+    }
+}
+server {
+    listen       1080;
+    # server_name  sudt.faucet.me;
+
+    location / {
+        root /var/lib/sudt-faucet/packages/app-ui-issuer/build;
+    }
+
+    location /sudt-issuer/api/v1 {
+        proxy_pass http://127.0.0.1:1570;
+        proxy_redirect     off;
+    }
+}
