@@ -7,6 +7,7 @@ import {
   ClaimStatus,
   Unclaimed,
   Claimed,
+  Disabled,
 } from '@sudt-faucet/commons';
 import dotenv from 'dotenv';
 import { Request } from 'express';
@@ -33,9 +34,9 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     throw new Error('Only the owner is allowed to access');
   }
 
-  get_user_address(req: Request): string {
+  verify_user(req: Request): void {
     const token = req.get('authorization') || '';
-    return verifyToken(token, keyPair.publicKey);
+    verifyToken(token, keyPair.publicKey);
   }
 
   list_issued_sudt(_payload: rpc.GetIssuedHistoryPayload): Promise<rpc.GetIssuedHistoryResponse> {
@@ -86,13 +87,18 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
               address: record.claim_address,
             } as Claimed;
           }
+          case 'Disabled': {
+            return {
+              status: 'disabled',
+            } as Disabled;
+          }
           default:
             throw new Error('exception: unknown record status');
         }
       })();
       return {
         mail: record.mail_address,
-        createdAt: new Date(record.created_at).getMilliseconds(),
+        createdAt: new Date(record.created_at).getTime(),
         expiredAt: record.expire_time,
         amount: record.amount,
         claimSecret: record.secret,

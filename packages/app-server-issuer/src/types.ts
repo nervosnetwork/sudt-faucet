@@ -20,10 +20,19 @@ export interface MailIssue {
   tx_hash: string;
   confirm_number: number;
   confirm_time: number;
-  // WaitForSendMail, WaitForClaim, WaitForTransfer, SendingTransaction, WaitForTransactionCommit, WaitForTransactionConfirm, Done
-  status: string;
+  status: MailIssueStatus;
   created_at: string;
 }
+
+export type MailIssueStatus =
+  | 'WaitForSendMail'
+  | 'WaitForClaim'
+  | 'WaitForTransfer'
+  | 'SendingTransaction'
+  | 'WaitForTransactionCommit'
+  | 'WaitForTransactionConfirm'
+  | 'Done'
+  | 'Disabled';
 
 export type InsertMailIssue = Pick<
   MailIssue,
