@@ -14,15 +14,12 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
       );
       if (unsendTransactions.length > 0) {
-        await db.updateStatusBySecrets(
-          unsendTransactions.map((value) => value.secret),
-          'SendingTransaction',
-        );
-        const txHash = await txManage.sendTransaction(unsendTransactions);
         const secrets = unsendTransactions.map((value) => value.secret);
+        await db.updateStatusBySecrets(secrets, 'SendingTransaction');
+        const txHash = await txManage.sendTransaction(unsendTransactions);
         await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
         await txManage.waitForCommit(txHash);
-        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionConfirm');
+        await db.updateStatusBySecrets(secrets, 'WaitForTransactionConfirm');
       } else {
         await utils.sleep(15000);
       }
@@ -30,7 +27,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
     } catch (e) {
       // TODO use log
       console.error(`An error occurred while transfer sudt: ${e}`);
-      await utils.sleep(15000);
+      await utils.sleep(300000);
     }
   }
 }

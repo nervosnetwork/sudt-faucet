@@ -42,7 +42,7 @@ export function startRpcServer(context: ServerContext): void {
     });
   });
 
-  const port = 1570;
+  const port = (process.env.SERVER_LISTEN_PORT ?? 1570) as number;
   app.listen(port, () => {
     console.log(`issuer server listen at ${port}`);
   });

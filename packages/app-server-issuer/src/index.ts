@@ -21,8 +21,8 @@ async function initContext(): Promise<ServerContext> {
   await ckitProvider.init(predefined.Aggron);
   // TODO get private key from keystore
   const txSigner = new internal.Secp256k1Signer(process.env.PRIVATE_KEY, ckitProvider, {
-    code_hash: ckitProvider.getScriptConfig('SECP256K1_BLAKE160').CODE_HASH,
-    hash_type: ckitProvider.getScriptConfig('SECP256K1_BLAKE160').HASH_TYPE,
+    code_hash: ckitProvider.getScriptConfig('ANYONE_CAN_PAY').CODE_HASH,
+    hash_type: ckitProvider.getScriptConfig('ANYONE_CAN_PAY').HASH_TYPE,
   });
   return { ckitProvider, txSigner };
 }
