@@ -51,16 +51,6 @@ export class RpcClient implements rpc.IssuerRpc {
     return rpcClient.request('send_claimable_mails', payload);
   }
 
-  async get_claimable_sudt_balance(
-    payload: rpc.GetClaimableSudtBalancePayload,
-  ): Promise<rpc.GetClaimableSudtBalanceResponse> {
-    return Promise.resolve({
-      address: 'Address',
-      amount: 'HexNumber7788',
-    });
-    return rpcClient.request('get_claimable_sudt_balance', payload);
-  }
-
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
     return rpcClient.request('list_claim_history', payload);
   }
@@ -71,5 +61,9 @@ export class RpcClient implements rpc.IssuerRpc {
 
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
     return rpcClient.request('claim_sudt', payload);
+  }
+
+  async get_claim_history(payload: rpc.GetClaimHistoryPayload): Promise<rpc.GetClaimHistoryResponse> {
+    return rpcClient.request('get_claim_history', payload);
   }
 }

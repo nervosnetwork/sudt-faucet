@@ -37,19 +37,18 @@ export interface IssuerRpc {
   send_claimable_mails(payload: SendClaimableMailsPayload): Promise<void>;
 
   /**
-   * the server maintains a private key, and the sudt issuer can issue to the corresponding address,
-   * the balance of this address will be used to automate the claim transfer
-   * @permission [owner]
-   * @param payload
-   */
-  get_claimable_sudt_balance(payload: GetClaimableSudtBalancePayload): Promise<GetClaimableSudtBalanceResponse>;
-
-  /**
    * list all claim histories
    * @permission [owner]
    * @param payload
    */
   list_claim_history(payload: ListClaimHistoryPayload): Promise<ListClaimHistoryResponse>;
+
+  /**
+   * get single claim history via claim secret
+   * @permission [anyone]
+   * @param payload
+   */
+  get_claim_history(payload: GetClaimHistoryPayload): Promise<GetClaimHistoryResponse>;
 
   /**
    * @permission [owner]
@@ -111,6 +110,14 @@ export interface ListClaimHistoryPayload {
 
 export interface ListClaimHistoryResponse {
   histories: ClaimHistory[];
+}
+
+export interface GetClaimHistoryPayload {
+  secret: string;
+}
+
+export interface GetClaimHistoryResponse {
+  history: ClaimHistory | undefined;
 }
 
 export interface DisableClaimSecretPayload {

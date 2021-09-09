@@ -8,11 +8,12 @@ import {
   Unclaimed,
   Claimed,
   Disabled,
+  ClaimHistory,
 } from '@sudt-faucet/commons';
 import dotenv from 'dotenv';
 import { Request } from 'express';
 import { DB } from '../db';
-import { InsertMailIssue, ServerContext } from '../types';
+import { InsertMailIssue, MailIssue, ServerContext } from '../types';
 import { genKeyPair } from '../util/createKey';
 
 dotenv.config();
@@ -69,43 +70,13 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
     const records = await DB.getInstance().getRecordsBySudtId(payload.sudtId);
-    const claimHistories = records.map((record) => {
-      const claimStatus: ClaimStatus = (() => {
-        switch (record.status) {
-          case 'WaitForSendMail':
-          case 'WaitForClaim':
-            return { status: 'unclaimed' } as Unclaimed;
-          case 'WaitForTransfer':
-          case 'SendingTransaction':
-          case 'WaitForTransactionCommit':
-          case 'WaitForTransactionConfirm': {
-            return {
-              status: 'claimed',
-              claimedStartAt: 0,
-              txHash: 'undo',
-              claimedAt: 0,
-              address: record.claim_address,
-            } as Claimed;
-          }
-          case 'Disabled': {
-            return {
-              status: 'disabled',
-            } as Disabled;
-          }
-          default:
-            throw new Error('exception: unknown record status');
-        }
-      })();
-      return {
-        mail: record.mail_address,
-        createdAt: new Date(record.created_at).getTime(),
-        expiredAt: record.expire_time,
-        amount: record.amount,
-        claimSecret: record.secret,
-        claimStatus,
-      };
-    });
+    const claimHistories = records.map(convertRecordToResponse);
     return { histories: claimHistories };
+  }
+
+  async get_claim_history(payload: rpc.GetClaimHistoryPayload): Promise<rpc.GetClaimHistoryResponse> {
+    const record = await DB.getInstance().getRecordBySecret(payload.secret);
+    return { history: record ? convertRecordToResponse(record) : undefined };
   }
 
   get_claimable_account_address(): Promise<string> {
@@ -128,4 +99,41 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     if (status !== 'WaitForClaim') throw new Error('error: status not unclaimed');
     return db.claimBySecret(payload.claimSecret, payload.address, 'WaitForTransfer');
   }
+}
+
+function convertRecordToResponse(record: MailIssue): ClaimHistory {
+  const claimStatus: ClaimStatus = (() => {
+    switch (record.status) {
+      case 'WaitForSendMail':
+      case 'WaitForClaim':
+        return { status: 'unclaimed' } as Unclaimed;
+      case 'WaitForTransfer':
+      case 'SendingTransaction':
+      case 'WaitForTransactionCommit':
+      case 'WaitForTransactionConfirm': {
+        return {
+          status: 'claimed',
+          claimedStartAt: 0,
+          txHash: 'undo',
+          claimedAt: 0,
+          address: record.claim_address,
+        } as Claimed;
+      }
+      case 'Disabled': {
+        return {
+          status: 'disabled',
+        } as Disabled;
+      }
+      default:
+        throw new Error('exception: unknown record status');
+    }
+  })();
+  return {
+    mail: record.mail_address,
+    createdAt: new Date(record.created_at).getTime(),
+    expiredAt: record.expire_time,
+    amount: record.amount,
+    claimSecret: record.secret,
+    claimStatus,
+  };
 }
