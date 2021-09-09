@@ -12,12 +12,12 @@ const StyleWrapper = styled.div`
 `;
 
 interface FormValues {
-  capaticy: string;
+  capacity: string;
   amount: string;
 }
 
 interface FormError {
-  capaticy?: string;
+  capacity?: string;
   amount?: string;
 }
 
@@ -41,12 +41,12 @@ const TokenCharge: React.FC = () => {
   const validate = (values: FormValues) => {
     if (!foundUdtInfo) return;
     const errors: FormError = {};
-    if (!values.capaticy) {
-      errors.capaticy = 'Capaticy is Required';
+    if (!values.capacity) {
+      errors.capacity = 'Capacity is Required';
     }
     const leftAmount = BigInt(foundUdtInfo.maxSupply) - BigInt(foundUdtInfo.currentSupply);
     if (!values.amount) {
-      errors.amount = 'Capaticy is Required';
+      errors.amount = 'Capacity is Required';
     } else if (BigInt(values.amount) >= leftAmount) {
       errors.amount = `Must be less than or equal to ${leftAmount}`;
     }
@@ -78,7 +78,7 @@ const TokenCharge: React.FC = () => {
   }
 
   const initialValues: FormValues = {
-    capaticy: '',
+    capacity: '',
     amount: '',
   };
 
@@ -104,13 +104,13 @@ const TokenCharge: React.FC = () => {
         <Form.Item label="to">
           <div>{chargeAddress}</div>
         </Form.Item>
-        <Form.Item label="Capaticy(CKB)" name="capaticy">
+        <Form.Item label="Capacity(CKB)" name="capacity">
           <Input
-            {...formik.getFieldProps('capaticy')}
+            {...formik.getFieldProps('capacity')}
             value={ckbAmount}
             onChange={(e) => setCkbAmount(e.target.value)}
           />
-          <Typography.Text type="danger">{formik.errors.capaticy}</Typography.Text>
+          <Typography.Text type="danger">{formik.errors.capacity}</Typography.Text>
         </Form.Item>
 
         <Form.Item label="Amount(Ins)" name="amount">
