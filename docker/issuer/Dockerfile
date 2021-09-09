@@ -10,12 +10,6 @@ RUN cd sudt-faucet/packages/app-ui-issuer && yarn build && cp -r build/ ../app-s
 RUN cd sudt-faucet/packages/app-server-issuer && yarn build
 
 EXPOSE 1570
-CMD cd sudt-faucet/packages/app-server-issuer && node dist/index.js
-
-
-
-
-
-
+CMD cd sudt-faucet/packages/app-server-issuer && sleep 30 && npx knex migrate:latest --knexfile ./src/db/knexfile.ts --env development  && node dist/index.js
 
 
