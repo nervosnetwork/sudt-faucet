@@ -26,6 +26,10 @@ const rpcClient: JSONRPCClient = new JSONRPCClient((jsonRPCRequest) => {
       return Promise.reject(new Error(response.statusText));
     }
 
+    if (response.status === 401) {
+      localStorage.removeItem('authorization');
+    }
+
     return Promise.reject(response);
   });
 });
