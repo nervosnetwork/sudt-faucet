@@ -8,7 +8,7 @@ import { IssuerRpcHandler } from './handler';
 export function startRpcServer(context: ServerContext): void {
   const app = express();
   app.use(bodyParser.json());
-  app.use(express.static('build'));
+
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
@@ -27,8 +27,16 @@ export function startRpcServer(context: ServerContext): void {
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
+    if (jsonRpcRequest.method !== 'login') {
+      try {
+        rpcHandler.verify_user(req);
+      } catch (error) {
+        res.status(401);
+        res.json(error);
+        return;
+      }
+    }
     //TODO handle auth
-    // rpcHandler.get_user_address(req);
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
         res.json(jsonRpcResponse);

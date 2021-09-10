@@ -1,10 +1,15 @@
-import { rpc, ClaimHistory } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ClaimHistory } from '@sudt-faucet/commons';
+import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import React, { useEffect, useState } from 'react';
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
 import client from '../configs/client';
+import { useChargeCellBalanceQuery } from '../hooks/useChargeCellBalanceQuery';
 import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
@@ -63,6 +68,11 @@ const TokenManagement: React.FC = () => {
       dataIndex: 'claimSecret',
     },
     {
+      key: 'claimAddress',
+      title: 'claimAddress',
+      dataIndex: ['claimStatus', 'address'],
+    },
+    {
       key: 'claimStatus',
       title: 'claimStatus',
       dataIndex: 'claimStatus',
@@ -72,45 +82,90 @@ const TokenManagement: React.FC = () => {
       key: 'action',
       title: 'action',
       dataIndex: 'claimSecret',
-      render: (claimSecret) => (
-        <Button
-          size="small"
-          onClick={() => {
-            disableCliam(claimSecret);
-          }}
-        >
-          disable
-        </Button>
-      ),
+      render: (claimSecret, record: ClaimHistory) => {
+        return record.claimStatus.status !== 'unclaimed' ? (
+          <div></div>
+        ) : (
+          <Button
+            size="small"
+            onClick={() => {
+              disableClaim(claimSecret);
+            }}
+          >
+            disable
+          </Button>
+        );
+      },
     },
   ];
 
-  const disableCliam = (claimSecret: string) => {
-    void client.disable_claim_secret({ claimSecret });
+  const disableClaim = (claimSecret: string) => {
+    Modal.confirm({
+      title: 'Disable',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Would you want to disable the claim secret?',
+      onOk() {
+        client
+          .disable_claim_secret({ claimSecret })
+          .then(() => {
+            void message.success('disable the claim secret success');
+          })
+          .catch(() => {
+            void message.error('disable the claim secret fail');
+          });
+      },
+    });
   };
+
+  const [addressOrEmail, setAddressOrEmail] = useState('');
+  const [status, setStatus] = useState('');
 
   const history = useHistory();
   const goCharge = () => {
     history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
-  const [mailList, setMailList] = useState<ClaimHistory[]>([]);
-  const [sudtBalance, setSudtBalance] = useState<string>();
-  useEffect(() => {
-    const getClaimHistoryData = async () => {
-      const response: rpc.ListClaimHistoryResponse = await client.list_claim_history({ sudtId: udtId });
-      setMailList(response.histories);
-    };
-    const getBalance = async () => {
-      const response: rpc.GetClaimableSudtBalanceResponse = await client.get_claimable_sudt_balance({ sudtId: udtId });
-      setSudtBalance(response.amount);
-    };
-    void getBalance();
-    void getClaimHistoryData();
-  }, []);
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+  const historyQuery = useQuery(
+    ['getClaimHistoryData', { sudtId: udtId, status: status, addressOrEmail: addressOrEmail }],
+    () => {
+      return client.list_claim_history({ sudtId: udtId, status, addressOrEmail });
+    },
+    {
+      onError: (error) => {
+        void message.error(error as string);
+        history.push('/login');
+      },
+    },
+  );
+
+  const { data: chargeBalance } = useChargeCellBalanceQuery(udtId);
+  interface SearchForm {
+    addressOrEmail: string;
+    status: string;
+  }
+
+  const formik = useFormik<SearchForm>({
+    initialValues: {
+      addressOrEmail: '',
+      status: 'all',
+    },
+    onSubmit: (val) => {
+      setAddressOrEmail(val.addressOrEmail);
+      setStatus(val.status);
+    },
+
+    validate() {
+      // TODO
+      //  - name: required
+      //  - symbol: required
+      //  - description: required
+      //  - maxSupply: required, number, integer
+      //  - decimals: required, large than maxSupply
+    },
+  });
+
+  const handleChange = (value: string) => {
+    void formik.setFieldValue('status', value);
   };
   return (
     <StyleWrapper>
@@ -121,34 +176,42 @@ const TokenManagement: React.FC = () => {
             charge
           </Button>
         </Typography>
-        <Typography className="number">54,321.12345 CKB</Typography>
-        <Typography className="number">{sudtBalance} INS</Typography>
+        <Typography className="number">
+          {chargeBalance ? <CkbAssetAmount {...chargeBalance.ckb} /> : <Spin />}
+        </Typography>
+        <Typography className="number">{chargeBalance ? <AssetAmount {...chargeBalance.udt} /> : <Spin />}</Typography>
       </div>
       <div className="accountList">
         <div className="filter">
-          <Form {...layout} name="customized_form_controls" layout="inline">
-            <Form.Item name="price" label="Filter:">
-              <Input placeholder="email/address" />
+          <Form name="customized_form_controls" layout="inline">
+            <Form.Item name="filter" label="Filter:">
+              <Input
+                name="addressOrEmail"
+                placeholder="email/address"
+                onChange={formik.handleChange}
+                value={formik.values.addressOrEmail}
+              />
             </Form.Item>
             <Form.Item>
-              <Select defaultValue="All" style={{ width: 120 }}>
-                <Select.Option value="wait-form-claim">wait form claim</Select.Option>
-                <Select.Option value="expired">expired</Select.Option>
-                <Select.Option value="claimed">claimed</Select.Option>
+              <Select style={{ width: 240 }} onChange={(value) => handleChange(value)} value={formik.values.status}>
                 <Select.Option value="all">all</Select.Option>
+                <Select.Option value="unclaimed">unclaimed</Select.Option>
+                <Select.Option value="claiming">claiming</Select.Option>
+                <Select.Option value="claimed">claimed</Select.Option>
+                <Select.Option value="disabled">disabled</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" onClick={formik.submitForm}>
                 Submit
               </Button>
             </Form.Item>
           </Form>
         </div>
         <Table
-          rowKey={(item) => item.mail + item.expiredAt}
+          rowKey={(item) => item.mail + item.createdAt + item.claimSecret}
           columns={columns}
-          dataSource={mailList}
+          dataSource={historyQuery.data?.histories}
           pagination={false}
         />
       </div>
