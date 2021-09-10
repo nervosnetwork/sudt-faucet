@@ -77,7 +77,10 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
           case 'WaitForTransfer':
           case 'SendingTransaction':
           case 'WaitForTransactionCommit':
-          case 'WaitForTransactionConfirm': {
+          case 'WaitForTransactionConfirm':
+          case 'Done':
+          case 'TransferSudtError':
+          case 'SendMailError': {
             return {
               status: 'claimed',
               claimedStartAt: 0,
