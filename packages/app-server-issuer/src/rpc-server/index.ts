@@ -7,31 +7,34 @@ import { IssuerRpcHandler } from './handler';
 
 export function startRpcServer(context: ServerContext): void {
   const app = express();
-  app.use(bodyParser.json());
-
+  app.use(bodyParser.json({ limit: '100mb' }));
+  app.use(bodyParser.urlencoded({ limit: '100mb', extended: true, parameterLimit: 100000 }));
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
+  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
   rpcServer.addMethod('send_claimable_mails', (params) =>
     rpcHandler.send_claimable_mails(params as rpc.SendClaimableMailsPayload),
   );
-
   rpcServer.addMethod('disable_claim_secret', (params) =>
     rpcHandler.disable_claim_secret(params as rpc.DisableClaimSecretPayload),
   );
-  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
-
   rpcServer.addMethod('get_claimable_account_address', () => rpcHandler.get_claimable_account_address());
-
   rpcServer.addMethod('claim_sudt', (params) => rpcHandler.claim_sudt(params as rpc.ClaimSudtPayload));
-
   rpcServer.addMethod('list_claim_history', (params) =>
     rpcHandler.list_claim_history(params as rpc.ListClaimHistoryPayload),
   );
 
+  rpcServer.addMethod('get_claim_history', (params) =>
+    rpcHandler.get_claim_history(params as rpc.GetClaimHistoryPayload),
+  );
+
+  const permissionlessMethods = new Set(['login', 'claim_sudt', 'get_claim_history']);
+
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
-    if (jsonRpcRequest.method !== 'login') {
+
+    if (!permissionlessMethods.has(jsonRpcRequest.method)) {
       try {
         rpcHandler.verify_user(req);
       } catch (error) {
@@ -50,7 +53,7 @@ export function startRpcServer(context: ServerContext): void {
     });
   });
 
-  const port = 1570;
+  const port = (process.env.SERVER_LISTEN_PORT ?? 1570) as number;
   app.listen(port, () => {
     console.log(`issuer server listen at ${port}`);
   });

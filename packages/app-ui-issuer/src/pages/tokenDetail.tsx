@@ -1,4 +1,4 @@
-import { Button, Spin, Typography } from 'antd';
+import { Button, Descriptions, Spin } from 'antd';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -7,8 +7,10 @@ import { useListRcSupplyLockUdtQuery } from '../hooks/';
 
 const StyleWrapper = styled.div`
   padding: 20px;
+
   .actions {
     padding-bottom: 10px;
+
     button + button {
       margin-left: 10px;
     }
@@ -21,43 +23,43 @@ const TokenDetail: React.FC = () => {
   const { data: udts, isLoading } = useListRcSupplyLockUdtQuery(udtId);
   const foundUdtInfo = udts?.[0];
 
-  const goToIssus = () => {
+  const goToIssue = () => {
     history.push(`/issue-token/${udtId}`);
   };
   const goToManagement = () => {
     history.push(`/token-management/${udtId}`);
   };
+
   return (
     <StyleWrapper>
       <div className="actions">
-        <Button onClick={goToIssus}>Issue</Button>
+        <Button onClick={goToIssue}>Issue</Button>
         <Button onClick={goToManagement}>Management</Button>
       </div>
       {isLoading || !foundUdtInfo ? (
         <Spin />
       ) : (
-        <>
-          <Typography>Name: {foundUdtInfo.name}</Typography>
-          <Typography>Symbol: {foundUdtInfo.symbol}</Typography>
-          <Typography>
-            Max supply:&nbsp;
+        <Descriptions column={1} bordered size="small">
+          <Descriptions.Item label="Name">{foundUdtInfo.name}</Descriptions.Item>
+          <Descriptions.Item label="Symbol">{foundUdtInfo.symbol}</Descriptions.Item>
+          <Descriptions.Item label="Max supply">
             <AssetAmount
               amount={foundUdtInfo.maxSupply}
               decimals={foundUdtInfo.decimals}
               symbol={foundUdtInfo.symbol}
             />
-          </Typography>
-          <Typography>
-            Current supply:&nbsp;
+          </Descriptions.Item>
+
+          <Descriptions.Item label="Current supply">
             <AssetAmount
               amount={foundUdtInfo.currentSupply}
               decimals={foundUdtInfo.decimals}
               symbol={foundUdtInfo.symbol}
             />
-          </Typography>
-          <Typography>Decimals: {foundUdtInfo.decimals}</Typography>
-          <Typography>Description: {foundUdtInfo.description}</Typography>
-        </>
+          </Descriptions.Item>
+          <Descriptions.Item label="Decimals">{foundUdtInfo.decimals}</Descriptions.Item>
+          <Descriptions.Item label="Description">{foundUdtInfo.description}</Descriptions.Item>
+        </Descriptions>
       )}
     </StyleWrapper>
   );

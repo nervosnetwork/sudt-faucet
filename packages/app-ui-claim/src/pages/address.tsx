@@ -9,7 +9,13 @@ function truncateMiddle(str: string, start: number, end = start): string {
 
 export const Address: React.FC<{ address: string }> = ({ address }) => {
   return (
-    <Tooltip title={<Typography.Text copyable>{address}</Typography.Text>}>
+    <Tooltip
+      title={
+        <Typography.Text copyable>
+          {<Typography.Text style={{ color: 'white' }}>{address}</Typography.Text>}
+        </Typography.Text>
+      }
+    >
       <span>{truncateMiddle(address, 8, 8)}</span>
     </Tooltip>
   );
