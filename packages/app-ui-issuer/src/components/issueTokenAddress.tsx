@@ -4,7 +4,8 @@ import { useFormik } from 'formik';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { useProvider, useRcSigner, useSendTransaction } from '../hooks';
+import { useListRcSupplyLockUdtQuery, useProvider, useRcSigner, useSendTransaction } from '../hooks';
+import { fixedStringToBigint } from '@sudt-faucet/commons';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -23,7 +24,9 @@ const IssueTokenAddress: React.FC = () => {
   const provider = useProvider();
   const { rcIdentity } = useRcSigner();
   const { mutateAsync: sendTransaction } = useSendTransaction();
+  const { data: udts } = useListRcSupplyLockUdtQuery(udtId);
 
+  const foundUdtInfo = udts?.[0];
   const formik = useFormik<{ address: string; amount: string }>({
     async onSubmit(val) {
       const builder = new MintRcUdtBuilder(
@@ -33,7 +36,7 @@ const IssueTokenAddress: React.FC = () => {
           recipients: [
             {
               recipient: val.address,
-              amount: val.amount,
+              amount: fixedStringToBigint(val.amount, foundUdtInfo?.decimals || 0).toString(),
               capacityPolicy: 'findOrCreate',
               additionalCapacity: '100000000',
             },

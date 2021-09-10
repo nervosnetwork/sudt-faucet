@@ -1,5 +1,6 @@
 import { CreateRcUdtInfoCellBuilder } from '@ckitjs/ckit';
 import { SudtStaticInfo } from '@ckitjs/rc-lock';
+import { fixedStringToBigint } from '@sudt-faucet/commons';
 import { Button, Form, Input } from 'antd';
 import { useFormik } from 'formik';
 import React from 'react';
@@ -25,7 +26,9 @@ const CreateToken: React.FC = () => {
       symbol: '',
     },
     async onSubmit(val) {
-      const builder = new CreateRcUdtInfoCellBuilder({ sudtInfo: val, rcIdentity }, provider);
+      const maxSupply = fixedStringToBigint(val.maxSupply, val.decimals).toString();
+      const sudtInfo = { ...val, ...{ maxSupply } };
+      const builder = new CreateRcUdtInfoCellBuilder({ sudtInfo, rcIdentity }, provider);
       const unsigned = await builder.build();
       return sendTransaction(unsigned).then(goToTokenList);
     },
