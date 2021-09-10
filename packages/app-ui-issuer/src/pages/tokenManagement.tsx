@@ -1,5 +1,6 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ClaimHistory } from '@sudt-faucet/commons';
-import { Button, Form, Input, message, Select, Spin, Table, Typography } from 'antd';
+import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React from 'react';
 import { useQuery } from 'react-query';
@@ -89,7 +90,21 @@ const TokenManagement: React.FC = () => {
   ];
 
   const disableCliam = (claimSecret: string) => {
-    void client.disable_claim_secret({ claimSecret });
+    Modal.confirm({
+      title: 'Disable',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Would you want to disable the claim secret?',
+      onOk() {
+        client
+          .disable_claim_secret({ claimSecret })
+          .then(() => {
+            void message.success('disable the claim secret success');
+          })
+          .catch(() => {
+            void message.error('disable the claim secret fail');
+          });
+      },
+    });
   };
 
   const history = useHistory();

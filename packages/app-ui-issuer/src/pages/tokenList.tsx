@@ -19,7 +19,6 @@ const TokenList: React.FC = () => {
   const history = useHistory();
 
   const { data, isLoading } = useListRcSupplyLockUdtQuery();
-
   const goToCreateToken = () => {
     history.push('/create-token');
   };
