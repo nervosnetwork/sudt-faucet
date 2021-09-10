@@ -1,5 +1,5 @@
 import Knex, { Knex as IKnex } from 'knex';
-import { InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
+import { ClaimRecord, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -51,18 +51,35 @@ export class DB {
     await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
   }
 
+  public async updateErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
+    const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError, status: status });
+  }
+
   public async claimBySecret(secret: string, address: string, status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
   }
 
-  public async getRecordsBySudtId(sudtId: string): Promise<MailIssue[]> {
-    return this.knex.select('*').from<MailIssue>('mail_issue').where({ sudt_id: sudtId }).orderBy('id', 'desc');
+  public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimRecord[]> {
+    return (await this.knex
+      .select(
+        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+      )
+      .from<MailIssue>('mail_issue')
+      .where({ sudt_id: sudtId })
+      .orderBy('id', 'desc')) as unknown as ClaimRecord[];
   }
 
-  public async getRecordBySecret(secret: string): Promise<MailIssue | undefined> {
-    const ret = await this.knex.select('*').from<MailIssue>('mail_issue').where({ secret });
+  public async getClaimHistoryBySecret(secret: string): Promise<ClaimRecord | undefined> {
+    const ret = await this.knex
+      .select(
+        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+      )
+      .from<MailIssue>('mail_issue')
+      .where({ secret: secret });
+
     if (ret.length > 1) throw new Error('exception: secret not unique');
 
-    return ret?.[0];
+    return ret?.[0] as unknown as ClaimRecord;
   }
 }

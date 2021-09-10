@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
     tableBuilder.string('sudt_id').notNullable();
     tableBuilder.decimal('amount', 36, 0).unsigned().notNullable();
     tableBuilder.string('secret', 32).notNullable().unique();
-    tableBuilder.string('mail_message', 2048);
+    tableBuilder.string('mail_message', 2048).notNullable().defaultTo('');
     tableBuilder.bigInteger('expire_time');
     tableBuilder.bigInteger('claim_time');
     tableBuilder.string('claim_address');
@@ -17,6 +17,7 @@ export async function up(knex: Knex): Promise<void> {
     tableBuilder.integer('confirm_number');
     tableBuilder.bigInteger('confirm_time');
     tableBuilder.string('status').notNullable();
+    tableBuilder.string('error', 1024);
     tableBuilder.dateTime('created_at').notNullable().defaultTo(knex.raw('CURRENT_TIMESTAMP'));
     tableBuilder
       .dateTime('updated_at')
