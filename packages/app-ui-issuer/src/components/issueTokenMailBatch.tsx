@@ -2,7 +2,7 @@ import { UploadOutlined } from '@ant-design/icons';
 import { MailIssueInfo } from '@sudt-faucet/commons/dist';
 import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -182,6 +182,10 @@ const IssueTokenMailBatch: React.FC = () => {
     setAdditionalMessage(e.target.value);
   };
 
+  const disabledDate = (current: Moment) => {
+    return current.isBefore(moment().millisecond(expiredDate));
+  };
+
   const columns: ColumnsType<MailIssueInfo> = [
     {
       key: 'mail-key',
@@ -242,7 +246,7 @@ const IssueTokenMailBatch: React.FC = () => {
         <Input value={amount} onChange={handleAmountChange} />
       </Modal>
       <Modal title="Edit" visible={isExpiredModalVisible} onOk={handleExpiredSubmit} onCancel={handleExpiredCancel}>
-        <DatePicker showTime onChange={handleExpiredChange} />
+        <DatePicker showTime onChange={handleExpiredChange} disabledDate={disabledDate} />
       </Modal>
       <Modal
         title="E-Mali Content"

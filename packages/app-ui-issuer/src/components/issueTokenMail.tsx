@@ -1,5 +1,6 @@
 import { MailIssueInfo } from '@sudt-faucet/commons';
 import { Form, Input, Button, Modal, DatePicker, message } from 'antd';
+import moment, { Moment } from 'moment';
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,7 +20,7 @@ const StyleWrapper = styled.div`
 `;
 
 const IssueTokenMail: React.FC = () => {
-  const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
+  const [isAdditionalModalVisible, setIsAdditionalModalVisible] = useState(false);
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [mail, setMail] = useState('');
   const [amount, setAmount] = useState('');
@@ -28,11 +29,11 @@ const IssueTokenMail: React.FC = () => {
   const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
 
-  const showAddtionalModal = () => {
-    setIsAddtionalModalVisible(true);
+  const showAdditionalModal = () => {
+    setIsAdditionalModalVisible(true);
   };
 
-  const handleAddtionalSubmit = async () => {
+  const handleAdditionalSubmit = async () => {
     const user: MailIssueInfo = {
       sudtId: udtId,
       mail,
@@ -42,7 +43,7 @@ const IssueTokenMail: React.FC = () => {
     };
     try {
       await client.send_claimable_mails({ recipients: [user], rcIdentity });
-      setIsAddtionalModalVisible(false);
+      setIsAdditionalModalVisible(false);
       void message.success('Email send success');
       history.push(`/token-management/${udtId}`);
     } catch (error) {
@@ -50,8 +51,8 @@ const IssueTokenMail: React.FC = () => {
     }
   };
 
-  const handleAddtionalCancel = () => {
-    setIsAddtionalModalVisible(false);
+  const handleAdditionalCancel = () => {
+    setIsAdditionalModalVisible(false);
   };
 
   const handleMailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +69,10 @@ const IssueTokenMail: React.FC = () => {
 
   const handleExpiredChange = (dateValue: unknown, dateString: string) => {
     setExpiredDate(new Date(dateString).getTime());
+  };
+
+  const disabledDate = (current: Moment) => {
+    return current.isBefore(moment().millisecond(expiredDate));
   };
 
   return (
@@ -90,20 +95,20 @@ const IssueTokenMail: React.FC = () => {
           name="expiredTime"
           rules={[{ required: true, message: 'Please input your token expired time!' }]}
         >
-          <DatePicker showTime onChange={handleExpiredChange} />
+          <DatePicker showTime onChange={handleExpiredChange} disabledDate={disabledDate} />
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" onClick={showAddtionalModal}>
+          <Button type="primary" htmlType="submit" onClick={showAdditionalModal}>
             Send An Claimable E-mail
           </Button>
         </Form.Item>
       </Form>
       <Modal
         title="E-Mali Content"
-        visible={isAddtionalModalVisible}
-        onOk={handleAddtionalSubmit}
-        onCancel={handleAddtionalCancel}
+        visible={isAdditionalModalVisible}
+        onOk={handleAdditionalSubmit}
+        onCancel={handleAdditionalCancel}
       >
         <Input.TextArea value={additionalMessage} onChange={handleAdditionMessageChange} rows={10} />
       </Modal>
