@@ -1,9 +1,9 @@
 import Joi, { CustomHelpers, ErrorReport } from 'joi';
 
-export const sendMailsPaylodSchema = Joi.object({
+export const sendMailsPayloadSchema = Joi.object({
   rcIdentity: Joi.object({
     flag: Joi.number().required(),
-    pubkeyHash: Joi.string().custom(validateHex).length(66).required(),
+    pubkeyHash: Joi.string().custom(validateHex).length(42).required(),
   }).required(),
   recipients: Joi.array()
     .min(1)
@@ -12,7 +12,7 @@ export const sendMailsPaylodSchema = Joi.object({
         sudtId: Joi.string().required(),
         mail: Joi.string().email().max(255).required(),
         amount: Joi.string()
-          .pattern(/^[0-9]+$/)
+          .pattern(/^(0x)?[0-9]+$/)
           .max(36)
           .required(),
         expiredAt: Joi.number().custom(validateExpireAt, 'expire time should be later than now').required(),
@@ -22,7 +22,7 @@ export const sendMailsPaylodSchema = Joi.object({
     .required(),
 });
 
-export const claimSudtPaylodSchema = Joi.object({
+export const claimSudtPayloadSchema = Joi.object({
   claimSecret: Joi.string().length(32).required(),
   address: Joi.string().max(1024).required(),
 });

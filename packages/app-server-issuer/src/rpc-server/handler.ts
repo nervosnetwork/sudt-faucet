@@ -15,7 +15,7 @@ import Joi from 'joi';
 import { DB } from '../db';
 import { InsertMailIssue, ServerContext, ClaimRecord } from '../types';
 import { genKeyPair } from '../util/createKey';
-import { claimSudtPaylodSchema, sendMailsPaylodSchema } from './validate';
+import { claimSudtPayloadSchema, sendMailsPayloadSchema } from './validate';
 
 const keyPair = genKeyPair();
 
@@ -44,7 +44,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
-    const validatedPayload = Joi.attempt(payload, sendMailsPaylodSchema) as rpc.SendClaimableMailsPayload;
+    const validatedPayload = Joi.attempt(payload, sendMailsPayloadSchema) as rpc.SendClaimableMailsPayload;
 
     const recordsWithSecret: InsertMailIssue[] = validatedPayload.recipients.map((recipient) => {
       return {
@@ -95,7 +95,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
-    Joi.assert(payload, claimSudtPaylodSchema);
+    Joi.assert(payload, claimSudtPayloadSchema);
     this.context.ckitProvider.parseToScript(payload.address);
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
