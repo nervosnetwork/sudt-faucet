@@ -67,7 +67,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    const records = await DB.getInstance().getRecordsBySudtId(payload.sudtId);
+    const records = await DB.getInstance().getClaimHistoryBySudtId(payload.sudtId);
     const claimHistories = records.map((record) => {
       const claimStatus: ClaimStatus = (() => {
         switch (record.status) {
@@ -97,7 +97,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
       })();
       return {
         mail: record.mail_address,
-        createdAt: new Date(record.created_at).getTime(),
+        createdAt: Number(record.created_at) * 1000,
         expiredAt: record.expire_time,
         amount: record.amount,
         claimSecret: record.secret,

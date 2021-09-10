@@ -1,5 +1,5 @@
 import Knex, { Knex as IKnex } from 'knex';
-import { InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
+import { ClaimHistory, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -58,6 +58,15 @@ export class DB {
 
   public async claimBySecret(secret: string, address: string, status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
+  }
+
+  public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimHistory[]> {
+    return (await this.knex
+      .select(
+        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+      )
+      .from<MailIssue>('mail_issue')
+      .where({ sudt_id: sudtId })) as unknown as ClaimHistory[];
   }
 
   public async getRecordsBySudtId(sudtId: string): Promise<MailIssue[]> {

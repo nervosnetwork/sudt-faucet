@@ -55,3 +55,8 @@ export type TransactionToSend = Pick<
   MailIssue,
   'sudt_issuer_pubkey_hash' | 'sudt_issuer_rc_id_flag' | 'sudt_id' | 'amount' | 'claim_address' | 'secret'
 >;
+
+export type ClaimHistory = Pick<
+  MailIssue,
+  'mail_address' | 'amount' | 'secret' | 'created_at' | 'expire_time' | 'status' | 'claim_address'
+>;
