@@ -1,12 +1,14 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ClaimHistory } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select, Modal, message } from 'antd';
+import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import React from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
 import client from '../configs/client';
+import { useChargeCellBalanceQuery } from '../hooks/useChargeCellBalanceQuery';
 import { formatTimeSpan } from '../utils';
 
 const StyleWrapper = styled.div`
@@ -122,18 +124,8 @@ const TokenManagement: React.FC = () => {
       },
     },
   );
-  const balanceQuery = useQuery(
-    'getBalance',
-    () => {
-      return client.get_claimable_sudt_balance({ sudtId: udtId });
-    },
-    {
-      onError: (error) => {
-        void message.error(error as string);
-        history.push('/login');
-      },
-    },
-  );
+
+  const { data: chargeBalance } = useChargeCellBalanceQuery(udtId);
 
   const layout = {
     labelCol: { span: 8 },
@@ -148,8 +140,10 @@ const TokenManagement: React.FC = () => {
             charge
           </Button>
         </Typography>
-        <Typography className="number">54,321.12345 CKB</Typography>
-        <Typography className="number">{balanceQuery.data?.amount} INS</Typography>
+        <Typography className="number">
+          {chargeBalance ? <CkbAssetAmount {...chargeBalance.ckb} /> : <Spin />}
+        </Typography>
+        <Typography className="number">{chargeBalance ? <AssetAmount {...chargeBalance.udt} /> : <Spin />}</Typography>
       </div>
       <div className="accountList">
         <div className="filter">

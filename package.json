@@ -9,8 +9,6 @@
   "npmClient": "yarn",
   "workspaces": [
     "packages/*",
-    "apps/ui/*",
-    "apps/server/*",
     "ckit/packages/*"
   ],
   "devDependencies": {
