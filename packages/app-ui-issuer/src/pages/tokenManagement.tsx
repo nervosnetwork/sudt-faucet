@@ -2,7 +2,6 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { ClaimHistory } from '@sudt-faucet/commons';
 import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { SelectValue } from 'antd/lib/select';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
@@ -85,7 +84,7 @@ const TokenManagement: React.FC = () => {
           <Button
             size="small"
             onClick={() => {
-              disableCliam(claimSecret);
+              disableClaim(claimSecret);
             }}
           >
             disable
@@ -95,7 +94,7 @@ const TokenManagement: React.FC = () => {
     },
   ];
 
-  const disableCliam = (claimSecret: string) => {
+  const disableClaim = (claimSecret: string) => {
     Modal.confirm({
       title: 'Disable',
       icon: <ExclamationCircleOutlined />,
