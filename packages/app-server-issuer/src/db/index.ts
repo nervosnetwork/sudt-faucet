@@ -1,5 +1,5 @@
 import Knex, { Knex as IKnex } from 'knex';
-import { ClaimHistory, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
+import { ClaimRecord, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -60,23 +60,26 @@ export class DB {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
   }
 
-  public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimHistory[]> {
+  public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimRecord[]> {
     return (await this.knex
       .select(
         this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
       )
       .from<MailIssue>('mail_issue')
-      .where({ sudt_id: sudtId })) as unknown as ClaimHistory[];
+      .where({ sudt_id: sudtId })
+      .orderBy('id', 'desc')) as unknown as ClaimRecord[];
   }
 
-  public async getRecordsBySudtId(sudtId: string): Promise<MailIssue[]> {
-    return this.knex.select('*').from<MailIssue>('mail_issue').where({ sudt_id: sudtId }).orderBy('id', 'desc');
-  }
+  public async getClaimHistoryBySecret(secret: string): Promise<ClaimRecord | undefined> {
+    const ret = await this.knex
+      .select(
+        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+      )
+      .from<MailIssue>('mail_issue')
+      .where({ secret: secret });
 
-  public async getRecordBySecret(secret: string): Promise<MailIssue | undefined> {
-    const ret = await this.knex.select('*').from<MailIssue>('mail_issue').where({ secret });
     if (ret.length > 1) throw new Error('exception: secret not unique');
 
-    return ret?.[0];
+    return ret?.[0] as unknown as ClaimRecord;
   }
 }
