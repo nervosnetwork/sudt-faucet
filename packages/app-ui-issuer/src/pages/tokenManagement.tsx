@@ -68,6 +68,11 @@ const TokenManagement: React.FC = () => {
       dataIndex: 'claimSecret',
     },
     {
+      key: 'claimAddress',
+      title: 'claimAddress',
+      dataIndex: ['claimStatus', 'address'],
+    },
+    {
       key: 'claimStatus',
       title: 'claimStatus',
       dataIndex: 'claimStatus',
