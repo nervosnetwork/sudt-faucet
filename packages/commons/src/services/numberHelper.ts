@@ -17,7 +17,7 @@ const fixString = (input: string, decimal: number): string => {
  *
  */
 const fixedStringToBigint = (input: string, decimal: number): bigint => {
-  const decimalString = Array(decimal).fill('0').join('');
+  const decimalString = Array(Number(decimal)).fill('0').join('');
   const inputArray = input.split('.');
   inputArray[1] = inputArray[1] ? `${inputArray[1]}${decimalString}`.slice(0, decimal) : decimalString;
   return BigInt(inputArray.join(''));

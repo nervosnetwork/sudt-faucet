@@ -26,8 +26,9 @@ const CreateToken: React.FC = () => {
       symbol: '',
     },
     async onSubmit(val) {
-      val.maxSupply = fixedStringToBigint(val.maxSupply, val.decimals).toString();
-      const builder = new CreateRcUdtInfoCellBuilder({ sudtInfo: val, rcIdentity }, provider);
+      const maxSupply = fixedStringToBigint(val.maxSupply, val.decimals).toString();
+      const sudtInfo = { ...val, ...{ maxSupply } };
+      const builder = new CreateRcUdtInfoCellBuilder({ sudtInfo, rcIdentity }, provider);
       const unsigned = await builder.build();
       return sendTransaction(unsigned).then(goToTokenList);
     },
