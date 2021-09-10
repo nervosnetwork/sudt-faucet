@@ -78,16 +78,20 @@ const TokenManagement: React.FC = () => {
       key: 'action',
       title: 'action',
       dataIndex: 'claimSecret',
-      render: (claimSecret) => (
-        <Button
-          size="small"
-          onClick={() => {
-            disableCliam(claimSecret);
-          }}
-        >
-          disable
-        </Button>
-      ),
+      render: (claimSecret, record: ClaimHistory) => {
+        return record.claimStatus.status !== 'unclaimed' ? (
+          <div></div>
+        ) : (
+          <Button
+            size="small"
+            onClick={() => {
+              disableCliam(claimSecret);
+            }}
+          >
+            disable
+          </Button>
+        );
+      },
     },
   ];
 
