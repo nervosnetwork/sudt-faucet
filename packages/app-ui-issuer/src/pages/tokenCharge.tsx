@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import client from '../configs/client';
 import { WalletContainer } from '../containers';
 import { useListRcSupplyLockUdtQuery, useProvider, useRcSigner, useSendTransaction } from '../hooks';
+import { fixedStringToBigint, bigintToFixedString, fixString } from '@sudt-faucet/commons';
 
 const StyleWrapper = styled.div`
   padding: 20px 60px;
@@ -112,35 +113,6 @@ const TokenCharge: React.FC = () => {
         });
     },
   });
-  /*
-   * fixString(1.12345678,6) --> 1.123456
-   * fixString(1.12345678,9) --> 1.123456780
-   * fixString(12345678,1) --> 12345678
-   *
-   */
-  const fixString = (input: string, decimal: number): string => {
-    const inputArray = input.split('.');
-    if (inputArray.length === 1) return inputArray[0];
-    return `${inputArray[0]}.${inputArray[1].slice(0, decimal)}`;
-  };
-
-  /*
-   * fixedStringToBigint(1.12345678,6) --> 1123456n
-   * fixedStringToBigint(1.12345678,9) --> 1123456780n
-   * fixedStringToBigint(12345678,1) --> 123456780n
-   *
-   */
-  const fixedStringToBigint = (input: string, decimal: number): bigint => {
-    const decimalString = Array(decimal).fill('0').join('');
-    const inputArray = input.split('.');
-    inputArray[1] = inputArray[1] ? `${inputArray[1]}${decimalString}`.slice(0, decimal) : decimalString;
-    return BigInt(inputArray.join(''));
-  };
-
-  const bigintToFixedString = (input: bigint, decimal: number): string => {
-    const inputString = input.toString();
-    return inputString.slice(0, 0 - decimal) + '.' + inputString.slice(0 - decimal);
-  };
 
   if (!chargeAddress) return null;
   return (
