@@ -1,7 +1,7 @@
 import { MailIssueInfo } from '@sudt-faucet/commons';
 import { Form, Input, Button, Modal, DatePicker, message } from 'antd';
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
 import { useRcSigner } from '../hooks';
@@ -25,7 +25,7 @@ const IssueTokenMail: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpiredDate] = useState(0);
   const { rcIdentity } = useRcSigner();
-
+  const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
 
   const showAddtionalModal = () => {
@@ -44,6 +44,7 @@ const IssueTokenMail: React.FC = () => {
       await client.send_claimable_mails({ recipients: [user], rcIdentity });
       setIsAddtionalModalVisible(false);
       void message.success('Email send success');
+      history.push(`/token-management/${udtId}`);
     } catch (error) {
       void message.error('Email send error');
     }

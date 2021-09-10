@@ -4,7 +4,7 @@ import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
 import { useRcSigner } from '../hooks';
@@ -59,6 +59,8 @@ const IssueTokenMailBatch: React.FC = () => {
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [userList, setUserList] = useState<MailIssueInfo[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const history = useHistory();
+  const { udtId } = useParams<{ udtId: string }>();
 
   useEffect(() => {
     const sendMail = async () => {
@@ -68,14 +70,13 @@ const IssueTokenMailBatch: React.FC = () => {
         setIsAddtionalModalVisible(false);
         setIsSending(false);
         void message.success('Email send success');
+        history.push(`/token-management/${udtId}`);
       } catch (error) {
         void message.error('Email send error');
       }
     };
     void sendMail();
   }, [isSending, rcIdentity, userList]);
-
-  const { udtId } = useParams<{ udtId: string }>();
 
   const showModal = () => {
     setIsModalVisible(true);
