@@ -2,17 +2,17 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import './App.less';
 import { ClaimContainer } from './ClaimContainer';
-import Cliamer from './pages/cliamer';
+import Claimer from './pages/claimer';
 
 const App: React.FC = () => {
   const queryClient = new QueryClient();
 
   return (
-    <ClaimContainer.Provider>
-      <QueryClientProvider client={queryClient}>
-        <Cliamer />
-      </QueryClientProvider>
-    </ClaimContainer.Provider>
+    <QueryClientProvider client={queryClient}>
+      <ClaimContainer.Provider>
+        <Claimer />
+      </ClaimContainer.Provider>
+    </QueryClientProvider>
   );
 };
 

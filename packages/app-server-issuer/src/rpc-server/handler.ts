@@ -8,10 +8,11 @@ import {
   Unclaimed,
   Claimed,
   Disabled,
+  ClaimHistory,
 } from '@sudt-faucet/commons';
 import { Request } from 'express';
 import { DB } from '../db';
-import { InsertMailIssue, ServerContext } from '../types';
+import { InsertMailIssue, MailIssue, ServerContext } from '../types';
 import { genKeyPair } from '../util/createKey';
 
 const keyPair = genKeyPair();
