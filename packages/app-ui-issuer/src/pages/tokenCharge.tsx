@@ -58,13 +58,11 @@ const TokenCharge: React.FC = () => {
     if (!query.data) return;
     const errors: FormError = {};
     if (!values.capacity) {
-      errors.capacity = 'Capacity is Required';
+      errors.capacity = 'Capacity(CKB) is Required';
     } else if (fixedStringToBigint(values.capacity, CKB_DECIMAL) > BigInt(query.data)) {
       errors.capacity = `Must be less than or equal to ${bigintToFixedString(BigInt(query.data), CKB_DECIMAL)}`;
     }
-    const leftAmount =
-      fixedStringToBigint(foundUdtInfo.maxSupply, foundUdtInfo.decimals) -
-      fixedStringToBigint(foundUdtInfo.currentSupply, foundUdtInfo.decimals);
+    const leftAmount = BigInt(foundUdtInfo.maxSupply) - BigInt(foundUdtInfo.currentSupply);
     if (!values.amount) {
       errors.amount = `Amount(${foundUdtInfo.symbol}) is Required`;
     } else if (fixedStringToBigint(values.amount, foundUdtInfo.decimals) > leftAmount) {
@@ -84,10 +82,9 @@ const TokenCharge: React.FC = () => {
         recipients: [
           {
             recipient: chargeAddress,
-            amount: fixedStringToBigint(values.amount, foundUdtInfo?.decimals || 0).toString(), //1
-            //TODO findOrCreate
-            capacityPolicy: 'createCell',
-            additionalCapacity: fixedStringToBigint(values.capacity, CKB_DECIMAL).toString(), //1212
+            amount: fixedStringToBigint(values.amount, foundUdtInfo?.decimals || 0).toString(),
+            capacityPolicy: 'findOrCreate',
+            additionalCapacity: fixedStringToBigint(values.capacity, CKB_DECIMAL).toString(),
           },
         ],
       },
@@ -117,7 +114,7 @@ const TokenCharge: React.FC = () => {
   });
   /*
    * fixString(1.12345678,6) --> 1.123456
-   * fixString(1.12345678,9) --> 1.123456789
+   * fixString(1.12345678,9) --> 1.123456780
    * fixString(12345678,1) --> 12345678
    *
    */
@@ -127,6 +124,12 @@ const TokenCharge: React.FC = () => {
     return `${inputArray[0]}.${inputArray[1].slice(0, decimal)}`;
   };
 
+  /*
+   * fixedStringToBigint(1.12345678,6) --> 1123456n
+   * fixedStringToBigint(1.12345678,9) --> 1123456780n
+   * fixedStringToBigint(12345678,1) --> 123456780n
+   *
+   */
   const fixedStringToBigint = (input: string, decimal: number): bigint => {
     const decimalString = Array(decimal).fill('0').join('');
     const inputArray = input.split('.');
