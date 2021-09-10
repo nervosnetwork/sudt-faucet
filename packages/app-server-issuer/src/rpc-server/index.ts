@@ -7,8 +7,8 @@ import { IssuerRpcHandler } from './handler';
 
 export function startRpcServer(context: ServerContext): void {
   const app = express();
-  app.use(bodyParser.json());
-
+  app.use(bodyParser.json({ limit: '100mb' }));
+  app.use(bodyParser.urlencoded({ limit: '100mb', extended: true, parameterLimit: 100000 }));
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
