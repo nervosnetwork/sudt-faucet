@@ -84,10 +84,10 @@ const TokenCharge: React.FC = () => {
         recipients: [
           {
             recipient: chargeAddress,
-            amount: values.amount,
+            amount: fixedStringToBigint(values.amount, foundUdtInfo?.decimals || 0).toString(), //1
             //TODO findOrCreate
             capacityPolicy: 'createCell',
-            additionalCapacity: values.capacity,
+            additionalCapacity: fixedStringToBigint(values.capacity, CKB_DECIMAL).toString(), //1212
           },
         ],
       },
@@ -106,7 +106,6 @@ const TokenCharge: React.FC = () => {
     initialValues,
     validate,
     onSubmit: (values: FormValues) => {
-      history.push('/token-list');
       charge(values)
         .then(() => {
           history.push('/token-list');
@@ -116,6 +115,12 @@ const TokenCharge: React.FC = () => {
         });
     },
   });
+  /*
+   * fixString(1.12345678,6) --> 1.123456
+   * fixString(1.12345678,9) --> 1.123456789
+   * fixString(12345678,1) --> 12345678
+   *
+   */
   const fixString = (input: string, decimal: number): string => {
     const inputArray = input.split('.');
     if (inputArray.length === 1) return inputArray[0];
