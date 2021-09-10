@@ -2,9 +2,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import { MailIssueInfo } from '@sudt-faucet/commons/dist';
 import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
 import { useRcSigner } from '../hooks';
@@ -53,29 +53,30 @@ const IssueTokenMailBatch: React.FC = () => {
   const { rcIdentity } = useRcSigner();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
-  const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
+  const [isAdditionalModalVisible, setIsAdditionalModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [userList, setUserList] = useState<MailIssueInfo[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const history = useHistory();
+  const { udtId } = useParams<{ udtId: string }>();
 
   useEffect(() => {
     const sendMail = async () => {
       if (!isSending) return;
       try {
         await client.send_claimable_mails({ recipients: userList, rcIdentity: rcIdentity });
-        setIsAddtionalModalVisible(false);
+        setIsAdditionalModalVisible(false);
         setIsSending(false);
         void message.success('Email send success');
+        history.push(`/token-management/${udtId}`);
       } catch (error) {
         void message.error('Email send error');
       }
     };
     void sendMail();
   }, [isSending, rcIdentity, userList]);
-
-  const { udtId } = useParams<{ udtId: string }>();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -85,8 +86,8 @@ const IssueTokenMailBatch: React.FC = () => {
     setIsExpiredModalVisible(true);
   };
 
-  const showAddtionalModal = () => {
-    setIsAddtionalModalVisible(true);
+  const showAdditionalModal = () => {
+    setIsAdditionalModalVisible(true);
   };
 
   const handleAmountSubmit = () => {
@@ -99,13 +100,13 @@ const IssueTokenMailBatch: React.FC = () => {
     updateExpired(expiredDate);
   };
 
-  const handleAddtionalSubmit = async () => {
+  const handleAdditionalSubmit = async () => {
     updateAdditional(additionalMessage);
     setIsSending(true);
   };
 
-  const handleAddtionalCancel = () => {
-    setIsAddtionalModalVisible(false);
+  const handleAdditionalCancel = () => {
+    setIsAdditionalModalVisible(false);
   };
 
   const handleCancel = () => {
@@ -181,6 +182,10 @@ const IssueTokenMailBatch: React.FC = () => {
     setAdditionalMessage(e.target.value);
   };
 
+  const disabledDate = (current: Moment) => {
+    return current.isBefore(moment().millisecond(expiredDate));
+  };
+
   const columns: ColumnsType<MailIssueInfo> = [
     {
       key: 'mail-key',
@@ -235,19 +240,19 @@ const IssueTokenMailBatch: React.FC = () => {
       </div>
       <Table rowKey="mail" columns={columns} dataSource={userList} />
       <div className="footer">
-        <Button onClick={showAddtionalModal}>Send Claimable E-mails</Button>
+        <Button onClick={showAdditionalModal}>Send Claimable E-mails</Button>
       </div>
       <Modal title="Edit" visible={isModalVisible} onOk={handleAmountSubmit} onCancel={handleCancel}>
         <Input value={amount} onChange={handleAmountChange} />
       </Modal>
       <Modal title="Edit" visible={isExpiredModalVisible} onOk={handleExpiredSubmit} onCancel={handleExpiredCancel}>
-        <DatePicker showTime onChange={handleExpiredChange} />
+        <DatePicker showTime onChange={handleExpiredChange} disabledDate={disabledDate} />
       </Modal>
       <Modal
         title="E-Mali Content"
-        visible={isAddtionalModalVisible}
-        onOk={handleAddtionalSubmit}
-        onCancel={handleAddtionalCancel}
+        visible={isAdditionalModalVisible}
+        onOk={handleAdditionalSubmit}
+        onCancel={handleAdditionalCancel}
       >
         <Input.TextArea value={additionalMessage} onChange={handelAdditionMessageChange} rows={10} />
       </Modal>
