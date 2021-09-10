@@ -3,7 +3,7 @@ import { MailIssueInfo } from '@sudt-faucet/commons/dist';
 import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
@@ -58,6 +58,22 @@ const IssueTokenMailBatch: React.FC = () => {
   const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [userList, setUserList] = useState<MailIssueInfo[]>([]);
+  const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    const sendMail = async () => {
+      if (!isSending) return;
+      try {
+        await client.send_claimable_mails({ recipients: userList, rcIdentity: rcIdentity });
+        setIsAddtionalModalVisible(false);
+        setIsSending(false);
+        void message.success('Email send success');
+      } catch (error) {
+        void message.error('Email send error');
+      }
+    };
+    void sendMail();
+  }, [isSending, rcIdentity, userList]);
 
   const { udtId } = useParams<{ udtId: string }>();
 
@@ -85,12 +101,7 @@ const IssueTokenMailBatch: React.FC = () => {
 
   const handleAddtionalSubmit = async () => {
     updateAdditional(additionalMessage);
-    try {
-      await client.send_claimable_mails({ recipients: userList, rcIdentity: rcIdentity });
-      setIsAddtionalModalVisible(false);
-    } catch (error) {
-      void message.error('Email send error');
-    }
+    setIsSending(true);
   };
 
   const handleAddtionalCancel = () => {
@@ -203,7 +214,7 @@ const IssueTokenMailBatch: React.FC = () => {
         );
       },
       dataIndex: 'expiredAt',
-      render: (expiredAt) => <div>{moment(expiredAt).format('YYYY-MM-DD HH:mm')}</div>,
+      render: (expiredAt) => <div>{expiredAt ? moment(expiredAt).format('YYYY-MM-DD HH:mm') : ''}</div>,
     },
   ];
 

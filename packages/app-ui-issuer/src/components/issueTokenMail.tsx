@@ -43,6 +43,7 @@ const IssueTokenMail: React.FC = () => {
     try {
       await client.send_claimable_mails({ recipients: [user], rcIdentity });
       setIsAddtionalModalVisible(false);
+      void message.success('Email send success');
     } catch (error) {
       void message.error('Email send error');
     }
