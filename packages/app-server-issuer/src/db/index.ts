@@ -51,6 +51,11 @@ export class DB {
     await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
   }
 
+  public async updateErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
+    const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError, status: status });
+  }
+
   public async claimBySecret(secret: string, address: string, status: MailIssueStatus): Promise<void> {
     await this.knex('mail_issue').where({ secret: secret }).update({ status: status, claim_address: address });
   }

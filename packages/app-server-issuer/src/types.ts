@@ -32,7 +32,9 @@ export type MailIssueStatus =
   | 'WaitForTransactionCommit'
   | 'WaitForTransactionConfirm'
   | 'Done'
-  | 'Disabled';
+  | 'Disabled'
+  | 'TransferSudtError'
+  | 'SendMailError';
 
 export type InsertMailIssue = Pick<
   MailIssue,

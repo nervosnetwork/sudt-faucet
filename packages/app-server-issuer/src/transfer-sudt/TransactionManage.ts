@@ -63,8 +63,10 @@ export class TransactionManage {
     return txHash;
   }
 
-  public async waitForCommit(txHash: Hash): Promise<Transaction | null> {
-    return this.provider.waitForTransactionCommitted(txHash, { timeoutMs: 180000 });
+  public async waitForCommit(txHash: Hash): Promise<Transaction> {
+    const tx = await this.provider.waitForTransactionCommitted(txHash, { timeoutMs: 300000 });
+    if (!tx) throw new Error('wait for tx commit timeout');
+    return tx;
   }
 
   // TODO impl

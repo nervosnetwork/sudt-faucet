@@ -9,13 +9,10 @@ import {
   Claimed,
   Disabled,
 } from '@sudt-faucet/commons';
-import dotenv from 'dotenv';
 import { Request } from 'express';
 import { DB } from '../db';
 import { InsertMailIssue, ServerContext } from '../types';
 import { genKeyPair } from '../util/createKey';
-
-dotenv.config();
 
 const keyPair = genKeyPair();
 
@@ -46,6 +43,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
     if (payload.recipients.length === 0) throw new Error('call send_claimable_mails with empty payload');
     const recordsWithSecret: InsertMailIssue[] = payload.recipients.map((recipient) => {
+      if (recipient.additionalMessage.length >= 2048)
+        throw new Error('error: additional message character length should not exceed 2048');
       return {
         mail_address: recipient.mail,
         sudt_issuer_pubkey_hash: payload.rcIdentity.pubkeyHash,
@@ -117,15 +116,18 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
     if (!status) throw new Error('error: secret not found');
-    if (status !== 'WaitForClaim') throw new Error('error: can not disable claimed secret');
+    if (status === 'Disabled') throw new Error('error: already disabled');
+    if (status !== 'WaitForSendMail' && status !== 'WaitForClaim')
+      throw new Error('error: can not disable secret after user claimed');
     return db.updateStatusBySecrets([payload.claimSecret], 'Disabled');
   }
 
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
+    if (payload.address.length >= 255) throw new Error('error: mail address character length should not exceed 255');
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
     if (!status) throw new Error('error: secret not found');
-    if (status !== 'WaitForClaim') throw new Error('error: status not unclaimed');
+    if (status !== 'WaitForClaim') throw new Error('error: already claimed');
     return db.claimBySecret(payload.claimSecret, payload.address, 'WaitForTransfer');
   }
 }

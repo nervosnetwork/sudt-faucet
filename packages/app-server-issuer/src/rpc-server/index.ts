@@ -12,19 +12,15 @@ export function startRpcServer(context: ServerContext): void {
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
+  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
   rpcServer.addMethod('send_claimable_mails', (params) =>
     rpcHandler.send_claimable_mails(params as rpc.SendClaimableMailsPayload),
   );
-
   rpcServer.addMethod('disable_claim_secret', (params) =>
     rpcHandler.disable_claim_secret(params as rpc.DisableClaimSecretPayload),
   );
-  rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
-
   rpcServer.addMethod('get_claimable_account_address', () => rpcHandler.get_claimable_account_address());
-
   rpcServer.addMethod('claim_sudt', (params) => rpcHandler.claim_sudt(params as rpc.ClaimSudtPayload));
-
   rpcServer.addMethod('list_claim_history', (params) =>
     rpcHandler.list_claim_history(params as rpc.ListClaimHistoryPayload),
   );
