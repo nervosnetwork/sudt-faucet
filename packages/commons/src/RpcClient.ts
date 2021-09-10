@@ -1,5 +1,5 @@
 import { JSONRPCClient } from 'json-rpc-2.0';
-import { rpc } from './interfaces';
+import { ClaimHistory, rpc } from './interfaces';
 
 type Header = {
   authorization?: string;
@@ -62,7 +62,22 @@ export class RpcClient implements rpc.IssuerRpc {
   }
 
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {
-    return rpcClient.request('list_claim_history', payload);
+    const response = await rpcClient.request('list_claim_history', payload);
+    let histories: ClaimHistory[] = response.histories;
+    if (payload.addressOrEmail) {
+      histories = histories.filter((item: ClaimHistory) => {
+        if (item.claimStatus.status === 'claiming' || item.claimStatus.status === 'claimed') {
+          return item.claimStatus.address === payload.addressOrEmail;
+        }
+        return item.mail === payload.addressOrEmail;
+      });
+    }
+    if (payload.status && payload.status !== 'all') {
+      histories = histories.filter((item: ClaimHistory) => {
+        return item.claimStatus.status === payload.status;
+      });
+    }
+    return { histories };
   }
 
   async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {

@@ -186,10 +186,11 @@ const TokenManagement: React.FC = () => {
             </Form.Item>
             <Form.Item>
               <Select style={{ width: 240 }} onChange={(value) => handleChange(value)} value={formik.values.status}>
-                <Select.Option value="wait-form-claim">wait form claim</Select.Option>
-                <Select.Option value="expired">expired</Select.Option>
-                <Select.Option value="claimed">claimed</Select.Option>
                 <Select.Option value="all">all</Select.Option>
+                <Select.Option value="unclaimed">unclaimed</Select.Option>
+                <Select.Option value="claiming">claiming</Select.Option>
+                <Select.Option value="claimed">claimed</Select.Option>
+                <Select.Option value="disabled">disabled</Select.Option>
               </Select>
             </Form.Item>
             <Form.Item>
@@ -200,7 +201,7 @@ const TokenManagement: React.FC = () => {
           </Form>
         </div>
         <Table
-          rowKey={(item) => item.mail + item.createdAt}
+          rowKey={(item) => item.mail + item.createdAt + item.claimSecret}
           columns={columns}
           dataSource={historyQuery.data?.histories}
           pagination={false}
