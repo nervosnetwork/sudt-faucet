@@ -29,9 +29,16 @@ export function startRpcServer(context: ServerContext): void {
     rpcHandler.list_claim_history(params as rpc.ListClaimHistoryPayload),
   );
 
+  rpcServer.addMethod('get_claim_history', (params) =>
+    rpcHandler.get_claim_history(params as rpc.GetClaimHistoryPayload),
+  );
+
+  const permissionlessMethods = new Set(['login', 'claim_sudt', 'get_claim_history']);
+
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
-    if (jsonRpcRequest.method !== 'login') {
+
+    if (!permissionlessMethods.has(jsonRpcRequest.method)) {
       try {
         rpcHandler.verify_user(req);
       } catch (error) {

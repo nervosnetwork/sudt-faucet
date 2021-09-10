@@ -56,6 +56,13 @@ export class DB {
   }
 
   public async getRecordsBySudtId(sudtId: string): Promise<MailIssue[]> {
-    return this.knex.select('*').from<MailIssue>('mail_issue').where({ sudt_id: sudtId });
+    return this.knex.select('*').from<MailIssue>('mail_issue').where({ sudt_id: sudtId }).orderBy('id', 'desc');
+  }
+
+  public async getRecordBySecret(secret: string): Promise<MailIssue | undefined> {
+    const ret = await this.knex.select('*').from<MailIssue>('mail_issue').where({ secret });
+    if (ret.length > 1) throw new Error('exception: secret not unique');
+
+    return ret?.[0];
   }
 }
