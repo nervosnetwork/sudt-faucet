@@ -1,7 +1,9 @@
 import { ClaimHistory } from '@sudt-faucet/commons';
 import { Button, Form, Input, message, Select, Spin, Table, Typography } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import React from 'react';
+import { SelectValue } from 'antd/lib/select';
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -92,15 +94,18 @@ const TokenManagement: React.FC = () => {
     void client.disable_claim_secret({ claimSecret });
   };
 
+  const [addressOrEmail, setAddressOrEmail] = useState('');
+  const [status, setStatus] = useState('');
+
   const history = useHistory();
   const goCharge = () => {
     history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
   const historyQuery = useQuery(
-    'getClaimHistoryData',
+    ['getClaimHistoryData', { sudtId: udtId, status: status, addressOrEmail: addressOrEmail }],
     () => {
-      return client.list_claim_history({ sudtId: udtId });
+      return client.list_claim_history({ sudtId: udtId, status, addressOrEmail });
     },
     {
       onError: (error) => {
@@ -111,10 +116,33 @@ const TokenManagement: React.FC = () => {
   );
 
   const { data: chargeBalance } = useChargeCellBalanceQuery(udtId);
+  interface SearchForm {
+    addressOrEmail: string;
+    status: string;
+  }
 
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+  const formik = useFormik<SearchForm>({
+    initialValues: {
+      addressOrEmail: '',
+      status: 'all',
+    },
+    onSubmit: (val) => {
+      setAddressOrEmail(val.addressOrEmail);
+      setStatus(val.status);
+    },
+
+    validate() {
+      // TODO
+      //  - name: required
+      //  - symbol: required
+      //  - description: required
+      //  - maxSupply: required, number, integer
+      //  - decimals: required, large than maxSupply
+    },
+  });
+
+  const handleChange = (value: string) => {
+    void formik.setFieldValue('status', value);
   };
   return (
     <StyleWrapper>
@@ -132,12 +160,17 @@ const TokenManagement: React.FC = () => {
       </div>
       <div className="accountList">
         <div className="filter">
-          <Form {...layout} name="customized_form_controls" layout="inline">
-            <Form.Item name="price" label="Filter:">
-              <Input placeholder="email/address" />
+          <Form name="customized_form_controls" layout="inline">
+            <Form.Item name="filter" label="Filter:">
+              <Input
+                name="addressOrEmail"
+                placeholder="email/address"
+                onChange={formik.handleChange}
+                value={formik.values.addressOrEmail}
+              />
             </Form.Item>
             <Form.Item>
-              <Select defaultValue="All" style={{ width: 120 }}>
+              <Select style={{ width: 240 }} onChange={(value) => handleChange(value)} value={formik.values.status}>
                 <Select.Option value="wait-form-claim">wait form claim</Select.Option>
                 <Select.Option value="expired">expired</Select.Option>
                 <Select.Option value="claimed">claimed</Select.Option>
@@ -145,14 +178,14 @@ const TokenManagement: React.FC = () => {
               </Select>
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" onClick={formik.submitForm}>
                 Submit
               </Button>
             </Form.Item>
           </Form>
         </div>
         <Table
-          rowKey={(item) => item.mail + item.expiredAt}
+          rowKey={(item) => item.mail + item.createdAt}
           columns={columns}
           dataSource={historyQuery.data?.histories}
           pagination={false}

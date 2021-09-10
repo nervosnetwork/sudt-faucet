@@ -107,6 +107,8 @@ export interface GetClaimableSudtBalanceResponse {
 
 export interface ListClaimHistoryPayload {
   sudtId: string;
+  addressOrEmail: string;
+  status: string;
 }
 
 export interface ListClaimHistoryResponse {
