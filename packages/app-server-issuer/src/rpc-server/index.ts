@@ -8,7 +8,7 @@ import { IssuerRpcHandler } from './handler';
 export function startRpcServer(context: ServerContext): void {
   const app = express();
   app.use(bodyParser.json());
-  app.use(express.static('build'));
+
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
