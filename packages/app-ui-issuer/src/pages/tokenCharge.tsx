@@ -66,7 +66,7 @@ const TokenCharge: React.FC = () => {
       fixedStringToBigint(foundUdtInfo.maxSupply, foundUdtInfo.decimals) -
       fixedStringToBigint(foundUdtInfo.currentSupply, foundUdtInfo.decimals);
     if (!values.amount) {
-      errors.amount = 'Amount(Ins) is Required';
+      errors.amount = `Amount(${foundUdtInfo.symbol}) is Required`;
     } else if (fixedStringToBigint(values.amount, foundUdtInfo.decimals) > leftAmount) {
       errors.amount = `Must be less than or equal to ${bigintToFixedString(leftAmount, foundUdtInfo.decimals)}`;
     }
@@ -154,7 +154,7 @@ const TokenCharge: React.FC = () => {
             <Typography.Text type="danger">{formik.errors.capacity}</Typography.Text>
           </Form.Item>
 
-          <Form.Item label="Amount(Ins)" name="amount">
+          <Form.Item label={`Amount(${foundUdtInfo.symbol})`} name="amount">
             <Input
               onChange={(e) => {
                 //TODO replace with new RegExp
