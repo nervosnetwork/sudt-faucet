@@ -53,7 +53,7 @@ const IssueTokenMailBatch: React.FC = () => {
   const { rcIdentity } = useRcSigner();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
-  const [isAddtionalModalVisible, setIsAddtionalModalVisible] = useState(false);
+  const [isAdditionalModalVisible, setIsAdditionalModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
@@ -67,7 +67,7 @@ const IssueTokenMailBatch: React.FC = () => {
       if (!isSending) return;
       try {
         await client.send_claimable_mails({ recipients: userList, rcIdentity: rcIdentity });
-        setIsAddtionalModalVisible(false);
+        setIsAdditionalModalVisible(false);
         setIsSending(false);
         void message.success('Email send success');
         history.push(`/token-management/${udtId}`);
@@ -86,8 +86,8 @@ const IssueTokenMailBatch: React.FC = () => {
     setIsExpiredModalVisible(true);
   };
 
-  const showAddtionalModal = () => {
-    setIsAddtionalModalVisible(true);
+  const showAdditionalModal = () => {
+    setIsAdditionalModalVisible(true);
   };
 
   const handleAmountSubmit = () => {
@@ -100,13 +100,13 @@ const IssueTokenMailBatch: React.FC = () => {
     updateExpired(expiredDate);
   };
 
-  const handleAddtionalSubmit = async () => {
+  const handleAdditionalSubmit = async () => {
     updateAdditional(additionalMessage);
     setIsSending(true);
   };
 
-  const handleAddtionalCancel = () => {
-    setIsAddtionalModalVisible(false);
+  const handleAdditionalCancel = () => {
+    setIsAdditionalModalVisible(false);
   };
 
   const handleCancel = () => {
@@ -236,7 +236,7 @@ const IssueTokenMailBatch: React.FC = () => {
       </div>
       <Table rowKey="mail" columns={columns} dataSource={userList} />
       <div className="footer">
-        <Button onClick={showAddtionalModal}>Send Claimable E-mails</Button>
+        <Button onClick={showAdditionalModal}>Send Claimable E-mails</Button>
       </div>
       <Modal title="Edit" visible={isModalVisible} onOk={handleAmountSubmit} onCancel={handleCancel}>
         <Input value={amount} onChange={handleAmountChange} />
@@ -246,9 +246,9 @@ const IssueTokenMailBatch: React.FC = () => {
       </Modal>
       <Modal
         title="E-Mali Content"
-        visible={isAddtionalModalVisible}
-        onOk={handleAddtionalSubmit}
-        onCancel={handleAddtionalCancel}
+        visible={isAdditionalModalVisible}
+        onOk={handleAdditionalSubmit}
+        onCancel={handleAdditionalCancel}
       >
         <Input.TextArea value={additionalMessage} onChange={handelAdditionMessageChange} rows={10} />
       </Modal>
