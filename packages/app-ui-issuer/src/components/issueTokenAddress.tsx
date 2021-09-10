@@ -30,12 +30,11 @@ const IssueTokenAddress: React.FC = () => {
         {
           udtId,
           rcIdentity,
-          // TODO impl createOrFind
           recipients: [
             {
               recipient: val.address,
               amount: val.amount,
-              capacityPolicy: 'createCell',
+              capacityPolicy: 'findOrCreate',
               additionalCapacity: '100000000',
             },
           ],
