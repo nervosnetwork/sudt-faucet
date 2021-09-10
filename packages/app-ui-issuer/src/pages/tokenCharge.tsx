@@ -85,8 +85,7 @@ const TokenCharge: React.FC = () => {
           {
             recipient: chargeAddress,
             amount: values.amount,
-            //TODO findOrCreate
-            capacityPolicy: 'createCell',
+            capacityPolicy: 'findOrCreate',
             additionalCapacity: values.capacity,
           },
         ],
