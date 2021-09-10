@@ -19,7 +19,7 @@ function getConfig(): GlobalConfig {
     ckitConfig,
     ckbRpcUrl: process.env.MERCURY_URL ?? 'https://testnet.ckb.dev/rpc',
     mercuryUrl: process.env.RPC_URL ?? 'https://testnet.ckb.dev/indexer',
-    unipassUrl: process.env.UNIPASS_URL ?? 'https://unipass.xyz',
+    unipassUrl: process.env.UNIPASS_URL ?? 'https://t.unipass.xyz',
     walletUrl: process.env.WALLET_URL ?? 'https://t.tok.social',
   };
 }
