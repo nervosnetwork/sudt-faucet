@@ -95,8 +95,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
-    if (!status) throw new Error('error: secret not found');
-    if (status !== 'WaitForClaim') throw new Error('error: status not unclaimed');
+    if (!status) throw new Error('The claim is invalid. Please make sure you have a valid claim invitation');
+    if (status !== 'WaitForClaim') throw new Error(`It seems you have already claimed`);
     return db.claimBySecret(payload.claimSecret, payload.address, 'WaitForTransfer');
   }
 }
