@@ -20,10 +20,11 @@ async function initContext(): Promise<ServerContext> {
   const ckitProvider = new CkitProvider(process.env.CKB_INDEXER_URL, process.env.CKB_NODE_URL);
   await ckitProvider.init(predefined.Aggron);
   // TODO get private key from keystore
-  const txSigner = new internal.Secp256k1Signer(process.env.PRIVATE_KEY, ckitProvider, {
-    code_hash: ckitProvider.getScriptConfig('SECP256K1_BLAKE160').CODE_HASH,
-    hash_type: ckitProvider.getScriptConfig('SECP256K1_BLAKE160').HASH_TYPE,
-  });
+  const txSigner = new internal.Secp256k1Signer(
+    process.env.PRIVATE_KEY,
+    ckitProvider,
+    ckitProvider.newScript('ANYONE_CAN_PAY'),
+  );
   return { ckitProvider, txSigner };
 }
 

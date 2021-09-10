@@ -2,6 +2,7 @@ import { Button, Spin, Typography } from 'antd';
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { AssetAmount } from '../components/assetAmount';
 import { useListRcSupplyLockUdtQuery } from '../hooks/';
 
 const StyleWrapper = styled.div`
@@ -39,8 +40,22 @@ const TokenDetail: React.FC = () => {
         <>
           <Typography>Name: {foundUdtInfo.name}</Typography>
           <Typography>Symbol: {foundUdtInfo.symbol}</Typography>
-          <Typography>Unissued: {foundUdtInfo.maxSupply}</Typography>
-          <Typography>Issued: {foundUdtInfo.currentSupply}</Typography>
+          <Typography>
+            Max supply:&nbsp;
+            <AssetAmount
+              amount={foundUdtInfo.maxSupply}
+              decimals={foundUdtInfo.decimals}
+              symbol={foundUdtInfo.symbol}
+            />
+          </Typography>
+          <Typography>
+            Current supply:&nbsp;
+            <AssetAmount
+              amount={foundUdtInfo.currentSupply}
+              decimals={foundUdtInfo.decimals}
+              symbol={foundUdtInfo.symbol}
+            />
+          </Typography>
           <Typography>Decimals: {foundUdtInfo.decimals}</Typography>
           <Typography>Description: {foundUdtInfo.description}</Typography>
         </>
