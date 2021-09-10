@@ -1,4 +1,4 @@
-import { message, Spin } from 'antd';
+import { Result, Spin } from 'antd';
 import React, { useMemo } from 'react';
 import { ClaimContainer } from '../ClaimContainer';
 import Claim from './claim';
@@ -12,11 +12,16 @@ const Claimer: React.FC = () => {
     if (!wallet) return null;
 
     if (!claimSecret) {
-      void message.error('Please click the claim link to reach this site, the claim needed a claim secret');
-      return null;
+      return (
+        <Result
+          status="error"
+          title="No Claim Secret Found"
+          extra="Please click the claim link to reach this site, the claim needed a claim secret"
+        />
+      );
     }
 
-    if (address && claimSecret) return <Claim address={address} claimSecret={claimSecret} />;
+    if (address) return <Claim address={address} claimSecret={claimSecret} />;
     return <Login />;
   }, [address, claimSecret, wallet]);
 
@@ -24,7 +29,7 @@ const Claimer: React.FC = () => {
 
   return (
     <div className="app">
-      <Header title="UDT Cliamer" />
+      <Header title="UDT Claimer" />
       {view}
     </div>
   );
