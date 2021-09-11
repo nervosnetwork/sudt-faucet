@@ -23,7 +23,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
       } catch (e) {
         // TODO use log
         console.error(`An error occurred while transfer sudt: ${e}`);
-        await db.updateTxHashBySecrets(secrets, e, 'TransferSudtError');
+        await db.updateErrorBySecrets(secrets, e, 'TransferSudtError');
         await utils.sleep(300000);
       }
     }
