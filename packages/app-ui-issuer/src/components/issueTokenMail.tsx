@@ -1,11 +1,11 @@
-import { MailIssueInfo } from '@sudt-faucet/commons';
+import { MailIssueInfo, fixedStringToBigint } from '@sudt-faucet/commons';
 import { Form, Input, Button, Modal, DatePicker, message } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import client from '../configs/client';
-import { useRcSigner } from '../hooks';
+import { useRcSigner, useGetDecimals } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -28,16 +28,18 @@ const IssueTokenMail: React.FC = () => {
   const { rcIdentity } = useRcSigner();
   const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
+  const decimals = useGetDecimals(udtId);
 
   const showAdditionalModal = () => {
     setIsAdditionalModalVisible(true);
   };
 
   const handleAdditionalSubmit = async () => {
+    const sendAmount = fixedStringToBigint(amount, decimals).toString();
     const user: MailIssueInfo = {
       sudtId: udtId,
       mail,
-      amount,
+      amount: sendAmount,
       expiredAt: expiredDate,
       additionalMessage,
     };
