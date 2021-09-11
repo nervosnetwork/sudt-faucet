@@ -1,5 +1,6 @@
 import { MintRcUdtBuilder } from '@ckitjs/ckit';
-import { Form, Input, Button, Typography, message } from 'antd';
+import { fixedStringToBigint, bigintToFixedString, fixString } from '@sudt-faucet/commons';
+import { Button, Form, Input, message, Typography } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -8,7 +9,6 @@ import styled from 'styled-components';
 import client from '../configs/client';
 import { WalletContainer } from '../containers';
 import { useListRcSupplyLockUdtQuery, useProvider, useRcSigner, useSendTransaction } from '../hooks';
-import { fixedStringToBigint, bigintToFixedString, fixString } from '@sudt-faucet/commons';
 
 const StyleWrapper = styled.div`
   padding: 20px 60px;
@@ -104,13 +104,10 @@ const TokenCharge: React.FC = () => {
     initialValues,
     validate,
     onSubmit: (values: FormValues) => {
-      charge(values)
-        .then(() => {
-          history.push('/token-list');
-        })
-        .catch((e) => {
-          void message.error(e);
-        });
+      charge(values).then(
+        () => history.push('/token-list'),
+        (e) => message.error(e),
+      );
     },
   });
 
