@@ -20,7 +20,7 @@ export async function startSendGrid(): Promise<void> {
         await db.updateStatusBySecrets(secrets, 'WaitForClaim');
       }
     } catch (e) {
-      logger.error(`An error occurred while send mails: ${e}`);
+      logger.error(`An error catched while send mails: ${e}`);
     }
     await utils.sleep(15000);
   }
