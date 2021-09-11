@@ -19,11 +19,11 @@ export const ClaimContainer = createContainer(() => {
       const provider = new CkitProvider(config.mercuryUrl, config.ckbRpcUrl);
       await provider.init(config.ckitConfig);
 
-      const wallet = new UnipassWallet(provider);
+      const wallet = new UnipassWallet(provider, { host: config.unipassUrl, loginDataCacheKey: '__unipass__' });
 
       wallet.on('signerChanged', (signer) => Promise.resolve(signer.getAddress()).then(setAddress));
 
-      const adapter = new UnipassWallet.UnipassRedirectAdapter({ host: config.unipassUrl });
+      const adapter = wallet.adapter;
       if (adapter.getLoginDataFromCache() || adapter.hasLoginInfo()) wallet.connect();
 
       setProvider(provider);
