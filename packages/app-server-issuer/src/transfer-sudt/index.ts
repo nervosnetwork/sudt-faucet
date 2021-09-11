@@ -9,23 +9,27 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
   const db = DB.getInstance();
 
   for (;;) {
-    const unsendTransactions = await db.getTransactionsToSend(
-      (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
-    );
-    const secrets = unsendTransactions.map((value) => value.secret);
-    if (unsendTransactions.length > 0) {
-      try {
-        await db.updateStatusBySecrets(secrets, 'SendingTransaction');
-        const txHash = await txManage.sendTransaction(unsendTransactions);
-        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
-        await txManage.waitForCommit(txHash);
-        await db.updateStatusBySecrets(secrets, 'WaitForTransactionConfirm');
-      } catch (e) {
-        // TODO use log
-        console.error(`An error occurred while transfer sudt: ${e}`);
-        await db.updateErrorBySecrets(secrets, e, 'TransferSudtError');
-        await utils.sleep(300000);
+    try {
+      const unsendTransactions = await db.getTransactionsToSend(
+        (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
+      );
+      const secrets = unsendTransactions.map((value) => value.secret);
+      if (unsendTransactions.length > 0) {
+        try {
+          await db.updateStatusBySecrets(secrets, 'SendingTransaction');
+          const txHash = await txManage.sendTransaction(unsendTransactions);
+          await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
+          await txManage.waitForCommit(txHash);
+          await db.updateStatusBySecrets(secrets, 'WaitForTransactionConfirm');
+        } catch (e) {
+          // TODO use log
+          console.error(`An error occurred while transfer sudt: ${e}`);
+          await db.updateErrorBySecrets(secrets, e, 'TransferSudtError');
+          await utils.sleep(300000);
+        }
       }
+    } catch (e) {
+      console.log(`An error occurred from db: ${e}`);
     }
     await utils.sleep(15000);
   }

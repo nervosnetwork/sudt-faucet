@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     tableBuilder.string('mail_message', 2048).notNullable().defaultTo('');
     tableBuilder.bigInteger('expire_time');
     tableBuilder.bigInteger('claim_time');
-    tableBuilder.string('claim_address');
+    tableBuilder.string('claim_address', 1024);
     tableBuilder.string('tx_hash', 66);
     tableBuilder.integer('confirm_number');
     tableBuilder.bigInteger('confirm_time');
