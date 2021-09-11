@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { usePrevious } from 'react-use';
 import Header from '../components/header';
 import { WalletContainer } from '../containers';
@@ -20,7 +20,6 @@ export const Issuer: React.FC = () => {
       wallet.connect();
     }
   }, [prevStage, wallet]);
-
   return (
     <div className="app">
       <Router>

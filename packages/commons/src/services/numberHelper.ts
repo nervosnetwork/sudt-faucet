@@ -26,11 +26,19 @@ const fixedStringToBigint = (input: string, decimal: number): bigint => {
  * bigintToFixedString(1123456n,6) --> 1.123456
  * bigintToFixedString(1123456780n,9) --> 1.123456780
  * bigintToFixedString(123456780n,1) --> 12345678.0
+ * bigintToFixedString(0.1234,6) --> 0.123400
  *
  */
 const bigintToFixedString = (input: bigint, decimal: number): string => {
-  const inputString = input.toString();
-  return inputString.slice(0, 0 - decimal) + '.' + inputString.slice(0 - decimal);
+  let inputString = input.toString();
+  if (inputString.length < decimal) {
+    const prefix = Array(Number(decimal) - inputString.length)
+      .fill('0')
+      .join('');
+    inputString = prefix + inputString;
+  }
+  const stringBeforeDot = inputString.slice(0, 0 - decimal) || '0';
+  return stringBeforeDot + '.' + inputString.slice(0 - decimal);
 };
 
 export { fixedStringToBigint, bigintToFixedString, fixString };
