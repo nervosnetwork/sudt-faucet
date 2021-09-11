@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('mail_issue', (tableBuilder) => {
     tableBuilder.increments();
     tableBuilder.string('mail_address').notNullable();
-    tableBuilder.string('sudt_issuer_pubkey_hash', 66).notNullable();
+    tableBuilder.string('sudt_issuer_pubkey_hash', 42).notNullable();
     tableBuilder.integer('sudt_issuer_rc_id_flag').notNullable();
     tableBuilder.string('sudt_id').notNullable();
     tableBuilder.decimal('amount', 36, 0).unsigned().notNullable();
