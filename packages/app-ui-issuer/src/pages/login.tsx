@@ -1,5 +1,5 @@
 import { createLoginMessage } from '@sudt-faucet/commons';
-import { Button, Spin } from 'antd';
+import { Button, Spin, Modal } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -47,7 +47,10 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     const message = `Login:${Date.now()}`;
     const { signature, address } = await createLoginMessage(message);
-    const response = await client.login({ address, message, sig: signature });
+    const response = await client.login({ address, message, sig: signature }).catch((e) => {
+      Modal.error({ title: 'Login failed', content: String(e) });
+      return Promise.reject(e);
+    });
     localStorage.setItem('authorization', response.jwt);
     goToTokenList();
   };
