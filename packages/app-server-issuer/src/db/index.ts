@@ -7,7 +7,18 @@ export class DB {
   private knex: IKnex;
 
   private constructor() {
-    this.knex = Knex(knexConfig.development);
+    const config = (() => {
+      switch (process.env.NODE_ENV) {
+        case undefined:
+        case 'development':
+          return knexConfig.development;
+        case 'production':
+          return knexConfig.production;
+        default:
+          throw new Error('unknown value of env NODE_ENV');
+      }
+    })();
+    this.knex = Knex(config);
   }
 
   public static getInstance(): DB {
@@ -64,7 +75,7 @@ export class DB {
     return (await this.knex
       .select(
         this.knex.raw(
-          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, status',
+          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, tx_hash, status',
         ),
       )
       .from<MailIssue>('mail_issue')
@@ -76,7 +87,7 @@ export class DB {
     const ret = await this.knex
       .select(
         this.knex.raw(
-          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, status',
+          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, tx_hash, status',
         ),
       )
       .from<MailIssue>('mail_issue')

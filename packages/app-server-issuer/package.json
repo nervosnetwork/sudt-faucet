@@ -25,7 +25,8 @@
     "joi": "^17.4.2",
     "json-rpc-2.0": "^0.2.18",
     "knex": "^0.95.10",
-    "mysql2": "^2.3.0"
+    "mysql2": "^2.3.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

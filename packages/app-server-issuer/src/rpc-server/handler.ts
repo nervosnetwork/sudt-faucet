@@ -121,7 +121,7 @@ function convertRecordToResponse(record: ClaimRecord): ClaimHistory {
         return {
           status: 'claimed',
           claimedStartAt: 0,
-          txHash: 'undo',
+          txHash: record.tx_hash ?? '',
           claimedAt: 0,
           address: record.claim_address,
         } as Claimed;

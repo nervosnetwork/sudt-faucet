@@ -8,6 +8,7 @@ import {
 } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
+import { logger } from '../logger';
 import { TransactionToSend } from '../types';
 
 export class TransactionManage {
@@ -36,12 +37,14 @@ export class TransactionManage {
     let signedTx: Transaction;
     await retry(
       async () => {
-        signedTx = await this.signer.seal(await txBuilder.build());
+        const unsignedTx = await txBuilder.build();
+        logger.debug(`Unsigned transfer sudt tx: ${unsignedTx}`);
+        signedTx = await this.signer.seal(unsignedTx);
       },
       {
         retries: 6,
         onRetry: (e) => {
-          console.log(`build transfer sudt tx error: ${e}`);
+          logger.error(`build transfer sudt tx error: ${e}`);
         },
       },
     );
@@ -54,7 +57,7 @@ export class TransactionManage {
       {
         retries: 6,
         onRetry: (e) => {
-          console.log(`send transfer sudt tx error: ${e}`);
+          logger.error(`send transfer sudt tx error: ${e}`);
         },
       },
     );

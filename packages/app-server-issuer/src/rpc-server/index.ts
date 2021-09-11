@@ -2,6 +2,7 @@ import { rpc } from '@sudt-faucet/commons';
 import bodyParser from 'body-parser';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
+import { logger } from '../logger';
 import { ServerContext } from '../types';
 import { IssuerRpcHandler } from './handler';
 
@@ -55,6 +56,6 @@ export function startRpcServer(context: ServerContext): void {
 
   const port = (process.env.SERVER_LISTEN_PORT ?? 1570) as number;
   app.listen(port, () => {
-    console.log(`issuer server listen at ${port}`);
+    logger.info(`issuer server listen at ${port}`);
   });
 }
