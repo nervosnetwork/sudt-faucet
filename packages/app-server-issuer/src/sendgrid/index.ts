@@ -1,6 +1,7 @@
 import sgMail from '@sendgrid/mail';
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
+import { logger } from '../logger';
 import { MailToSend } from '../types';
 
 export async function startSendGrid(): Promise<void> {
@@ -10,7 +11,8 @@ export async function startSendGrid(): Promise<void> {
 
   for (;;) {
     try {
-      const unsendMails = await db.getMailsToSend((process.env.BATCH_MAIL_LIMIT as unknown as number) ?? 500);
+      const unsendMails = await db.getMailsToSend((process.env.BATCH_MAIL_LIMIT as unknown as number) ?? 50);
+      logger.info(`New send mails round with records: ${unsendMails}`);
       if (unsendMails.length > 0) {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
@@ -18,10 +20,9 @@ export async function startSendGrid(): Promise<void> {
         await db.updateStatusBySecrets(secrets, 'WaitForClaim');
       }
     } catch (e) {
-      // TODO use log
-      console.error(`An error occurred while send mails: ${e}`);
+      logger.error(`An error catched while send mails: ${e}`);
     }
-    await utils.sleep(3000);
+    await utils.sleep(15000);
   }
 }
 
