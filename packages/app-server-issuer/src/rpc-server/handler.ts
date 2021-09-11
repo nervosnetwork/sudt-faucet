@@ -11,9 +11,11 @@ import {
   ClaimHistory,
 } from '@sudt-faucet/commons';
 import { Request } from 'express';
+import Joi from 'joi';
 import { DB } from '../db';
 import { InsertMailIssue, ServerContext, ClaimRecord } from '../types';
 import { genKeyPair } from '../util/createKey';
+import { claimSudtPaylodSchema, sendMailsPaylodSchema } from './validate';
 
 const keyPair = genKeyPair();
 
@@ -42,14 +44,13 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   send_claimable_mails(payload: rpc.SendClaimableMailsPayload): Promise<void> {
-    if (payload.recipients.length === 0) throw new Error('call send_claimable_mails with empty payload');
-    const recordsWithSecret: InsertMailIssue[] = payload.recipients.map((recipient) => {
-      if (recipient.additionalMessage.length >= 2048)
-        throw new Error('error: additional message character length should not exceed 2048');
+    const validatedPayload = Joi.attempt(payload, sendMailsPaylodSchema) as rpc.SendClaimableMailsPayload;
+
+    const recordsWithSecret: InsertMailIssue[] = validatedPayload.recipients.map((recipient) => {
       return {
         mail_address: recipient.mail,
-        sudt_issuer_pubkey_hash: payload.rcIdentity.pubkeyHash,
-        sudt_issuer_rc_id_flag: Number(payload.rcIdentity.flag),
+        sudt_issuer_pubkey_hash: validatedPayload.rcIdentity.pubkeyHash,
+        sudt_issuer_rc_id_flag: Number(validatedPayload.rcIdentity.flag),
         sudt_id: recipient.sudtId,
         amount: recipient.amount,
         secret: utils.randomHexString(32).slice(2),
@@ -94,7 +95,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   }
 
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
-    if (payload.address.length >= 255) throw new Error('error: mail address character length should not exceed 255');
+    Joi.assert(payload, claimSudtPaylodSchema);
+    this.context.ckitProvider.parseToScript(payload.address);
     const db = DB.getInstance();
     const status = await db.getStatusBySecret(payload.claimSecret);
     if (!status) throw new Error('The claim is invalid. Please make sure you have a valid claim invitation');

@@ -63,7 +63,9 @@ export class DB {
   public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimRecord[]> {
     return (await this.knex
       .select(
-        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+        this.knex.raw(
+          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, status',
+        ),
       )
       .from<MailIssue>('mail_issue')
       .where({ sudt_id: sudtId })
@@ -73,7 +75,9 @@ export class DB {
   public async getClaimHistoryBySecret(secret: string): Promise<ClaimRecord | undefined> {
     const ret = await this.knex
       .select(
-        this.knex.raw('mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, status'),
+        this.knex.raw(
+          'mail_address, UNIX_TIMESTAMP(created_at) as created_at, expire_time, amount, secret, claim_address, status',
+        ),
       )
       .from<MailIssue>('mail_issue')
       .where({ secret: secret });
