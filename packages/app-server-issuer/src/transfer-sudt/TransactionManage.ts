@@ -42,7 +42,7 @@ export class TransactionManage {
         signedTx = await this.signer.seal(unsignedTx);
       },
       {
-        retries: 1,
+        retries: 6,
         onRetry: (e) => {
           logger.error(`build transfer sudt tx error: ${e}`);
         },
