@@ -29,12 +29,14 @@ export const claimSudtPayloadSchema = Joi.object({
 
 function validateHex(value: string, helpers: CustomHelpers): string | ErrorReport {
   if (value.length < 2 || (value.slice(0, 2) !== '0x' && value.slice(0, 2) !== '0X')) {
-    return helpers.error('hash string should start with 0x');
+    return helpers.message({ custom: 'hash string should start with 0x' });
   }
   Joi.assert(value.slice(2), Joi.string().hex());
   return value;
 }
 
 function validateExpireAt(value: number, helpers: CustomHelpers): number | ErrorReport {
-  return new Date().getTime() < value ? value : helpers.error('claim expire time should be later than now');
+  return new Date().getTime() < value
+    ? value
+    : helpers.message({ custom: 'claim expire time should be later than now' });
 }
