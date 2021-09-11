@@ -13,6 +13,12 @@ const StyleWrapper = styled.div`
     display: flex;
     align-items: center;
   }
+  .ant-list-item {
+    cursor: pointer;
+    &:hover {
+      background-color: #eeeeee;
+    }
+  }
 `;
 
 const TokenList: React.FC = () => {

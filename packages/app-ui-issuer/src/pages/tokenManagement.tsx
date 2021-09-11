@@ -1,5 +1,5 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ClaimHistory } from '@sudt-faucet/commons';
+import { ClaimHistory, bigintToFixedString } from '@sudt-faucet/commons';
 import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useFormik } from 'formik';
@@ -9,6 +9,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
 import client from '../configs/client';
+import { useListRcSupplyLockUdtQuery } from '../hooks';
 import { useChargeCellBalanceQuery } from '../hooks/useChargeCellBalanceQuery';
 import { formatTimeSpan } from '../utils';
 
@@ -61,6 +62,7 @@ const TokenManagement: React.FC = () => {
       key: 'amount',
       title: 'amount',
       dataIndex: 'amount',
+      render: (amount) => <div>{bigintToFixedString(amount, decimals)}</div>,
     },
     {
       key: 'claimSecret',
@@ -125,6 +127,9 @@ const TokenManagement: React.FC = () => {
     history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
+  const { data: udts } = useListRcSupplyLockUdtQuery(udtId);
+  const decimals = udts?.[0].decimals || 0;
+
   const historyQuery = useQuery(
     ['getClaimHistoryData', { sudtId: udtId, status: status, addressOrEmail: addressOrEmail }],
     () => {
