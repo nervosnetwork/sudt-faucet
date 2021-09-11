@@ -58,5 +58,5 @@ export type TransactionToSend = Pick<
 
 export type ClaimRecord = Pick<
   MailIssue,
-  'mail_address' | 'amount' | 'secret' | 'created_at' | 'expire_time' | 'status' | 'claim_address'
+  'mail_address' | 'amount' | 'secret' | 'created_at' | 'expire_time' | 'status' | 'claim_address' | 'tx_hash'
 >;

@@ -1,7 +1,22 @@
+import dotenv from 'dotenv';
 import winston from 'winston';
 
+dotenv.config();
+
+const logLevel = (() => {
+  switch (process.env.NODE_ENV) {
+    case undefined:
+    case 'development':
+      return 'debug';
+    case 'production':
+      return 'info';
+    default:
+      throw new Error('unknown value of env NODE_ENV');
+  }
+})();
+
 export const logger = winston.createLogger({
-  level: 'debug',
+  level: logLevel,
   format: winston.format.combine(
     winston.format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
