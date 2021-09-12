@@ -12,7 +12,7 @@ export async function startSendGrid(): Promise<void> {
   for (;;) {
     try {
       const unsendMails = await db.getMailsToSend((process.env.BATCH_MAIL_LIMIT as unknown as number) ?? 50);
-      logger.info(`New send mails round with records: ${unsendMails}`);
+      logger.info(`New send mails round with records: ${unsendMails.length ? unsendMails : '[]'}`);
       if (unsendMails.length > 0) {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
