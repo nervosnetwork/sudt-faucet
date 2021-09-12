@@ -2,3 +2,4 @@ export { useProvider, useRcHelper, useListRcSupplyLockUdtQuery } from './useProv
 export { useRcSigner } from './useSigner';
 export { useSendTransaction } from './useSendTransaction';
 export { useGetDecimals } from './useGetDecimals';
+export { useLoginStatus } from './useLoginStatus';

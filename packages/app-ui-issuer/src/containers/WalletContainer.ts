@@ -1,4 +1,5 @@
 import { ConnectStatus, RcOwnerWallet, RcPwSigner } from '@ckitjs/ckit';
+import { detect } from '@ckitjs/ckit/dist/wallets/PwWallet';
 import memoize from 'memoizee';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createContainer } from 'unstated-next';
@@ -9,18 +10,21 @@ import { ProviderContainer } from './CkitProviderContainer';
 RcPwSigner.prototype.signMessage = memoize(RcPwSigner.prototype.signMessage, { promise: true });
 
 export interface UnreadyWallet {
+  isInitialized: boolean;
   stage: 'uninitialized';
   connectStatus: 'disconnected';
   errorMessage: string | undefined;
 }
 
 export interface ReadyWallet {
+  isInitialized: boolean;
   stage: 'readyToConnect';
   connectStatus: ConnectStatus;
   connect: () => void;
 }
 
 export interface ReadySigner {
+  isInitialized: boolean;
   stage: 'readyToSign';
   connectStatus: 'connected';
   signer: RcPwSigner;
@@ -37,6 +41,17 @@ function useWallet(): AppWallet {
   const [errorMessage, setErrorMessage] = useState<string>();
   const [signer, setSigner] = useState<RcPwSigner>();
   const [address, setAddress] = useState<string>();
+  const [isRcWalletInitialized, setIsRcWalletInitialized] = useState(false);
+
+  useEffect(() => {
+    if (isRcWalletInitialized) return;
+
+    if (address) return setIsRcWalletInitialized(true);
+
+    void detect().then((ethereum) => {
+      if (!ethereum.selectedAddress) return setIsRcWalletInitialized(true);
+    });
+  }, [address, isRcWalletInitialized]);
 
   useEffect(() => {
     if (!provider) return;
@@ -93,6 +108,7 @@ function useWallet(): AppWallet {
     signer,
     address,
     errorMessage,
+    isInitialized: isRcWalletInitialized,
   } as AppWallet;
 }
 
