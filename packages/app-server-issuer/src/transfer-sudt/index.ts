@@ -15,7 +15,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
       );
       const secrets = unsendTransactions.map((value) => value.secret);
-      logger.info(`New transfer sudt round with records: ${unsendTransactions}`);
+      logger.info(`New transfer sudt round with records: ${unsendTransactions.length ? unsendTransactions : '[]'}`);
       if (unsendTransactions.length > 0) {
         try {
           await db.updateStatusBySecrets(secrets, 'SendingTransaction');

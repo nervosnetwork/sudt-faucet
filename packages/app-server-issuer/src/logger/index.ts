@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import winston from 'winston';
 
+const { createLogger, format, transports } = winston;
+
 dotenv.config();
 
 const logLevel = (() => {
@@ -15,18 +17,21 @@ const logLevel = (() => {
   }
 })();
 
-export const logger = winston.createLogger({
+const myFormat = format.printf(({ level, message, timestamp }) => {
+  return `${timestamp} ${level} ${message}`;
+});
+
+export const logger = createLogger({
   level: logLevel,
-  format: winston.format.combine(
-    winston.format.timestamp({
+  format: format.combine(
+    format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json(),
-    winston.format.colorize(),
-    winston.format.simple(),
+    format.errors({ stack: true }),
+    format.json(),
+    format.colorize(),
+    format.simple(),
+    myFormat,
   ),
-  defaultMeta: { service: 'issuer-server' },
-  transports: [new winston.transports.Console()],
+  transports: [new transports.Console()],
 });
