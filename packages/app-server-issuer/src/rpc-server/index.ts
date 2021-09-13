@@ -56,6 +56,6 @@ export function startRpcServer(context: ServerContext): void {
 
   const port = (process.env.SERVER_LISTEN_PORT ?? 1570) as number;
   app.listen(port, () => {
-    logger.info(`issuer server listen at ${port}`);
+    logger.info(`Issuer server started and listen at ${port}`);
   });
 }

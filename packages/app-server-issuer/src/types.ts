@@ -1,8 +1,9 @@
-import { CkitProvider, internal } from '@ckitjs/ckit';
+import { CkitProvider, internal, RcSupplyLockHelper } from '@ckitjs/ckit';
 
 export interface ServerContext {
   ckitProvider: CkitProvider;
   txSigner: InstanceType<typeof internal['Secp256k1Signer']>;
+  rcHelper: RcSupplyLockHelper;
 }
 
 export interface MailIssue {
@@ -49,7 +50,17 @@ export type InsertMailIssue = Pick<
   | 'status'
 >;
 
-export type MailToSend = Pick<MailIssue, 'mail_address' | 'amount' | 'secret' | 'mail_message' | 'expire_time'>;
+export type MailToSend = Pick<
+  MailIssue,
+  | 'mail_address'
+  | 'amount'
+  | 'sudt_issuer_pubkey_hash'
+  | 'sudt_issuer_rc_id_flag'
+  | 'sudt_id'
+  | 'secret'
+  | 'mail_message'
+  | 'expire_time'
+>;
 
 export type TransactionToSend = Pick<
   MailIssue,

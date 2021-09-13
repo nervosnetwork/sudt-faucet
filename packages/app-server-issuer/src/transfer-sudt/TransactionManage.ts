@@ -38,13 +38,13 @@ export class TransactionManage {
     await retry(
       async () => {
         const unsignedTx = await txBuilder.build();
-        logger.debug(`Unsigned transfer sudt tx: ${unsignedTx}`);
+        logger.info(`Unsigned transfer sudt tx: ${unsignedTx}`);
         signedTx = await this.signer.seal(unsignedTx);
       },
       {
         retries: 6,
-        onRetry: (e) => {
-          logger.error(`build transfer sudt tx error: ${e}`);
+        onRetry: (e, attempt) => {
+          logger.error(`(retry ${attempt} times) build transfer sudt tx error: ${e}`);
         },
       },
     );
@@ -56,8 +56,8 @@ export class TransactionManage {
       },
       {
         retries: 6,
-        onRetry: (e) => {
-          logger.error(`send transfer sudt tx error: ${e}`);
+        onRetry: (e, attempt) => {
+          logger.error(`(retry ${attempt} times) send transfer sudt tx error: ${e}`);
         },
       },
     );
