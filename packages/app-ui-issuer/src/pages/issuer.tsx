@@ -2,6 +2,7 @@ import { Button, Spin } from 'antd';
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { usePrevious } from 'react-use';
+import styled from 'styled-components';
 import Header from '../components/header';
 import { WalletContainer } from '../containers';
 import { useLoginStatus } from '../hooks';
@@ -12,6 +13,19 @@ import TokenCharge from './tokenCharge';
 import TokenDetail from './tokenDetail';
 import TokenList from './tokenList';
 import TokenManagement from './tokenManagement';
+
+const Wrapper = styled.div`
+  height: calc(90% - 40px);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .login-btn {
+    height: 40px;
+    width: 250px;
+  }
+`;
 
 export const Issuer: React.FC = () => {
   const wallet = WalletContainer.useContainer();
@@ -24,9 +38,12 @@ export const Issuer: React.FC = () => {
   }, [prevStage, wallet]);
 
   if (wallet.stage !== 'readyToSign') {
-    return <Spin tip="App is initialing..." />;
+    return (
+      <Wrapper>
+        <Spin tip="App is initialing..." />
+      </Wrapper>
+    );
   }
-
   return (
     <div className="app">
       <Router>
