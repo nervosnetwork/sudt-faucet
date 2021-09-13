@@ -6,7 +6,6 @@ import { useClaimSecret } from './useClaimSecret';
 export function useClaimStatus(): UseQueryResult<ClaimHistory> {
   const { client } = ClaimContainer.useContainer();
   const [secret] = useClaimSecret();
-
   return useQuery(
     ['get_claim_history', { secret }],
     () => {
