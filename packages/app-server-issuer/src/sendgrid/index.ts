@@ -38,7 +38,7 @@ export async function startSendGrid(context: ServerContext): Promise<void> {
         const sgMails = unsendMails.map(toSGMail);
         await sgMail.send(sgMails);
         const secrets = unsendMails.map((value) => value.secret);
-        await db.updateStatusBySecrets(secrets, 'WaitForClaim');
+        await db.updateStatusToWaitForClaim(secrets);
       }
     } catch (e) {
       logger.error(`An error caught while send mails: ${e}`);
@@ -52,7 +52,7 @@ async function getSudtInfo(
   options: { rcIdentity: RcIdentity; udtId: string },
 ): Promise<SudtInfo | undefined> {
   logger.info(`getSudtInfo not hit cache, options: ${JSON.stringify(options)}`);
-  let sudtInfos;
+  let sudtInfos: SudtInfo[];
   await retry(
     async () => {
       sudtInfos = await rcHelper.listCreatedSudt(options);
@@ -64,7 +64,9 @@ async function getSudtInfo(
       },
     },
   );
-  return sudtInfos?.[0];
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return sudtInfos[0];
 }
 
 function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
