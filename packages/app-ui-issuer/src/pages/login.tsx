@@ -52,6 +52,7 @@ const Login: React.FC = () => {
       return Promise.reject(e);
     });
     localStorage.setItem('authorization', response.jwt);
+    window.dispatchEvent(new Event('storage')); // fix storage  not trigger change event on same document
     goToTokenList();
   };
 
