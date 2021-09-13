@@ -11,34 +11,39 @@ const Wrapper = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
-
+  padding: 20px;
   .content {
   }
 
   .content-text {
+    width: 500px;
     padding: 20px;
     line-height: 20px;
-    margin-bottom: 30px;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    .title {
+      font-size: 24px;
+    }
+  }
+
+  .steps {
+    width: 500px;
   }
 `;
 const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, claimSecret }) => {
   const config = useGlobalConfig();
   const { client } = ClaimContainer.useContainer();
   const query = useClaimStatus();
-
-  if (!query.isFetched) return null;
-
-  // TODO add transaction hash
-  if (query.data) {
-    return (
-      <Steps>
-        <Steps.Step title="Claim request sent" />
-        <Steps.Step title="Finished" />
-      </Steps>
-    );
+  const claimData = query.data;
+  let current = 0;
+  if (claimData?.claimStatus.status === 'claimed' || claimData?.claimStatus.status === 'claiming') {
+    current = 1;
   }
+  if (!query.isFetched) return null;
 
   async function claim() {
     return client.claim_sudt({ claimSecret, address }).then(
@@ -60,9 +65,8 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
       },
     );
   }
-
-  return (
-    <Wrapper>
+  const getStep0Render = () => {
+    return (
       <Result
         title={
           <div>
@@ -83,7 +87,38 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
           </Button>
         }
       />
-    </Wrapper>
-  );
+    );
+  };
+
+  const getStep1Render = () => {
+    return (
+      <div className="content-text">
+        <div className="title">Your tokens have been claimed</div>
+        <div className="description">
+          <span>click to </span>
+          <a
+            target="_blank"
+            href={`https://explorer.nervos.org/aggron/transaction/${query.data?.claimStatus.txHash}`}
+            rel="noreferrer"
+          >
+            Transaction Detail
+          </a>
+        </div>
+      </div>
+    );
+  };
+
+  if (query.data) {
+    return (
+      <Wrapper>
+        <Steps current={current} className="steps">
+          <Steps.Step title="Claim request sent" />
+          <Steps.Step title="Finished" />
+        </Steps>
+        {current === 0 ? getStep0Render() : getStep1Render()}
+      </Wrapper>
+    );
+  }
+  return <div> not found </div>;
 };
 export default Claim;

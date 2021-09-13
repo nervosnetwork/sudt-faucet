@@ -76,7 +76,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
 
   async get_claim_history(payload: rpc.GetClaimHistoryPayload): Promise<rpc.GetClaimHistoryResponse> {
     const record = await DB.getInstance().getClaimHistoryBySecret(payload.secret);
-    return { history: record ? convertRecordToResponse(record) : undefined };
+    return { history: record ? convertRecordToResponse(record) : null };
   }
 
   get_claimable_account_address(): Promise<string> {
