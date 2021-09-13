@@ -17,8 +17,8 @@ const logLevel = (() => {
   }
 })();
 
-const myFormat = format.printf(({ level, message, timestamp }) => {
-  return `${timestamp} ${level} ${message}`;
+const myFormat = format.printf(({ level, message, label, timestamp }) => {
+  return label ? `${timestamp} [{$label}] ${level} ${message}` : `${timestamp} ${level} ${message}`;
 });
 
 export const logger = createLogger({

@@ -34,7 +34,16 @@ export class DB {
 
   public async getMailsToSend(limit: number): Promise<MailToSend[]> {
     return this.knex
-      .select('mail_address', 'amount', 'secret', 'mail_message', 'expire_time')
+      .select(
+        'mail_address',
+        'sudt_issuer_pubkey_hash',
+        'sudt_issuer_rc_id_flag',
+        'sudt_id',
+        'amount',
+        'secret',
+        'mail_message',
+        'expire_time',
+      )
       .from<MailIssue>('mail_issue')
       .where({ status: 'WaitForSendMail' })
       .limit(limit);
