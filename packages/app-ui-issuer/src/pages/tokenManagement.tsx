@@ -4,7 +4,7 @@ import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } 
 import { ColumnsType } from 'antd/es/table';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
@@ -110,6 +110,7 @@ const TokenManagement: React.FC = () => {
         client
           .disable_claim_secret({ claimSecret })
           .then(() => {
+            void queryClient.invalidateQueries('getClaimHistoryData');
             void message.success('disable the claim secret success');
           })
           .catch(() => {
@@ -129,6 +130,7 @@ const TokenManagement: React.FC = () => {
   const { udtId } = useParams<{ udtId: string }>();
   const { data: udts } = useListRcSupplyLockUdtQuery(udtId);
   const decimals = udts?.[0].decimals || 0;
+  const queryClient = useQueryClient();
 
   const historyQuery = useQuery(
     ['getClaimHistoryData', { sudtId: udtId, status: status, addressOrEmail: addressOrEmail }],
