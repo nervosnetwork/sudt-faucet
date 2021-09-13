@@ -27,6 +27,7 @@ const Wrapper = styled.div`
     align-items: center;
     .title {
       font-size: 24px;
+      padding-bottom: 10px;
     }
   }
 
