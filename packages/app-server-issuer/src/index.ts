@@ -1,4 +1,4 @@
-import { CkitProvider, internal, predefined } from '@ckitjs/ckit';
+import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
 import dotenv from 'dotenv';
 import { DB } from './db';
 import { logger } from './logger';
@@ -9,7 +9,7 @@ import { ServerContext } from './types';
 
 async function main() {
   const context = await initContext();
-  void startSendGrid();
+  void startSendGrid(context);
   logger.info('Send grid routine started');
   void startTransferSudt(context);
   logger.info('Transfer sudt routine started');
@@ -31,7 +31,17 @@ async function initContext(): Promise<ServerContext> {
     ckitProvider,
     ckitProvider.newScript('ANYONE_CAN_PAY'),
   );
-  return { ckitProvider, txSigner };
+  const rcHelper = new RcSupplyLockHelper(ckitProvider.mercury, {
+    rcLock: {
+      code_hash: ckitProvider.getScriptConfig('RC_LOCK').CODE_HASH,
+      hash_type: ckitProvider.getScriptConfig('RC_LOCK').HASH_TYPE,
+    },
+    sudtType: {
+      code_hash: ckitProvider.getScriptConfig('SUDT').CODE_HASH,
+      hash_type: ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
+    },
+  });
+  return { ckitProvider, txSigner, rcHelper };
 }
 
 void main();
