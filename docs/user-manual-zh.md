@@ -10,8 +10,8 @@
 
 - 私钥用处：
 
-    - `Admin` 私钥：用来铸造 ，管理` token`。
-    - `Transfer` 私钥：用来发送 `Token` 给邮件接收者
+    - `Owner` 私钥：用来铸造 ，管理` token`。
+    - `Hosted` 私钥：用来发送 `Token` 给邮件接收者
 
 - 申请方法：
 
@@ -23,7 +23,7 @@
 
         - 若是之前有CKB 账户私钥
 
-            - 安装 [metamask](https://metamask.io/) ，选择导入`Admin` 私钥，记录下其 `ETH` 地址
+            - 安装 [metamask](https://metamask.io/) ，选择导入`Owner` 私钥，记录下其 `ETH` 地址
 
 
 
@@ -46,10 +46,10 @@
 若是完成了上述准备工作，你应该可以获得类似下面的数据，此处数据均是样例
 
 ```shell
-# 私钥信息，将你生成的私钥导入 metamask, 请仔细保管私钥，涉及资金安全，极为重要‼️。此处是个样例
-Admin 私钥： 0xeae06b50dc7d59bdc680f0a68ba295281578cca8ffdd4fca0f67f494222982ee 
-Admin 地址： 0x4eF5DCA89B4B8DB609c3e54fCbd57F7882ba3bE6
-Transfer 私钥：0x588b62cd5b2676b052b12fce73d4febcebce516e8380d93dbb7e2f3f8797d799 
+# 私钥信息，将你生成的私钥导入 metamask, 请仔细保管私钥，涉及资金安全，极为重要‼️。
+Owner 私钥： 0x... 
+Owner 地址： 0xxxx
+Hosted 私钥：0x... 
 
 # SendGrid 邮件信息
 SENDGRID_API_KEY='SB.2BiBXG1gQvqr9BfqdkUlSB.2B43jMWnccTmCNHOllfKzAAVjteyduViTHTZrE0UjSB'
@@ -192,9 +192,10 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
   CKB_INDEXER_URL='https://testnet.ckb.dev/indexer'
   BATCH_TRANSACTION_LIMIT=100
   BATCH_MAIL_LIMIT=100
-  USER_ADDRESS='Admin 地址'
-  PRIVATE_KEY='Transfer 私钥'
+  USER_ADDRESS='Owner 私钥'
+  PRIVATE_KEY='Hosted 私钥'
   CLAIM_SUDT_DOMAIN="http://127.0.0.1:1570"  #域名
+  
   ```
 
 
@@ -211,7 +212,7 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 ## 三、如何使用系统
 
-### Admin
+### Owner
 
 这是整个系统的拥有者，涉及到
 
@@ -219,7 +220,7 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 - 打开 系统界面
 
-  ![](https://upload.cc/i1/2021/09/11/Q7TujN.png)
+  ![](https://upload.cc/i1/2021/09/13/wirM98.png)
 
 - 登录后可以看到主页面
 
@@ -253,11 +254,11 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 ##### Management 功能
 
-![](https://upload.cc/i1/2021/09/11/kiXhAS.png)
+![](https://upload.cc/i1/2021/09/13/qLyANB.png)
 
-- change 功能组件： 点击 change 从 Admin 账户转帐给 Transfer 账户
+- change 功能组件： 点击 change 从 Owner 账户转帐给 Hosted 账户
 
-  ![](https://upload.cc/i1/2021/09/11/JQnfi9.png)
+  ![](https://upload.cc/i1/2021/09/13/9NQztj.png)
 
 - disable 功能组件： 点击 disable 可以取消该用户领取 token 的权利
 
@@ -290,5 +291,5 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 #### 账户安全
 
-- Admin 账户 和 Transfer 账户都会涉及到资产，注意保管‼️
+- Owner 账户 和 Hosted 账户都会涉及到资产，注意保管‼️
 
