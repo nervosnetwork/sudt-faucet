@@ -1,8 +1,8 @@
-import { Button, Modal, Result } from 'antd';
+import { Button, Modal, Result, Steps } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 import { ClaimContainer } from '../ClaimContainer';
-import { useClaimSecret } from '../hooks/useClaimSecret';
+import { useClaimStatus } from '../hooks/useClaimStatus';
 import { useGlobalConfig } from '../hooks/useGlobalConfig';
 import { Address } from './address';
 
@@ -26,13 +26,23 @@ const Wrapper = styled.div`
 const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, claimSecret }) => {
   const config = useGlobalConfig();
   const { client } = ClaimContainer.useContainer();
-  const [, clearClaimSecret] = useClaimSecret();
+  const query = useClaimStatus();
+
+  if (!query.isFetched) return null;
+
+  // TODO add transaction hash
+  if (query.data) {
+    return (
+      <Steps>
+        <Steps.Step title="Claim request sent" />
+        <Steps.Step title="Finished" />
+      </Steps>
+    );
+  }
 
   async function claim() {
     return client.claim_sudt({ claimSecret, address }).then(
       () => {
-        clearClaimSecret();
-
         Modal.success({
           title: 'Congratulation',
           content: <p>Successfully claimed, go to my wallet to see</p>,
