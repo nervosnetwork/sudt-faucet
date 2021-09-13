@@ -256,7 +256,7 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 ![](https://upload.cc/i1/2021/09/13/qLyANB.png)
 
-- change 功能组件： 点击 change 从 Owner 账户转帐给 Hosted 账户
+- charge 功能组件： 点击 change 从 Owner 账户转帐给 Hosted 账户，需要注意地是，这里的 token 是使用 mint 方式进行增发，也就是说，使用 charge 功能会增加当前流通量（current supply）
 
   ![](https://upload.cc/i1/2021/09/13/9NQztj.png)
 
