@@ -53,7 +53,7 @@ export class DB {
     return this.knex
       .select('sudt_issuer_pubkey_hash', 'sudt_issuer_rc_id_flag', 'sudt_id', 'amount', 'claim_address', 'secret')
       .from<MailIssue>('mail_issue')
-      .where({ status: 'WaitForTransfer' })
+      .whereIn(status, ['WaitForTransfer', 'BuildTransactionError'])
       .limit(limit);
   }
 
