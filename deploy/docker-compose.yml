@@ -1,0 +1,33 @@
+version: '3.2'
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: sudt-faucet-mysql
+    env_file:
+      - .env
+    ports:
+      - '3306:3306'
+    networks:
+      - sudt_faucet_network
+
+  issuer-server:
+    build:
+      context: issuer/
+    container_name: sudt-faucet-issuer
+    env_file:
+      - .env
+    volumes:
+      - ./issuer/nginx_faucet:/etc/nginx/sites-enabled/sudt_faucet
+    ports:
+      - '3046:1570'
+      - '3047:1080'
+      - '3048:1081'
+    networks:
+      - sudt_faucet_network
+    depends_on:
+      - mysql
+
+networks:
+  sudt_faucet_network:
+    driver: bridge
