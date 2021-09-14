@@ -47,28 +47,24 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
   const [loading, setLoading] = useState(false);
 
   if (!query.isFetched) return null;
-  if (!query.data) return null;
+  if (!query.data) return <div> not found </div>;
 
   const claimData = query.data;
   let current = 0;
 
-  if (claimData?.claimStatus.status === 'claimed') {
+  if (claimData.claimStatus.status === 'claimed') {
     current = 1;
   }
 
   async function claim() {
     setLoading(true);
     void queryClient.invalidateQueries('get_claim_history');
-    return client.claim_sudt({ claimSecret, address }).then(
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      () => {},
-      (e: Error) => {
-        Modal.error({
-          title: 'Failed',
-          content: <p>{e.message}</p>,
-        });
-      },
-    );
+    return client.claim_sudt({ claimSecret, address }).catch((e: Error) => {
+      Modal.error({
+        title: 'Failed',
+        content: <p>{e.message}</p>,
+      });
+    });
   }
   const getUnclaimedRender = () => {
     if (query.data?.claimStatus.status !== 'claimed' && loading) {
@@ -129,29 +125,26 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
   };
 
   const getDisabledRender = () => {
-    return <div>disabled</div>;
-  };
-  if (claimData.claimStatus.status === 'disabled') {
     return (
       <Wrapper>
         <Typography.Text>This is a disabled token </Typography.Text>
       </Wrapper>
     );
+  };
+  if (claimData.claimStatus.status === 'disabled') {
+    getDisabledRender();
   }
 
-  if (query.data) {
-    return (
-      <Wrapper>
-        <Steps current={current} className="steps">
-          <Steps.Step title="Claim" />
-          <Steps.Step title="Finished" />
-        </Steps>
-        {claimData.claimStatus.status === 'unclaimed' && getUnclaimedRender()}
-        {claimData.claimStatus.status === 'claiming' && <Spin />}
-        {claimData.claimStatus.status === 'claimed' && getClaimedRender()}
-      </Wrapper>
-    );
-  }
-  return <div> not found </div>;
+  return (
+    <Wrapper>
+      <Steps current={current} className="steps">
+        <Steps.Step title="Claim" />
+        <Steps.Step title="Finished" />
+      </Steps>
+      {claimData.claimStatus.status === 'unclaimed' && getUnclaimedRender()}
+      {claimData.claimStatus.status === 'claiming' && <Spin />}
+      {claimData.claimStatus.status === 'claimed' && getClaimedRender()}
+    </Wrapper>
+  );
 };
 export default Claim;
