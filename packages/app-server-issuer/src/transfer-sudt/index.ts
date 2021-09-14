@@ -1,8 +1,10 @@
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
-import { logger } from '../logger';
+import { loggerWithModule } from '../logger';
 import { ServerContext } from '../types';
 import { TransactionManage } from './TransactionManage';
+
+const logger = loggerWithModule('TransferSudt');
 
 export async function startTransferSudt(context: ServerContext): Promise<void> {
   const txManage = new TransactionManage(context.ckitProvider, context.txSigner, context.rcHelper);

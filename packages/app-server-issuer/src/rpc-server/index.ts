@@ -2,9 +2,11 @@ import { rpc } from '@sudt-faucet/commons';
 import bodyParser from 'body-parser';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
-import { logger } from '../logger';
+import { loggerWithModule } from '../logger';
 import { ServerContext } from '../types';
 import { IssuerRpcHandler } from './handler';
+
+const logger = loggerWithModule('RpcServer');
 
 export function startRpcServer(context: ServerContext): void {
   const app = express();
@@ -34,6 +36,7 @@ export function startRpcServer(context: ServerContext): void {
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
+    logger.http(`Request: ${JSON.stringify(jsonRpcRequest)}`);
 
     if (!permissionlessMethods.has(jsonRpcRequest.method)) {
       try {
@@ -47,6 +50,9 @@ export function startRpcServer(context: ServerContext): void {
     //TODO handle auth
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
+        if (jsonRpcResponse.error) {
+          logger.http(`Response: ${JSON.stringify(jsonRpcResponse)}`);
+        }
         res.json(jsonRpcResponse);
         return;
       }
