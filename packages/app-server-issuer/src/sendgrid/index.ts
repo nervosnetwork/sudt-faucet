@@ -52,7 +52,7 @@ async function getSudtInfo(
   options: { rcIdentity: RcIdentity; udtId: string },
 ): Promise<SudtInfo | undefined> {
   logger.info(`getSudtInfo not hit cache, options: ${JSON.stringify(options)}`);
-  let sudtInfos: SudtInfo[];
+  let sudtInfos: SudtInfo[] = [];
   await retry(
     async () => {
       sudtInfos = await rcHelper.listCreatedSudt(options);
@@ -64,8 +64,6 @@ async function getSudtInfo(
       },
     },
   );
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   return sudtInfos[0];
 }
 
