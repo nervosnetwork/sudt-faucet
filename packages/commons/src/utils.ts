@@ -21,3 +21,9 @@ export function randomHexString(lengthWithOut0x: number): HexString {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export function truncateMiddle(str: string, start: number, end = start): string {
+  if (!start || !end || start <= 0 || end <= 0) throw new Error('start or end is invalid');
+  if (str.length <= start + end) return str;
+  return str.slice(0, start) + '...' + str.slice(-end);
+}
