@@ -14,7 +14,7 @@ import { TransactionToSend } from '../types';
 export class TransactionManage {
   constructor(private provider: CkitProvider, private signer: EntrySigner, private rcHelper: RcSupplyLockHelper) {}
 
-  public async sendTransaction(txs: TransactionToSend[]): Promise<Hash> {
+  public async buildTransaction(txs: TransactionToSend[]): Promise<Transaction> {
     const builderOptions = txs.map((tx) => {
       const rcIdentity = {
         flag: convertToRcIdentityFlag(tx.sudt_issuer_rc_id_flag),
@@ -38,7 +38,7 @@ export class TransactionManage {
     await retry(
       async () => {
         const unsignedTx = await txBuilder.build();
-        logger.info(`Unsigned transfer sudt tx: ${JSON.stringify(unsignedTx.serializeJson())}`);
+        logger.info(`Build unsigned transfer sudt tx: ${JSON.stringify(unsignedTx.serializeJson())}`);
         signedTx = await this.signer.seal(unsignedTx);
       },
       {
@@ -49,6 +49,12 @@ export class TransactionManage {
       },
     );
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return signedTx;
+  }
+
+  public async sendTransaction(signedTx: Transaction): Promise<Hash> {
     let txHash: Hash;
     await retry(
       async () => {

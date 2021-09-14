@@ -105,7 +105,8 @@ function convertRecordToResponse(record: ClaimRecord): ClaimHistory {
       case 'WaitForTransactionCommit':
       case 'WaitForTransactionConfirm':
       case 'Done':
-      case 'TransferSudtError':
+      case 'BuildTransactionError':
+      case 'SendTransactionError':
       case 'SendMailError': {
         return {
           status: 'claimed',
