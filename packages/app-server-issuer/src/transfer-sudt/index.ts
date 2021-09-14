@@ -11,7 +11,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
   for (;;) {
     try {
       const unsendTransactions = await db.getTransactionsToSend(
-        (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
+        (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
       const secrets = unsendTransactions.map((value) => value.secret);
       logger.info(
