@@ -11,7 +11,7 @@ export const Address: React.FC<{ address: string }> = ({ address }) => {
   return (
     <Tooltip
       title={
-        <Typography.Text copyable>
+        <Typography.Text copyable={{ text: address }}>
           {<Typography.Text style={{ color: 'white' }}>{address}</Typography.Text>}
         </Typography.Text>
       }

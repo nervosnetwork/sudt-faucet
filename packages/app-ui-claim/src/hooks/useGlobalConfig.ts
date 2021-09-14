@@ -7,10 +7,12 @@ interface GlobalConfig {
   ckbRpcUrl: string;
   unipassUrl: string;
   walletUrl: string;
+  nervosExploreTxUrlPrefix: string;
 }
 
 function getConfig(): GlobalConfig {
   const ckitConfig = env.readAsStr('NETWORK', 'Aggron') === 'Lina' ? predefined.Lina : predefined.Aggron;
+  const NERVOS_EXPLORER_URL = env.readAsStr('NERVOS_EXPLORER_URL', 'https://explorer.nervos.org/aggron');
 
   return {
     ckitConfig,
@@ -18,6 +20,7 @@ function getConfig(): GlobalConfig {
     mercuryUrl: env.readAsStr('CKB_INDEXER_URL', 'https://testnet.ckb.dev/indexer'),
     unipassUrl: env.readAsStr('UNIPASS_URL', 'https://t.unipass.xyz'),
     walletUrl: env.readAsStr('WALLET_URL', 'https://t.tok.social'),
+    nervosExploreTxUrlPrefix: `${NERVOS_EXPLORER_URL}/transaction`,
   };
 }
 
