@@ -6,7 +6,7 @@ interface GlobalConfig {
   ckbRpcUrl: string;
   unipassUrl: string;
   walletUrl: string;
-  ckbExplorer: string;
+  nervosExplorerUrl: string;
 }
 
 function getConfig(): GlobalConfig {
@@ -22,7 +22,7 @@ function getConfig(): GlobalConfig {
     mercuryUrl: process.env.RPC_URL ?? 'https://testnet.ckb.dev/indexer',
     unipassUrl: process.env.UNIPASS_URL ?? 'https://t.unipass.xyz',
     walletUrl: process.env.WALLET_URL ?? 'https://t.tok.social',
-    ckbExplorer: process.env.WALLET_URL ?? 'https://explorer.nervos.org/aggron/transaction',
+    nervosExplorerUrl: process.env.NERVOS_EXPLORER_URL ?? 'https://explorer.nervos.org/aggron/transaction',
   };
 }
 

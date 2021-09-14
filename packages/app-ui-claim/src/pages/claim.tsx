@@ -119,7 +119,7 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
         {claimData.claimStatus.txHash && (
           <div className="description">
             <span>click to my </span>
-            <a target="_blank" href={`${config.ckbExplorer}/${claimData.claimStatus.txHash}`} rel="noreferrer">
+            <a target="_blank" href={`${config.nervosExplorerUrl}/${claimData.claimStatus.txHash}`} rel="noreferrer">
               Transaction Detail
             </a>
           </div>
