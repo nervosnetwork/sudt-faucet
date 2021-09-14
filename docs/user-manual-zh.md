@@ -112,7 +112,7 @@ cd packages/app-server-claim && yarn build && cd ../../
 
 - Nginx 配置文件，可以命名为 `sudt_faucet` ，下面配置中 注释的代码就是 之前准备的域名。
 
-    - 配置中 `/var/lib/sudt-faucet/packages/app-ui-claim/build`   是对应的项目代码位置，可根据实际位置将其替换
+    - 配置中 `/var/lib/sudt-faucet/packages/app-ui-claim/build`   是对应的项目代码位置，必须根据实际位置将其替换
 
   ```
   # upstream sudt.faucet.me { 
@@ -179,31 +179,52 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 #### 服务启动
 
-- 1、在`packages/app-server-issuer `  目录下存在 `.env` 文件， 设置环境变量
+- 在`packages/app-server-issuer `  目录下存在 `.env` 文件， 设置环境变量
 
   ```shell
-  MYSQL_HOST=localhost
+  ### app-server-issuer
+  # ----------- commons -----------
+  NETWORK=Lina
+  CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
+  CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
+  
+  # ----------- Faucet Server -----------
+  ## A private key hosted by issuer server which is used for transferring automatically.
+  ## Note: Recommend to set when launching server
+  PRIVATE_KEY='0x...'
+  
+  ## The issuer Ethereum address
+  USER_ADDRESS='0x...'
+  
+  MYSQL_HOST=sudt-faucet-mysql
   MYSQL_PORT=3306
   MYSQL_ROOT_PASSWORD=123456
-  MYSQL_DATABASE=sudt_faucet 
-  SENDGRID_API_KEY='your_api_key'
-  SENDGRID_VERIFIED_SENDER='your_verified_sender'
-  CKB_NODE_URL='https://testnet.ckb.dev/rpc'
-  CKB_INDEXER_URL='https://testnet.ckb.dev/indexer'
-  BATCH_TRANSACTION_LIMIT=100
-  BATCH_MAIL_LIMIT=100
-  USER_ADDRESS='Owner 私钥'
-  PRIVATE_KEY='Hosted 私钥'
-  CLAIM_SUDT_DOMAIN="http://127.0.0.1:1570"  #域名
+  MYSQL_DATABASE=sudt_faucet
   
+  SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
+  SENDGRID_VERIFIED_SENDER='MY_SENDGRID_VERIFIED_SENDER'
+  
+  BATCH_TRANSACTION_LIMIT=100
+  BATCH_MAIL_LIMIT=50
+  CLAIM_SUDT_DOMAIN="MY_DOMAIN"
+  
+  # ----------- UI -----------
+  ## Unipass authentication URL
+  UNIPASS_URL=https://unipass.xyz
+  ## Social token wallet URL
+  WALLET_URL=https://tok.social
+  ## Nervosnetwork explorer URL
+  NERVOS_EXPLORER_URL=https://explorer.nervos.org
   ```
+
+
 
 
 
 - 2、通过 PM2 维护服务
 
   ```shell
-  pm2 start --name issuer-server "node dist/index.js"
+  cd packages/app-server-issuer && pm2 start --name issuer-server "node dist/index.js"
   ```
 
 
