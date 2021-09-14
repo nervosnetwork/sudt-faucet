@@ -89,7 +89,7 @@ https://sudt.faucet.me/
 cd sudt-faucet && rm -rf ckit && git clone https://github.com/homura/ckit.git
 
 # 切换 submodule 分支，并且构建 submodule 代码
-cd ckit && git checkout e4947e954d50b6a14b7bbdc729c8cab944f1ffc6 && cd ../ && yarn install && yarn build:lib 
+cd ckit && git checkout develop && git pull && cd ../ && yarn install && yarn build:lib 
 
 # 构建 app-ui-issuer 代码
 cd packages/app-ui-issuer  && yarn build && cd ../../
