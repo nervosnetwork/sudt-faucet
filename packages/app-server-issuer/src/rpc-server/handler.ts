@@ -83,25 +83,14 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     return this.context.txSigner.getAddress();
   }
 
-  // TODO resolve concurrency with claim sudt
   async disable_claim_secret(payload: rpc.DisableClaimSecretPayload): Promise<void> {
-    const db = DB.getInstance();
-    const status = await db.getStatusBySecret(payload.claimSecret);
-    if (!status) throw new Error('error: secret not found');
-    if (status === 'Disabled') throw new Error('error: already disabled');
-    if (status !== 'WaitForSendMail' && status !== 'WaitForClaim')
-      throw new Error('error: can not disable secret after user claimed');
-    return db.updateStatusBySecrets([payload.claimSecret], 'Disabled');
+    return DB.getInstance().disableSecret(payload.claimSecret);
   }
 
   async claim_sudt(payload: rpc.ClaimSudtPayload): Promise<void> {
     Joi.assert(payload, claimSudtPayloadSchema);
     this.context.ckitProvider.parseToScript(payload.address);
-    const db = DB.getInstance();
-    const status = await db.getStatusBySecret(payload.claimSecret);
-    if (!status) throw new Error('The claim is invalid. Please make sure you have a valid claim invitation');
-    if (status !== 'WaitForClaim') throw new Error('It seems you have already claimed');
-    return db.claimBySecret(payload.claimSecret, payload.address, 'WaitForTransfer');
+    return DB.getInstance().claimSudtBySecret(payload.claimSecret, payload.address);
   }
 }
 
