@@ -52,7 +52,7 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
   const claimData = query.data;
   let current = 0;
 
-  if (claimData.claimStatus.status === 'claimed') {
+  if (claimData.claimStatus.status === 'claimed' && claimData.claimStatus.txHash) {
     current = 1;
   }
 
@@ -71,7 +71,7 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
       return (
         <>
           <Spin></Spin>
-          <Typography.Text>It will take faw moment to claim</Typography.Text>
+          <Typography.Text>It will take a few seconds to claim</Typography.Text>
         </>
       );
     }
@@ -102,26 +102,32 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
   };
 
   const getClaimedRender = () => {
-    if (claimData.claimStatus.status !== 'claimed') return;
-    return (
-      <div className="content-text">
-        <div className="title">Successfully claimed</div>
-        <div className="description">
-          <span>click to my </span>
-          <a target="_blank" href={`${config.walletUrl}`} rel="noreferrer">
-            Wallet
-          </a>
-        </div>
-        {claimData.claimStatus.txHash && (
+    if (claimData.claimStatus.status === 'claimed' && claimData.claimStatus.txHash) {
+      return (
+        <div className="content-text">
+          <div className="title">Successfully claimed</div>
+          <div className="description">
+            <span>click to my </span>
+            <a target="_blank" href={`${config.walletUrl}`} rel="noreferrer">
+              Wallet
+            </a>
+          </div>
           <div className="description">
             <span>click to my </span>
             <a target="_blank" href={`${config.nervosExplorerUrl}/${claimData.claimStatus.txHash}`} rel="noreferrer">
               Transaction Detail
             </a>
           </div>
-        )}
-      </div>
-    );
+        </div>
+      );
+    } else {
+      return (
+        <>
+          <Spin></Spin>
+          <Typography.Text>It will take a few seconds to claim</Typography.Text>
+        </>
+      );
+    }
   };
 
   const getDisabledRender = () => {
