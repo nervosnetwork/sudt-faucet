@@ -1,4 +1,5 @@
 import { CkitInitOptions, predefined } from '@ckitjs/ckit';
+import { env } from '@sudt-faucet/commons';
 
 interface GlobalConfig {
   ckitConfig: CkitInitOptions;
@@ -9,18 +10,14 @@ interface GlobalConfig {
 }
 
 function getConfig(): GlobalConfig {
-  const network = process.env.NETWORK;
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const ckitConfig = network === 'Lina' ? (predefined.Lina as CkitInitOptions) : predefined.Aggron;
+  const ckitConfig = env.readAsStr('NETWORK', 'Aggron') === 'Lina' ? predefined.Lina : predefined.Aggron;
 
   return {
     ckitConfig,
-    ckbRpcUrl: process.env.MERCURY_URL ?? 'https://testnet.ckb.dev/rpc',
-    mercuryUrl: process.env.RPC_URL ?? 'https://testnet.ckb.dev/indexer',
-    unipassUrl: process.env.UNIPASS_URL ?? 'https://t.unipass.xyz',
-    walletUrl: process.env.WALLET_URL ?? 'https://t.tok.social',
+    ckbRpcUrl: env.readAsStr('CKB_NODE_URL', 'https://testnet.ckb.dev/rpc'),
+    mercuryUrl: env.readAsStr('CKB_INDEXER_URL', 'https://testnet.ckb.dev/indexer'),
+    unipassUrl: env.readAsStr('UNIPASS_URL', 'https://t.unipass.xyz'),
+    walletUrl: env.readAsStr('WALLET_URL', 'https://t.tok.social'),
   };
 }
 
