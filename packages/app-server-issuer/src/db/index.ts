@@ -59,64 +59,82 @@ export class DB {
 
   public async disableSecret(secret: string): Promise<void> {
     const trx = await this.knex.transaction();
-    const statusRow = await this.knex
-      .select('status')
-      .from<MailIssue>('mail_issue')
-      .where({ secret: secret })
-      .forUpdate()
-      .transacting(trx);
-    if (statusRow.length > 1) await trx.rollback('exception: secret not unique');
+    try {
+      const statusRow = await this.knex
+        .select('status')
+        .from<MailIssue>('mail_issue')
+        .where({ secret: secret })
+        .forUpdate()
+        .transacting(trx);
+      if (statusRow.length > 1) throw new Error('exception: secret not unique');
 
-    const status = statusRow[0]?.status;
-    if (!status) await trx.rollback('error: secret not found');
+      const status = statusRow[0]?.status;
+      if (!status) throw new Error('error: secret not found');
 
-    if (status === 'Disabled') await trx.rollback('error: secret already disabled');
-    if (status !== 'WaitForSendMail' && status !== 'WaitForClaim')
-      await trx.rollback('error: can not disable secret after user claimed');
-    await this.knex('mail_issue').where({ secret: secret }).update({ status: 'Disabled' }).transacting(trx);
+      if (status === 'Disabled') throw new Error('error: secret already disabled');
+      if (status !== 'WaitForSendMail' && status !== 'WaitForClaim')
+        throw new Error('error: can not disable secret after user claimed');
+      await this.knex('mail_issue').where({ secret: secret }).update({ status: 'Disabled' }).transacting(trx);
+    } catch (e) {
+      await trx.rollback();
+      throw e;
+    }
     await trx.commit();
   }
 
   public async claimSudtBySecret(secret: string, address: string): Promise<void> {
     const trx = await this.knex.transaction();
-    const statusRow = await this.knex
-      .select('status')
-      .from<MailIssue>('mail_issue')
-      .where({ secret: secret })
-      .forUpdate()
-      .transacting(trx);
-    if (statusRow.length > 1) await trx.rollback('exception: secret not unique');
+    try {
+      const rows = await this.knex
+        .select('status', 'expire_time')
+        .from<MailIssue>('mail_issue')
+        .where({ secret: secret })
+        .forUpdate()
+        .transacting(trx);
+      if (rows.length > 1) throw new Error('exception: secret not unique');
+      if (rows.length === 0)
+        throw new Error('The claim is invalid. Please make sure you have a valid claim invitation');
 
-    const status = statusRow[0]?.status;
-    if (!status) await trx.rollback('The claim is invalid. Please make sure you have a valid claim invitation');
-    if (status !== 'WaitForClaim') await trx.rollback('It seems you have already claimed');
+      if (rows[0]!.expire_time <= new Date().getTime()) throw new Error('The claim secret was expired');
 
-    await this.knex('mail_issue')
-      .where({ secret: secret })
-      .update({
-        status: status,
-        claim_address: address,
-      })
-      .transacting(trx);
+      const status = rows[0]!.status;
+      if (!status) throw new Error('The claim is invalid. Please make sure you have a valid claim invitation');
+      if (status !== 'WaitForClaim') throw new Error('It seems you have already claimed');
+
+      await this.knex('mail_issue')
+        .where({ secret: secret })
+        .update({
+          status: 'WaitForTransfer',
+          claim_address: address,
+        })
+        .transacting(trx);
+    } catch (e) {
+      await trx.rollback();
+      throw e;
+    }
     await trx.commit();
   }
 
   public async updateStatusToWaitForClaim(secrets: string[]): Promise<void> {
     const trx = await this.knex.transaction();
-    const rows = await this.knex
-      .select('secret', 'status')
-      .from<MailIssue>('mail_issue')
-      .whereIn('secret', secrets)
-      .forUpdate()
-      .transacting(trx);
-    const secretsOfUpdateRows = rows.filter((row) => row.status !== 'Disabled').map((row) => row.secret);
-
-    if (secretsOfUpdateRows.length > 0)
-      await this.knex('mail_issue')
-        .whereIn('secret', secretsOfUpdateRows)
-        .update({ status: 'WaitForClaim' })
+    try {
+      const rows = await this.knex
+        .select('secret', 'status')
+        .from<MailIssue>('mail_issue')
+        .whereIn('secret', secrets)
+        .forUpdate()
         .transacting(trx);
+      const secretsOfUpdateRows = rows.filter((row) => row.status !== 'Disabled').map((row) => row.secret);
 
+      if (secretsOfUpdateRows.length > 0)
+        await this.knex('mail_issue')
+          .whereIn('secret', secretsOfUpdateRows)
+          .update({ status: 'WaitForClaim' })
+          .transacting(trx);
+    } catch (e) {
+      await trx.rollback();
+      throw e;
+    }
     await trx.commit();
   }
 
