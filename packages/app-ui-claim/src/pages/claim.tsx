@@ -37,6 +37,9 @@ const Wrapper = styled.div`
   .claim-button {
     width: 120px;
   }
+  .loading-container {
+    margin-top: 50px;
+  }
 `;
 const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, claimSecret }) => {
   const config = useGlobalConfig();
@@ -69,10 +72,10 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
   const getUnclaimedRender = () => {
     if (query.data?.claimStatus.status !== 'claimed' && loading) {
       return (
-        <>
+        <div className="loading-container">
           <Spin></Spin>
           <Typography.Text>It will take a few seconds to claim</Typography.Text>
-        </>
+        </div>
       );
     }
     return (
@@ -126,10 +129,10 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
       );
     } else {
       return (
-        <>
+        <div className="loading-container">
           <Spin></Spin>
           <Typography.Text>It will take a few seconds to claim</Typography.Text>
-        </>
+        </div>
       );
     }
   };
