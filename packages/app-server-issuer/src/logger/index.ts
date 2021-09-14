@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import morgan, { StreamOptions } from 'morgan';
 import winston, { Logger } from 'winston';
 
 const { createLogger, format, transports } = winston;
@@ -49,9 +48,3 @@ export const logger = createLogger({
 export function loggerWithModule(moduleName: string): Logger {
   return logger.child({ label: moduleName });
 }
-
-export const stream: StreamOptions = {
-  write: (message) => logger.http(message),
-};
-
-export const morganMiddleware = morgan(':method :url :status :res[content-length] - :response-time ms', { stream });
