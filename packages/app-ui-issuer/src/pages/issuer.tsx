@@ -58,9 +58,7 @@ export const Issuer: React.FC = () => {
           <Route path="/issue-token/:udtId">{loginStatus ? <IssueToken /> : <Redirect to="/login" />}</Route>
           <Route path="/token-management/:udtId">{loginStatus ? <TokenManagement /> : <Redirect to="/login" />}</Route>
           <Route path="/token-charge/:udtId">{loginStatus ? <TokenCharge /> : <Redirect to="/login" />}</Route>
-          <Route path="/">
-            <Login />
-          </Route>
+          <Route path="/">{loginStatus ? <TokenList /> : <Redirect to="/login" />}</Route>
         </Switch>
       </Router>
     </div>
