@@ -17,7 +17,7 @@ const NERVOS_EXPLORER_URL = env.readAsStr('REACT_APP_NERVOS_EXPLORER_URL', 'http
 export const initialValue: LocalConfig = {
   ckitConfig: predefined[env.readAsStr('REACT_APP_NETWORK', 'Aggron') === 'Lina' ? 'Lina' : 'Aggron'],
   mercuryRPC: env.readAsStr('REACT_APP_CKB_INDEXER_URL', 'https://testnet.ckb.dev/indexer'),
-  ckbRPC: env.readAsStr('REACT_APP_CKB_INDEXER_URL', 'https://testnet.ckb.dev/rpc'),
+  ckbRPC: env.readAsStr('REACT_APP_CKB_NODE_URL', 'https://testnet.ckb.dev/rpc'),
   nervosExploreTxUrlPrefix: `${NERVOS_EXPLORER_URL}/transaction/`,
   nervosExploreAddressUrlPrefix: `${NERVOS_EXPLORER_URL}/address/`,
   nervosExploreSudtUrlPrefix: `${NERVOS_EXPLORER_URL}/sudt/`,
