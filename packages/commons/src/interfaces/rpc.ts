@@ -119,7 +119,7 @@ export interface GetClaimHistoryPayload {
 }
 
 export interface GetClaimHistoryResponse {
-  history: ClaimHistory | undefined;
+  history: ClaimHistory | null;
 }
 
 export interface DisableClaimSecretPayload {
