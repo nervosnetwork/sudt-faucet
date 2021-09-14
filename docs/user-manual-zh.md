@@ -15,15 +15,15 @@
 
 - 申请方法：
 
-    - [MetaMask使用教程](https://zhuanlan.zhihu.com/p/112285438)：
+    - [MetaMask使用教程](https://zhuanlan.zhihu.com/p/112285438) ：
 
         - 若是之前没有过CKB 账户私钥
 
-            - 从[metamask.io](https://metamask.io/)网站安装`Chrome`或`Firefox`浏览器扩展，可以生成账户，导出私钥
+            - 从[metamask.io](https://metamask.io/) 网站安装`Chrome`或`Firefox`浏览器扩展，可以生成账户，导出私钥
 
         - 若是之前有CKB 账户私钥
 
-            - 安装 [metamask](https://metamask.io/) ，选择导入`Owner` 私钥，记录下其 `ETH` 地址
+            - 安装 [metamask](https://metamask.io/)   ,选择导入`Owner` 私钥，记录下其 `ETH` 地址
 
 
 
@@ -31,7 +31,7 @@
 
 - 账号用处：该系统使用了[SendGrid](https://sendgrid.com/) 代理批量发送邮件，所以需要提供 [SendGrid](https://sendgrid.com/) 账号
 
-- 申请方法：注册一个[SendGrid](https://sendgrid.com/)账号，获取一个[API_KEY](https://docs.sendgrid.com/ui/account-and-settings/api-keys)，并进行[认证](https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication)
+- 申请方法：注册一个[SendGrid](https://sendgrid.com/) 账号，获取一个[API_KEY](https://docs.sendgrid.com/ui/account-and-settings/api-keys) ，并进行[认证](https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication)
 
 #### 准备域名
 
