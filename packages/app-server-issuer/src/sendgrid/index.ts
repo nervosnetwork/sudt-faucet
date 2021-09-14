@@ -4,9 +4,11 @@ import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
 import memoize from 'memoizee';
 import { DB } from '../db';
-import { logger } from '../logger';
+import { loggerWithModule } from '../logger';
 import { MailToSend, ServerContext } from '../types';
 import { AssetAmount } from '../util';
+
+const logger = loggerWithModule('SendGrid');
 
 export async function startSendGrid(context: ServerContext): Promise<void> {
   if (!process.env.SENDGRID_API_KEY) throw new Error('env SENDGRID_API_KEY not set');
@@ -36,6 +38,7 @@ export async function startSendGrid(context: ServerContext): Promise<void> {
             new AssetAmount(unsendMail.amount, sudtInfo.decimals).toHumanizeString() + ` ${sudtInfo.symbol}`;
         }
         const sgMails = unsendMails.map(toSGMail);
+        logger.info(`Sended mails content: ${JSON.stringify(sgMails)}`);
         await sgMail.send(sgMails);
         const secrets = unsendMails.map((value) => value.secret);
         await db.updateStatusToWaitForClaim(secrets);
@@ -60,7 +63,7 @@ async function getSudtInfo(
     {
       retries: 6,
       onRetry: (e, attempt) => {
-        logger.error(`(retry ${attempt} times) get sudt info of ${JSON.stringify(options)} with error: ${e}`);
+        logger.warn(`(retry ${attempt} times) get sudt info of ${JSON.stringify(options)} with error: ${e}`);
       },
     },
   );
@@ -72,7 +75,7 @@ function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.CLAIM_SUDT_DOMAIN) throw new Error('env CLAIM_SUDT_DOMAIN not set');
 
   const expireDate = mail.expire_time
-    ? 'before' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' })
+    ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' })
     : '';
 
   return {

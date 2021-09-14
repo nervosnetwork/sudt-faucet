@@ -8,8 +8,10 @@ import {
 } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
-import { logger } from '../logger';
+import { loggerWithModule } from '../logger';
 import { TransactionToSend } from '../types';
+
+const logger = loggerWithModule('TransferSudt');
 
 export class TransactionManage {
   constructor(private provider: CkitProvider, private signer: EntrySigner, private rcHelper: RcSupplyLockHelper) {}
@@ -44,7 +46,7 @@ export class TransactionManage {
       {
         retries: 6,
         onRetry: (e, attempt) => {
-          logger.error(`(retry ${attempt} times) build transfer sudt tx error: ${e}`);
+          logger.warn(`(retry ${attempt} times) build transfer sudt tx error: ${e}`);
         },
       },
     );
@@ -63,7 +65,7 @@ export class TransactionManage {
       {
         retries: 6,
         onRetry: (e, attempt) => {
-          logger.error(`(retry ${attempt} times) send transfer sudt tx error: ${e}`);
+          logger.warn(`(retry ${attempt} times) send transfer sudt tx error: ${e}`);
         },
       },
     );
