@@ -2,14 +2,17 @@ import { rpc } from '@sudt-faucet/commons';
 import bodyParser from 'body-parser';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
-import { logger } from '../logger';
+import { loggerWithModule, morganMiddleware } from '../logger';
 import { ServerContext } from '../types';
 import { IssuerRpcHandler } from './handler';
+
+const logger = loggerWithModule('JsonRPC');
 
 export function startRpcServer(context: ServerContext): void {
   const app = express();
   app.use(bodyParser.json({ limit: '100mb' }));
   app.use(bodyParser.urlencoded({ limit: '100mb', extended: true, parameterLimit: 100000 }));
+  app.use(morganMiddleware);
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
@@ -34,19 +37,23 @@ export function startRpcServer(context: ServerContext): void {
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
+    logger.info(`request: ${JSON.stringify(jsonRpcRequest)}`);
 
-    if (!permissionlessMethods.has(jsonRpcRequest.method)) {
-      try {
-        rpcHandler.verify_user(req);
-      } catch (error) {
-        res.status(401);
-        res.json(error);
-        return;
-      }
-    }
+    // if (!permissionlessMethods.has(jsonRpcRequest.method)) {
+    //   try {
+    //     rpcHandler.verify_user(req);
+    //   } catch (error) {
+    //     res.status(401);
+    //     res.json(error);
+    //     return;
+    //   }
+    // }
     //TODO handle auth
     void rpcServer.receive(jsonRpcRequest).then((jsonRpcResponse) => {
       if (jsonRpcResponse) {
+        if (jsonRpcResponse.error) {
+          logger.error(`response: ${JSON.stringify(jsonRpcResponse)}`);
+        }
         res.json(jsonRpcResponse);
         return;
       }
