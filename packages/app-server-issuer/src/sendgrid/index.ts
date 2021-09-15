@@ -18,6 +18,7 @@ export async function startSendGrid(context: ServerContext): Promise<void> {
     normalizer: (args) => JSON.stringify(args[1]),
     promise: true,
   });
+  logger.info('Send grid routine started');
 
   for (;;) {
     try {
@@ -55,10 +56,9 @@ async function getSudtInfo(
   options: { rcIdentity: RcIdentity; udtId: string },
 ): Promise<SudtInfo | undefined> {
   logger.info(`getSudtInfo not hit cache, options: ${JSON.stringify(options)}`);
-  let sudtInfos: SudtInfo[] = [];
-  await retry(
+  const sudtInfos = await retry<SudtInfo[]>(
     async () => {
-      sudtInfos = await rcHelper.listCreatedSudt(options);
+      return rcHelper.listCreatedSudt(options);
     },
     {
       retries: 6,

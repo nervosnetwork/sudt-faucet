@@ -9,18 +9,19 @@ const logger = loggerWithModule('TransferSudt');
 export async function startTransferSudt(context: ServerContext): Promise<void> {
   const txManage = new TransactionManage(context.ckitProvider, context.txSigner, context.rcHelper);
   const db = DB.getInstance();
+  logger.info('Transfer sudt routine started');
 
   for (;;) {
     try {
       const unsendTransactions = await db.getTransactionsToSend(
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
-      const secrets = unsendTransactions.map((value) => value.secret);
       logger.info(
         `New transfer sudt round with records: ${
           unsendTransactions.length ? JSON.stringify(unsendTransactions) : '[]'
         }`,
       );
+      const secrets = unsendTransactions.map((value) => value.secret);
       if (unsendTransactions.length > 0) {
         try {
           const signedTx = await txManage.buildTransaction(unsendTransactions);

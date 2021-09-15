@@ -1,7 +1,6 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
 import dotenv from 'dotenv';
 import { DB } from './db';
-import { logger } from './logger';
 import { startRpcServer } from './rpc-server';
 import { startSendGrid } from './sendgrid';
 import { startTransferSudt } from './transfer-sudt';
@@ -10,9 +9,7 @@ import { ServerContext } from './types';
 async function main() {
   const context = await initContext();
   void startSendGrid(context);
-  logger.info('Send grid routine started');
   void startTransferSudt(context);
-  logger.info('Transfer sudt routine started');
   startRpcServer(context);
 }
 
