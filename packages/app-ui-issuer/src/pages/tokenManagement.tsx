@@ -1,6 +1,6 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ClaimHistory, bigintToFixedString } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
+import { ClaimHistory, bigintToFixedString, utils } from '@sudt-faucet/commons';
+import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message, Tooltip } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
@@ -9,6 +9,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
 import client from '../configs/client';
+import { GlobalConfigContainer } from '../containers';
 import { useListRcSupplyLockUdtQuery } from '../hooks';
 import { useChargeCellBalanceQuery } from '../hooks/useChargeCellBalanceQuery';
 import { formatTimeSpan } from '../utils';
@@ -73,12 +74,41 @@ const TokenManagement: React.FC = () => {
       key: 'claimAddress',
       title: 'claimAddress',
       dataIndex: ['claimStatus', 'address'],
+      render: (address) => {
+        return address ? (
+          <Tooltip
+            title={
+              <Typography.Text copyable={{ text: address }}>
+                {<Typography.Text style={{ color: 'white' }}>{address}</Typography.Text>}
+              </Typography.Text>
+            }
+          >
+            <span>{utils.truncateMiddle(address, 8, 8)}</span>
+          </Tooltip>
+        ) : (
+          <div></div>
+        );
+      },
     },
     {
       key: 'claimStatus',
       title: 'claimStatus',
       dataIndex: 'claimStatus',
       render: (claimStatus) => <div>{claimStatus.status}</div>,
+    },
+    {
+      key: 'Tx Hash',
+      title: 'Tx Hash',
+      dataIndex: 'claimStatus',
+      render: (claimStatus) => {
+        return claimStatus.txHash ? (
+          <a target="_blank" href={`${config.nervosExploreTxUrlPrefix}${claimStatus.txHash}`} rel="noreferrer">
+            {utils.truncateMiddle(claimStatus.txHash, 8, 8)}
+          </a>
+        ) : (
+          <div></div>
+        );
+      },
     },
     {
       key: 'action',
@@ -124,6 +154,7 @@ const TokenManagement: React.FC = () => {
   const [status, setStatus] = useState('');
 
   const history = useHistory();
+  const [config] = GlobalConfigContainer.useContainer();
   const goCharge = () => {
     history.push(`/token-charge/${udtId}`);
   };
