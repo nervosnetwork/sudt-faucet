@@ -2,9 +2,9 @@ import { Hash, Transaction } from '@ckb-lumos/base';
 import {
   AcpTransferSudtBuilder,
   CkitProvider,
+  convertToRcIdentityFlag,
   EntrySigner,
   RcSupplyLockHelper,
-  convertToRcIdentityFlag,
 } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
@@ -36,12 +36,11 @@ export class TransactionManage {
       await this.signer.getAddress(),
     );
 
-    let signedTx: Transaction;
-    await retry(
+    return retry<Transaction>(
       async () => {
         const unsignedTx = await txBuilder.build();
         logger.info(`Build unsigned transfer sudt tx: ${JSON.stringify(unsignedTx.serializeJson())}`);
-        signedTx = await this.signer.seal(unsignedTx);
+        return this.signer.seal(unsignedTx);
       },
       {
         retries: 6,
@@ -50,17 +49,12 @@ export class TransactionManage {
         },
       },
     );
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return signedTx;
   }
 
   public async sendTransaction(signedTx: Transaction): Promise<Hash> {
-    let txHash: Hash;
-    await retry(
+    return retry<Hash>(
       async () => {
-        txHash = await this.provider.sendTransaction(signedTx);
+        return this.provider.sendTransaction(signedTx);
       },
       {
         retries: 6,
@@ -69,9 +63,6 @@ export class TransactionManage {
         },
       },
     );
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return txHash;
   }
 
   public async waitForCommit(txHash: Hash): Promise<Transaction> {
