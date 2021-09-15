@@ -39,6 +39,8 @@ const Wrapper = styled.div`
   }
   .loading-container {
     margin-top: 50px;
+    display: flex;
+    flex-direction: column;
   }
 `;
 const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, claimSecret }) => {

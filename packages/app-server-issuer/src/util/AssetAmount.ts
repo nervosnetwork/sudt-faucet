@@ -27,7 +27,7 @@ export class AssetAmount {
   }
 
   toHumanizeString(): string {
-    const humanizeAmount = this.rawAmount.times(10 ** -this.decimals);
+    const humanizeAmount = this.rawAmount.times(new BigNumber(10).pow(-this.decimals));
     const originDecimalPlaces = humanizeAmount.decimalPlaces();
     const rounded = humanizeAmount.decimalPlaces(originDecimalPlaces, BigNumber.ROUND_FLOOR);
     return rounded.toFormat().toString();
