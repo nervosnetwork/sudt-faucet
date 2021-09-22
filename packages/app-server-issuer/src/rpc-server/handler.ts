@@ -28,7 +28,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const { message, sig } = payload;
     const result = await verifyLoginMessage(sig, message, address);
     if (result) {
-      const token = createToken(address, keyPair.privateKey);
+      const token = createToken(message, keyPair.privateKey);
       return { jwt: token };
     }
     throw new Error('Only the owner is allowed to access');
