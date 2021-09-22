@@ -9,6 +9,7 @@ export function useClaimStatus(): UseQueryResult<ClaimHistory> {
   return useQuery(
     ['get_claim_history', { secret }],
     () => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return client.get_claim_history({ secret: secret! }).then((res) => res.history);
     },
     {

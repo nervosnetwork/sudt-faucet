@@ -31,5 +31,10 @@ export const ClaimContainer = createContainer(() => {
     })();
   }, [config.ckitConfig, config.ckbRpcUrl, config.mercuryUrl, config.unipassUrl]);
 
+  // clear Unipass cache to avoid address changes due to user Unipass lock being recovered.
+  useEffect(() => {
+    localStorage.removeItem('__unipass__');
+  }, [address]);
+
   return { address, wallet, provider, client, claimSecret, clearClaimSecret };
 });

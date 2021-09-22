@@ -12,12 +12,12 @@ export interface LocalConfig {
   nervosExploreSudtUrlPrefix: string;
 }
 
-const NERVOS_EXPLORER_URL = env.readAsStr('REACT_APP_NERVOS_EXPLORER_URL', 'https://explorer.nervos.org/aggron');
+const NERVOS_EXPLORER_URL = env.readAsStr('REACT_APP_NERVOS_EXPLORER_URL');
 
 export const initialValue: LocalConfig = {
-  ckitConfig: predefined[env.readAsStr('REACT_APP_NETWORK', 'Aggron') === 'Lina' ? 'Lina' : 'Aggron'],
-  mercuryRPC: env.readAsStr('REACT_APP_CKB_INDEXER_URL', 'https://testnet.ckb.dev/indexer'),
-  ckbRPC: env.readAsStr('REACT_APP_CKB_NODE_URL', 'https://testnet.ckb.dev/rpc'),
+  ckitConfig: predefined[env.readAsStr('REACT_APP_NETWORK') === 'Lina' ? 'Lina' : 'Aggron'],
+  mercuryRPC: env.readAsStr('REACT_APP_CKB_INDEXER_URL'),
+  ckbRPC: env.readAsStr('REACT_APP_CKB_NODE_URL'),
   nervosExploreTxUrlPrefix: `${NERVOS_EXPLORER_URL}/transaction/`,
   nervosExploreAddressUrlPrefix: `${NERVOS_EXPLORER_URL}/address/`,
   nervosExploreSudtUrlPrefix: `${NERVOS_EXPLORER_URL}/sudt/`,

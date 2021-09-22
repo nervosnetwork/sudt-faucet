@@ -1,6 +1,6 @@
 import { MintRcUdtBuilder } from '@ckitjs/ckit';
 import { fixedStringToBigint } from '@sudt-faucet/commons';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useFormik } from 'formik';
 import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';

@@ -11,15 +11,15 @@ interface GlobalConfig {
 }
 
 function getConfig(): GlobalConfig {
-  const ckitConfig = env.readAsStr('REACT_APP_NETWORK', 'Aggron') === 'Lina' ? predefined.Lina : predefined.Aggron;
-  const NERVOS_EXPLORER_URL = env.readAsStr('NERVOS_EXPLORER_URL', 'https://explorer.nervos.org/aggron');
+  const ckitConfig = env.readAsStr('REACT_APP_NETWORK') === 'Lina' ? predefined.Lina : predefined.Aggron;
+  const NERVOS_EXPLORER_URL = env.readAsStr('REACT_APP_NERVOS_EXPLORER_URL');
 
   return {
     ckitConfig,
-    ckbRpcUrl: env.readAsStr('REACT_APP_CKB_NODE_URL', 'https://testnet.ckb.dev/rpc'),
-    mercuryUrl: env.readAsStr('REACT_APP_CKB_INDEXER_URL', 'https://testnet.ckb.dev/indexer'),
-    unipassUrl: env.readAsStr('REACT_APP_UNIPASS_URL', 'https://t.unipass.xyz'),
-    walletUrl: env.readAsStr('REACT_APP_WALLET_URL', 'https://t.tok.social'),
+    ckbRpcUrl: env.readAsStr('REACT_APP_CKB_NODE_URL'),
+    mercuryUrl: env.readAsStr('REACT_APP_CKB_INDEXER_URL'),
+    unipassUrl: env.readAsStr('REACT_APP_UNIPASS_URL'),
+    walletUrl: env.readAsStr('REACT_APP_WALLET_URL'),
     nervosExploreTxUrlPrefix: `${NERVOS_EXPLORER_URL}/transaction`,
   };
 }
