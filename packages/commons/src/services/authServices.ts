@@ -33,8 +33,13 @@ const verifyLoginMessage = async (signature: string, message: string, address: s
   return recoveredAddress.toLocaleLowerCase() === address.toLocaleLowerCase();
 };
 
-const createToken = (address: string, privateKey: string): string => {
-  return jwt.sign({ address }, privateKey, { expiresIn: '1h', algorithm: 'RS256' });
+const createToken = (message: string, privateKey: string): string => {
+  const loginTime = message.split(':')[1];
+  if (!loginTime) {
+    throw new Error('login message error');
+  }
+  const exp = Math.floor(parseInt(loginTime) / 1000) + 60 * 60;
+  return jwt.sign({ data: message, exp }, privateKey, { algorithm: 'RS256' });
 };
 
 const verifyToken = (token: string, publicKey: string): string | JwtPayload => {
