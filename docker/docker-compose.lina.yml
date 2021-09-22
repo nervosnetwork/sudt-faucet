@@ -2,28 +2,46 @@ version: '3.2'
 
 services:
   mysql:
+    container_name: mysql-sudt-faucet-lina
     env_file:
       - .env.lina
     ports:
-      - '3306:3336'
+      - '3306:3337'
     volumes:
       - mysql-sudt-faucet-lina:/var/lib/mysql
+    networks:
+      - sudt_faucet_network_lina
 
   issuer-server:
+    container_name: issuer-server-lina
     env_file:
       - .env.lina
     ports:
-      - '1570:1570'
+      - '1570:1571'
     volumes:
       - issuer-server-log-lina:/app/packages/app-server-issuer/logs
+    networks:
+      - sudt_faucet_network_lina
 
   issuer-ui:
+    image: issuer-ui-lina
+    container_name: issuer-ui-lina
+    networks:
+      - sudt_faucet_network_lina
     ports:
-      - "1080:1080"
+      - "1080:3090"
 
   claim-ui:
+    image: claim-ui-lina
+    container_name: claim-ui-lina
+    networks:
+      - sudt_faucet_network_lina
     ports:
-      - "1081:1081"
+      - "1081:3091"
+
+networks:
+  sudt_faucet_network_lina:
+    driver: bridge
 
 volumes:
   mysql-sudt-faucet-lina:

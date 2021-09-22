@@ -2,28 +2,46 @@ version: '3.2'
 
 services:
   mysql:
+    container_name: mysql-sudt-faucet-aggron
     env_file:
       - .env.aggron
     ports:
       - '3306:3336'
     volumes:
       - mysql-sudt-faucet-aggron:/var/lib/mysql
+    networks:
+      - sudt_faucet_network_aggron
 
   issuer-server:
+    container_name: issuer-server-aggron
     env_file:
       - .env.aggron
     ports:
       - '1570:1570'
     volumes:
       - issuer-server-log-aggron:/app/packages/app-server-issuer/logs
+    networks:
+      - sudt_faucet_network_aggron
 
   issuer-ui:
+    image: issuer-ui-aggron
+    container_name: issuer-ui-aggron
+    networks:
+      - sudt_faucet_network_aggron
     ports:
-      - "1080:1080"
+      - "1080:3080"
 
   claim-ui:
+    image: claim-ui-aggron
+    container_name: claim-ui-aggron
+    networks:
+      - sudt_faucet_network_aggron
     ports:
-      - "1081:1081"
+      - "1081:3081"
+
+networks:
+  sudt_faucet_network_aggron:
+    driver: bridge
 
 volumes:
   mysql-sudt-faucet-aggron:
