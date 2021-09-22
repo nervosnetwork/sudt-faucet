@@ -3,10 +3,12 @@ version: '3.2'
 services:
   mysql:
     image: mysql:5.7
+    hostname: mysql-sudt-faucet
     restart: always
 
   issuer-server:
     image: issuer-server
+    hostname: issuer-server
     restart: always
     depends_on:
       - mysql
