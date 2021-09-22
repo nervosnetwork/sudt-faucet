@@ -3,6 +3,7 @@ packages/*/node_modules
 packages/*/build
 packages/*/dist
 packages/*/logs
+packages/app-server-issuer/.env*
 ckit/apps
 ckit/deps
 ckit/node_modules

@@ -1,35 +1,49 @@
 version: '3.2'
 
 services:
-#  mysql:
-#    image: mysql:5.7
-#    container_name: sudt-faucet-mysql
-#    env_file:
-#      - .env
-#    ports:
-#      - '3306:3306'
-#    networks:
-#      - sudt_faucet_network
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-sudt-faucet-aggron
+    restart: always
+    env_file:
+      - .env.aggron
+    ports:
+      - '3306:3336'
+    networks:
+      - sudt_faucet_network
+    volumes:
+      - mysql-sudt-faucet-aggron:/var/lib/mysql
 
-#  issuer-server:
-#    build:
-#      context: issuer/
-#    container_name: sudt-faucet-issuer
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./issuer/nginx_faucet:/etc/nginx/sites-enabled/sudt_faucet
-#    ports:
-#      - '3046:1570'
-#      - '3047:1080'
-#      - '3048:1081'
-#    networks:
-#      - sudt_faucet_network
-#    depends_on:
-#      - mysql
+  issuer-server:
+    image: issuer-server
+    container_name: sudt-faucet-issuer-server
+    restart: always
+    env_file:
+      - .env.aggron
+    ports:
+      - '1570:1570'
+    networks:
+      - sudt_faucet_network
+    volumes:
+      - issuer-server-log-aggron:/app/packages/app-server-issuer/logs
+    depends_on:
+      - mysql
 
   issuer-ui:
     image: issuer-ui
+    container_name: sudt-faucet-issuer-ui
+    restart: always
+    ports:
+      - "1080:1080"
+    networks:
+      - sudt_faucet_network
+    depends_on:
+      - issuer-server
+
+  claim-ui:
+    image: claim-ui
+    container_name: sudt-faucet-claim-ui
+    restart: always
     ports:
       - "1081:1081"
     networks:
@@ -37,13 +51,10 @@ services:
     depends_on:
       - issuer-server
 
-  issuer-server:
-    image: issuer-server
-    ports:
-      - "1570:1570"
-    networks:
-      - sudt_faucet_network
-
 networks:
   sudt_faucet_network:
     driver: bridge
+
+volumes:
+  mysql-sudt-faucet-aggron:
+  issuer-server-log-aggron:

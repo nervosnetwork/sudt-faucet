@@ -1,0 +1,30 @@
+version: '3.2'
+
+services:
+  mysql:
+    env_file:
+      - .env.lina
+    ports:
+      - '3306:3336'
+    volumes:
+      - mysql-sudt-faucet-lina:/var/lib/mysql
+
+  issuer-server:
+    env_file:
+      - .env.lina
+    ports:
+      - '1570:1570'
+    volumes:
+      - issuer-server-log-lina:/app/packages/app-server-issuer/logs
+
+  issuer-ui:
+    ports:
+      - "1080:1080"
+
+  claim-ui:
+    ports:
+      - "1081:1081"
+
+volumes:
+  mysql-sudt-faucet-lina:
+  issuer-server-log-lina:
