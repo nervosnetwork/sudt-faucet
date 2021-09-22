@@ -34,8 +34,9 @@ const verifyLoginMessage = async (signature: string, message: string, address: s
 };
 
 const createToken = (message: string, privateKey: string): string => {
+  const INTEGER_REGEX = /^\d+$/;
   const loginTime = message.split(':')[1];
-  if (!loginTime) {
+  if (!loginTime || !INTEGER_REGEX.test(loginTime)) {
     throw new Error('login message error');
   }
   const exp = Math.floor(parseInt(loginTime) / 1000) + 60 * 60;
