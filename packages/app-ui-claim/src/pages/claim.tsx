@@ -75,8 +75,7 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
     if (query.data?.claimStatus.status !== 'claimed' && loading) {
       return (
         <div className="loading-container">
-          <Spin></Spin>
-          <Typography.Text>It will take a few seconds to claim</Typography.Text>
+          <Spin tip="It will take a few seconds to claim" />
         </div>
       );
     }
@@ -132,8 +131,7 @@ const Claim: React.FC<{ address: string; claimSecret: string }> = ({ address, cl
     } else {
       return (
         <div className="loading-container">
-          <Spin></Spin>
-          <Typography.Text>It will take a few seconds to claim</Typography.Text>
+          <Spin tip="It will take a few seconds to claim" />
         </div>
       );
     }
