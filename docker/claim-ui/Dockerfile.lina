@@ -1,0 +1,14 @@
+# syntax=docker/dockerfile:1
+FROM node AS build
+
+WORKDIR /app
+COPY . .
+ENV GENERATE_SOURCEMAP=false
+
+COPY docker/.env.lina packages/app-ui-claim/.env
+RUN yarn install && yarn build:lib
+RUN cd packages/app-ui-claim && yarn build
+
+FROM nginx:alpine
+COPY --from=build /app/packages/app-ui-claim/build /usr/share/nginx/html
+COPY ./docker/claim-ui/nginx.conf /etc/nginx/conf.d/default.conf

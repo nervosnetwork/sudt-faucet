@@ -75,7 +75,7 @@ function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.CLAIM_SUDT_DOMAIN) throw new Error('env CLAIM_SUDT_DOMAIN not set');
 
   const expireDate = mail.expire_time
-    ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' })
+    ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' }) + '(UTC Time)'
     : '';
 
   return {

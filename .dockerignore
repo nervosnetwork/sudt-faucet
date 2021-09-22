@@ -1,0 +1,11 @@
+node_modules
+packages/*/node_modules
+packages/*/build
+packages/*/dist
+packages/*/logs
+ckit/apps
+ckit/deps
+ckit/node_modules
+ckit/packages/*/node_modules
+ckit/packages/*/build
+ckit/packages/*/dist

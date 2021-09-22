@@ -15,7 +15,7 @@ async function main() {
 
 async function initContext(): Promise<ServerContext> {
   dotenv.config();
-  DB.getInstance();
+  await DB.init();
 
   if (!process.env.CKB_NODE_URL) throw new Error('env CKB_NODE_URL not set');
   if (!process.env.CKB_INDEXER_URL) throw new Error('env CKB_INDEXER_URL not set');

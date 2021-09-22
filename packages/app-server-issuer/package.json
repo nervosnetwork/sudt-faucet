@@ -27,7 +27,8 @@
     "knex": "^0.95.10",
     "memoizee": "^0.4.15",
     "mysql2": "^2.3.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"
