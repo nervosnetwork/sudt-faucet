@@ -33,7 +33,7 @@ services:
     networks:
       - sudt_faucet_network_lina
     ports:
-      - "3090:1080"
+      - "3098:1080"
 
   claim-ui:
     image: claim-ui-lina
@@ -41,7 +41,7 @@ services:
     networks:
       - sudt_faucet_network_lina
     ports:
-      - "3091:1081"
+      - "3099:1081"
 
 networks:
   sudt_faucet_network_lina:

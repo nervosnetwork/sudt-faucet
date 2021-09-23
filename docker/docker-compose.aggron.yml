@@ -33,7 +33,7 @@ services:
     networks:
       - sudt_faucet_network_aggron
     ports:
-      - "3080:1080"
+      - "3088:1080"
 
   claim-ui:
     image: claim-ui-aggron
@@ -41,7 +41,7 @@ services:
     networks:
       - sudt_faucet_network_aggron
     ports:
-      - "3081:1081"
+      - "3089:1081"
 
 networks:
   sudt_faucet_network_aggron:

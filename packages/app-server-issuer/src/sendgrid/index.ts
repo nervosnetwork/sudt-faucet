@@ -82,6 +82,6 @@ function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
     to: mail.mail_address,
     from: process.env.SENDGRID_VERIFIED_SENDER,
     subject: 'You have received some tokens',
-    text: `${mail.mail_message}\nClick this link to claim ${mail.amount} ${expireDate}:\n${process.env.CLAIM_SUDT_DOMAIN}?claim_secret=${mail.secret}`,
+    text: `${mail.mail_message}\n\nClick this link to claim ${mail.amount} ${expireDate}:\n${process.env.CLAIM_SUDT_DOMAIN}?claim_secret=${mail.secret}`,
   };
 }
