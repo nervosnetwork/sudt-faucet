@@ -4,11 +4,11 @@ services:
   mysql:
     container_name: mysql-sudt-faucet-lina
     env_file:
-      - .env.lina
+      - .env.lina.local
     ports:
       - '3337:3306'
     volumes:
-      - mysql-sudt-faucet-lina:/var/lib/mysql
+      - mysql_sudt_faucet_lina:/var/lib/mysql
     networks:
       sudt_faucet_network_lina:
         aliases:
@@ -17,11 +17,11 @@ services:
   issuer-server:
     container_name: issuer-server-lina
     env_file:
-      - .env.lina
+      - .env.lina.local
     ports:
       - '1571:1570'
     volumes:
-      - issuer-server-log-lina:/app/packages/app-server-issuer/logs
+      - issuer_server_log_lina:/app/packages/app-server-issuer/logs
     networks:
       sudt_faucet_network_lina:
         aliases:
@@ -48,5 +48,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-sudt-faucet-lina:
-  issuer-server-log-lina:
+  mysql_sudt_faucet_lina:
+  issuer_server_log_lina:

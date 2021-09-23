@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 ENV GENERATE_SOURCEMAP=false
 
-COPY docker/.env.aggron packages/app-ui-claim/.env
+COPY docker/.env.aggron.local packages/app-ui-claim/.env
 RUN yarn install && yarn build:lib
 RUN cd packages/app-ui-claim && yarn build
 

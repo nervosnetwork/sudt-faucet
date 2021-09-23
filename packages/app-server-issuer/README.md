@@ -8,7 +8,7 @@ Sign up [SendGrid](https://sendgrid.com/) to get `api_keys` and `verified_sender
 
 ```bash
 # copy from .env.development, then make .env fields complete
-copy  .env.development .env
+cp  .env.development .env
 ```
 
 To login with matemask, relase the `USER_ADDRESS`in `.env` file to your matemask address

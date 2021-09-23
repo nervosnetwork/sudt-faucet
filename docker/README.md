@@ -2,8 +2,14 @@
 
 ## Config Environment
 
-- config `docker/.env.aggron` before deploy applications for aggron
-- config `docker/.env.lina` before deploy applications for lina
+```bash
+# cd project_root_directory
+cp docker/.env.aggron docker/.env.aggron.local
+cp docker/.env.lina docker/.env.lina.local
+```
+
+- config `docker/.env.aggron.local` before deploy applications for aggron
+- config `docker/.env.lina.local` before deploy applications for lina
 
 ## Build Images
 
@@ -52,6 +58,5 @@ docker-compose -f docker-compose.yml -f docker-compose.lina.yml up -d
 
 ## Upgrade Applications
 
-1. Git pull to get the latest code
-2. Rebuild the service image you want to upgrade
-3. Run `cd docker && docker-compose up --no-deps -d ${service_name_you_want_to_upgrade}`
+1. Rebuild the service image you want to upgrade
+2. Run `cd docker && docker-compose up --no-deps -d ${service_name_you_want_to_upgrade}`

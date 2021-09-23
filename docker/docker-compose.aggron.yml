@@ -4,11 +4,11 @@ services:
   mysql:
     container_name: mysql-sudt-faucet-aggron
     env_file:
-      - .env.aggron
+      - .env.aggron.local
     ports:
       - '3336:3306'
     volumes:
-      - mysql-sudt-faucet-aggron:/var/lib/mysql
+      - mysql_sudt_faucet_aggron:/var/lib/mysql
     networks:
       sudt_faucet_network_aggron:
         aliases:
@@ -17,11 +17,11 @@ services:
   issuer-server:
     container_name: issuer-server-aggron
     env_file:
-      - .env.aggron
+      - .env.aggron.local
     ports:
       - '1570:1570'
     volumes:
-      - issuer-server-log-aggron:/app/packages/app-server-issuer/logs
+      - issuer_server_log_aggron:/app/packages/app-server-issuer/logs
     networks:
       sudt_faucet_network_aggron:
         aliases:
@@ -48,5 +48,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-sudt-faucet-aggron:
-  issuer-server-log-aggron:
+  mysql_sudt_faucet_aggron:
+  issuer_server_log_aggron:
