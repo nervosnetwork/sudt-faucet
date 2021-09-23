@@ -30,7 +30,7 @@ const Header: React.FC<IProps> = (props: IProps) => {
   const wallet = WalletContainer.useContainer();
   const history = useHistory();
   const goLogin = () => {
-    history.push('/login');
+    history.push('/token-list');
   };
 
   const goBack = () => {

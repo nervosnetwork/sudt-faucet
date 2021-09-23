@@ -13,15 +13,21 @@
     "watch": "yarn run build:js --watch & yarn run build:types --watch"
   },
   "dependencies": {
-    "@sudt-faucet/commons": "*",
     "@sendgrid/mail": "^7.4.6",
+    "@sudt-faucet/commons": "*",
+    "@types/async-retry": "^1.4.3",
     "@types/express": "^4.17.13",
+    "@types/joi": "^17.2.3",
+    "async-retry": "^1.3.3",
     "body-parser": "^1.19.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "joi": "^17.4.2",
     "json-rpc-2.0": "^0.2.18",
     "knex": "^0.95.10",
-    "mysql2": "^2.3.0"
+    "memoizee": "^0.4.15",
+    "mysql2": "^2.3.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.12"

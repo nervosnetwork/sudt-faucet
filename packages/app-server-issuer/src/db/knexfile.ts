@@ -1,6 +1,15 @@
-const password = process.env.MYSQL_PASSWORD || '123456';
-const host = process.env.MYSQL_HOST || '127.0.0.1';
-const port = process.env.MYSQL_PORT || '3306';
+const password = process.env.MYSQL_PASSWORD;
+const host = process.env.MYSQL_HOST;
+const port = process.env.MYSQL_PORT;
+
+function nonNullable(condition: unknown, name = 'The variable'): asserts condition {
+  if (!condition) throw new Error(`${name} cannot be nil`);
+}
+
+nonNullable(password);
+nonNullable(host);
+nonNullable(port);
+
 const knexConfig = {
   development: {
     client: 'mysql2',

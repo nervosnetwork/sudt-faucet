@@ -1,10 +1,11 @@
 import { MintRcUdtBuilder } from '@ckitjs/ckit';
+import { fixedStringToBigint } from '@sudt-faucet/commons';
 import { Button, Form, Input } from 'antd';
 import { useFormik } from 'formik';
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { useProvider, useRcSigner, useSendTransaction } from '../hooks';
+import { useProvider, useRcSigner, useSendTransaction, useGetDecimals } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -23,6 +24,8 @@ const IssueTokenAddress: React.FC = () => {
   const provider = useProvider();
   const { rcIdentity } = useRcSigner();
   const { mutateAsync: sendTransaction } = useSendTransaction();
+  const decimals = useGetDecimals(udtId);
+  const history = useHistory();
 
   const formik = useFormik<{ address: string; amount: string }>({
     async onSubmit(val) {
@@ -30,12 +33,11 @@ const IssueTokenAddress: React.FC = () => {
         {
           udtId,
           rcIdentity,
-          // TODO impl createOrFind
           recipients: [
             {
               recipient: val.address,
-              amount: val.amount,
-              capacityPolicy: 'createCell',
+              amount: fixedStringToBigint(val.amount, decimals).toString(),
+              capacityPolicy: 'findOrCreate',
               additionalCapacity: '100000000',
             },
           ],
@@ -44,7 +46,9 @@ const IssueTokenAddress: React.FC = () => {
       );
 
       const unsigned = await builder.build();
-      return sendTransaction(unsigned);
+      return sendTransaction(unsigned).then(() => {
+        history.push(`/token-management/${udtId}`);
+      });
     },
     initialValues: {
       amount: '',

@@ -30,11 +30,17 @@ const verifyLoginMessage = async (signature: string, message: string, address: s
   const sigDecoded = ethUtil.fromRpcSig(signature);
   const recoveredPub = ethUtil.ecrecover(messageHash, sigDecoded.v, sigDecoded.r, sigDecoded.s);
   const recoveredAddress = '0x' + ethUtil.pubToAddress(recoveredPub).toString('hex');
-  return recoveredAddress === address.toLocaleLowerCase();
+  return recoveredAddress.toLocaleLowerCase() === address.toLocaleLowerCase();
 };
 
-const createToken = (address: string, privateKey: string): string => {
-  return jwt.sign({ address }, privateKey, { expiresIn: '1h', algorithm: 'RS256' });
+const createToken = (message: string, privateKey: string): string => {
+  const INTEGER_REGEX = /^\d+$/;
+  const loginTime = message.split(':')[1];
+  if (!loginTime || !INTEGER_REGEX.test(loginTime)) {
+    throw new Error('login message error');
+  }
+  const exp = Math.floor(parseInt(loginTime) / 1000) + 60 * 60;
+  return jwt.sign({ data: message, exp }, privateKey, { algorithm: 'RS256' });
 };
 
 const verifyToken = (token: string, publicKey: string): string | JwtPayload => {

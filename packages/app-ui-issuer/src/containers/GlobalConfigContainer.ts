@@ -1,5 +1,6 @@
 import { CkitInitOptions, predefined } from '@ckitjs/ckit';
 import { useLocalStorage } from '@rehooks/local-storage';
+import { env } from '@sudt-faucet/commons';
 import { createContainer } from 'unstated-next';
 
 export interface LocalConfig {
@@ -11,13 +12,15 @@ export interface LocalConfig {
   nervosExploreSudtUrlPrefix: string;
 }
 
+const NERVOS_EXPLORER_URL = env.readAsStr('REACT_APP_NERVOS_EXPLORER_URL');
+
 export const initialValue: LocalConfig = {
-  ckitConfig: predefined.Aggron,
-  mercuryRPC: 'https://testnet.ckb.dev/indexer',
-  ckbRPC: 'https://testnet.ckb.dev/rpc',
-  nervosExploreTxUrlPrefix: 'https://explorer.nervos.org/aggron/transaction/',
-  nervosExploreAddressUrlPrefix: 'https://explorer.nervos.org/aggron/address/',
-  nervosExploreSudtUrlPrefix: 'https://explorer.nervos.org/aggron/sudt/',
+  ckitConfig: predefined[env.readAsStr('REACT_APP_NETWORK') === 'Lina' ? 'Lina' : 'Aggron'],
+  mercuryRPC: env.readAsStr('REACT_APP_CKB_INDEXER_URL'),
+  ckbRPC: env.readAsStr('REACT_APP_CKB_NODE_URL'),
+  nervosExploreTxUrlPrefix: `${NERVOS_EXPLORER_URL}/transaction/`,
+  nervosExploreAddressUrlPrefix: `${NERVOS_EXPLORER_URL}/address/`,
+  nervosExploreSudtUrlPrefix: `${NERVOS_EXPLORER_URL}/sudt/`,
 };
 
 function useGlobalConfig() {

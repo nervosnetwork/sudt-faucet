@@ -1,51 +1,54 @@
-import { RcSupplyLockHelper } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
+import { loggerWithModule } from '../logger';
 import { ServerContext } from '../types';
 import { TransactionManage } from './TransactionManage';
 
+const logger = loggerWithModule('TransferSudt');
+
 export async function startTransferSudt(context: ServerContext): Promise<void> {
-  const txManage = await initTransactionManage(context);
+  const txManage = new TransactionManage(context.ckitProvider, context.txSigner, context.rcHelper);
   const db = DB.getInstance();
+  logger.info('Transfer sudt routine started');
 
   for (;;) {
     try {
       const unsendTransactions = await db.getTransactionsToSend(
-        (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 100,
+        (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
+      logger.info(
+        `New transfer sudt round with records: ${
+          unsendTransactions.length ? JSON.stringify(unsendTransactions) : '[]'
+        }`,
+      );
+      const secrets = unsendTransactions.map((value) => value.secret);
       if (unsendTransactions.length > 0) {
-        await db.updateStatusBySecrets(
-          unsendTransactions.map((value) => value.secret),
-          'SendingTransaction',
-        );
-        const txHash = await txManage.sendTransaction(unsendTransactions);
-        const secrets = unsendTransactions.map((value) => value.secret);
-        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
-        await txManage.waitForCommit(txHash);
-        await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionConfirm');
-      } else {
-        await utils.sleep(15000);
+        try {
+          const signedTx = await txManage.buildTransaction(unsendTransactions);
+          await db.updateStatusBySecrets(secrets, 'SendingTransaction');
+          try {
+            const txHash = await txManage.sendTransaction(signedTx);
+            logger.info(`Send transfer sudt, tx hash: ${txHash}`);
+            await db.updateTxHashBySecrets(secrets, txHash, 'WaitForTransactionCommit');
+            await txManage.waitForCommit(txHash);
+            logger.info(`Transfer sudt tx(${txHash}) committed`);
+            await db.updateStatusBySecrets(secrets, 'WaitForTransactionConfirm');
+          } catch (e) {
+            logger.error(`An error caught while send transfer sudt tx: ${e}`);
+            const errorString = e instanceof Error ? e.toString() : String(e);
+            await db.updateErrorBySecrets(secrets, errorString, 'SendTransactionError');
+            await utils.sleep(300000);
+          }
+        } catch (e) {
+          logger.error(`An error caught while build transfer sudt tx: ${e}`);
+          const errorString = e instanceof Error ? e.toString() : String(e);
+          await db.updateErrorBySecrets(secrets, errorString, 'BuildTransactionError');
+          await utils.sleep(300000);
+        }
       }
-      // await txManage.syncConfirmNumber();
     } catch (e) {
-      // TODO use log
-      console.error(`An error occurred while transfer sudt: ${e}`);
-      await utils.sleep(15000);
+      logger.error(`An error caught from db: ${e}`);
     }
+    await utils.sleep(15000);
   }
-}
-
-async function initTransactionManage(context: ServerContext): Promise<TransactionManage> {
-  const rcHelper = new RcSupplyLockHelper(context.ckitProvider.mercury, {
-    rcLock: {
-      code_hash: context.ckitProvider.getScriptConfig('RC_LOCK').CODE_HASH,
-      hash_type: context.ckitProvider.getScriptConfig('RC_LOCK').HASH_TYPE,
-    },
-    sudtType: {
-      code_hash: context.ckitProvider.getScriptConfig('SUDT').CODE_HASH,
-      hash_type: context.ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
-    },
-  });
-
-  return new TransactionManage(context.ckitProvider, context.txSigner, rcHelper);
 }

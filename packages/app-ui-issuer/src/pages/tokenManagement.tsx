@@ -1,14 +1,16 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { ClaimHistory } from '@sudt-faucet/commons';
-import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message } from 'antd';
+import { ClaimHistory, bigintToFixedString, utils } from '@sudt-faucet/commons';
+import { Typography, Button, Table, Form, Input, Select, Modal, Spin, message, Tooltip } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useFormik } from 'formik';
 import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { AssetAmount, CkbAssetAmount } from '../components/assetAmount';
 import client from '../configs/client';
+import { GlobalConfigContainer } from '../containers';
+import { useListRcSupplyLockUdtQuery } from '../hooks';
 import { useChargeCellBalanceQuery } from '../hooks/useChargeCellBalanceQuery';
 import { formatTimeSpan } from '../utils';
 
@@ -61,6 +63,7 @@ const TokenManagement: React.FC = () => {
       key: 'amount',
       title: 'amount',
       dataIndex: 'amount',
+      render: (amount) => <div>{bigintToFixedString(amount, decimals)}</div>,
     },
     {
       key: 'claimSecret',
@@ -71,12 +74,41 @@ const TokenManagement: React.FC = () => {
       key: 'claimAddress',
       title: 'claimAddress',
       dataIndex: ['claimStatus', 'address'],
+      render: (address) => {
+        return address ? (
+          <Tooltip
+            title={
+              <Typography.Text copyable={{ text: address }}>
+                {<Typography.Text style={{ color: 'white' }}>{address}</Typography.Text>}
+              </Typography.Text>
+            }
+          >
+            <span>{utils.truncateMiddle(address, 8, 8)}</span>
+          </Tooltip>
+        ) : (
+          <div></div>
+        );
+      },
     },
     {
       key: 'claimStatus',
       title: 'claimStatus',
       dataIndex: 'claimStatus',
       render: (claimStatus) => <div>{claimStatus.status}</div>,
+    },
+    {
+      key: 'Tx Hash',
+      title: 'Tx Hash',
+      dataIndex: 'claimStatus',
+      render: (claimStatus) => {
+        return claimStatus.txHash ? (
+          <a target="_blank" href={`${config.nervosExploreTxUrlPrefix}${claimStatus.txHash}`} rel="noreferrer">
+            {utils.truncateMiddle(claimStatus.txHash, 8, 8)}
+          </a>
+        ) : (
+          <div></div>
+        );
+      },
     },
     {
       key: 'action',
@@ -108,6 +140,7 @@ const TokenManagement: React.FC = () => {
         client
           .disable_claim_secret({ claimSecret })
           .then(() => {
+            void queryClient.invalidateQueries('getClaimHistoryData');
             void message.success('disable the claim secret success');
           })
           .catch(() => {
@@ -121,10 +154,15 @@ const TokenManagement: React.FC = () => {
   const [status, setStatus] = useState('');
 
   const history = useHistory();
+  const [config] = GlobalConfigContainer.useContainer();
   const goCharge = () => {
     history.push(`/token-charge/${udtId}`);
   };
   const { udtId } = useParams<{ udtId: string }>();
+  const { data: udts } = useListRcSupplyLockUdtQuery(udtId);
+  const decimals = udts?.[0].decimals || 0;
+  const queryClient = useQueryClient();
+
   const historyQuery = useQuery(
     ['getClaimHistoryData', { sudtId: udtId, status: status, addressOrEmail: addressOrEmail }],
     () => {

@@ -1,5 +1,6 @@
 import { MintRcUdtBuilder } from '@ckitjs/ckit';
-import { Form, Input, Button, Typography, message } from 'antd';
+import { fixedStringToBigint, bigintToFixedString, fixString } from '@sudt-faucet/commons';
+import { Button, Form, Input, message, Typography } from 'antd';
 import { useFormik } from 'formik';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -58,13 +59,11 @@ const TokenCharge: React.FC = () => {
     if (!query.data) return;
     const errors: FormError = {};
     if (!values.capacity) {
-      errors.capacity = 'Capacity is Required';
+      errors.capacity = 'Capacity(CKB) is Required';
     } else if (fixedStringToBigint(values.capacity, CKB_DECIMAL) > BigInt(query.data)) {
       errors.capacity = `Must be less than or equal to ${bigintToFixedString(BigInt(query.data), CKB_DECIMAL)}`;
     }
-    const leftAmount =
-      fixedStringToBigint(foundUdtInfo.maxSupply, foundUdtInfo.decimals) -
-      fixedStringToBigint(foundUdtInfo.currentSupply, foundUdtInfo.decimals);
+    const leftAmount = BigInt(foundUdtInfo.maxSupply) - BigInt(foundUdtInfo.currentSupply);
     if (!values.amount) {
       errors.amount = `Amount(${foundUdtInfo.symbol}) is Required`;
     } else if (fixedStringToBigint(values.amount, foundUdtInfo.decimals) > leftAmount) {
@@ -84,10 +83,9 @@ const TokenCharge: React.FC = () => {
         recipients: [
           {
             recipient: chargeAddress,
-            amount: values.amount,
-            //TODO findOrCreate
-            capacityPolicy: 'createCell',
-            additionalCapacity: values.capacity,
+            amount: fixedStringToBigint(values.amount, foundUdtInfo?.decimals || 0).toString(),
+            capacityPolicy: 'findOrCreate',
+            additionalCapacity: fixedStringToBigint(values.capacity, CKB_DECIMAL).toString(),
           },
         ],
       },
@@ -106,33 +104,12 @@ const TokenCharge: React.FC = () => {
     initialValues,
     validate,
     onSubmit: (values: FormValues) => {
-      history.push('/token-list');
-      charge(values)
-        .then(() => {
-          history.push('/token-list');
-        })
-        .catch((e) => {
-          void message.error(e);
-        });
+      charge(values).then(
+        () => history.push('/token-list'),
+        (e) => message.error(e),
+      );
     },
   });
-  const fixString = (input: string, decimal: number): string => {
-    const inputArray = input.split('.');
-    if (inputArray.length === 1) return inputArray[0];
-    return `${inputArray[0]}.${inputArray[1].slice(0, decimal)}`;
-  };
-
-  const fixedStringToBigint = (input: string, decimal: number): bigint => {
-    const decimalString = Array(decimal).fill('0').join('');
-    const inputArray = input.split('.');
-    inputArray[1] = inputArray[1] ? `${inputArray[1]}${decimalString}`.slice(0, decimal) : decimalString;
-    return BigInt(inputArray.join(''));
-  };
-
-  const bigintToFixedString = (input: bigint, decimal: number): string => {
-    const inputString = input.toString();
-    return inputString.slice(0, 0 - decimal) + '.' + inputString.slice(0 - decimal);
-  };
 
   if (!chargeAddress) return null;
   return (
