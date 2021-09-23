@@ -1,7 +1,19 @@
-const password = process.env.MYSQL_PASSWORD || '123456';
-const host = process.env.MYSQL_HOST || '127.0.0.1';
-const port = process.env.MYSQL_PORT || '3306';
+import dotenv from 'dotenv';
+import { nonNullable } from '../util';
+
+dotenv.config();
+
+const host = process.env.MYSQL_HOST;
+const port = process.env.MYSQL_PORT;
+const user = process.env.MYSQL_USER;
+const password = process.env.MYSQL_PASSWORD;
 const database = process.env.MYSQL_DATABASE;
+
+nonNullable(host, 'env MYSQL_HOST');
+nonNullable(port, 'env MYSQL_PORT');
+nonNullable(user, 'env MYSQL_USER');
+nonNullable(password, 'env MYSQL_PASSWORD');
+nonNullable(database, 'env MYSQL_DATABASE');
 
 const knexConfig = {
   development: {
@@ -10,7 +22,7 @@ const knexConfig = {
       host: host,
       database: database,
       port: port,
-      user: 'root',
+      user: user,
       password: password,
     },
     migrations: {
@@ -26,7 +38,7 @@ const knexConfig = {
       host: host,
       database: database,
       port: port,
-      user: 'root',
+      user: user,
       password: password,
     },
     migrations: {

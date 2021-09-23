@@ -6,22 +6,26 @@ services:
     env_file:
       - .env.lina
     ports:
-      - '3306:3337'
+      - '3337:3306'
     volumes:
       - mysql-sudt-faucet-lina:/var/lib/mysql
     networks:
-      - sudt_faucet_network_lina
+      sudt_faucet_network_lina:
+        aliases:
+          - mysql-sudt-faucet
 
   issuer-server:
     container_name: issuer-server-lina
     env_file:
       - .env.lina
     ports:
-      - '1570:1571'
+      - '1571:1570'
     volumes:
       - issuer-server-log-lina:/app/packages/app-server-issuer/logs
     networks:
-      - sudt_faucet_network_lina
+      sudt_faucet_network_lina:
+        aliases:
+          - issuer-server
 
   issuer-ui:
     image: issuer-ui-lina
@@ -29,7 +33,7 @@ services:
     networks:
       - sudt_faucet_network_lina
     ports:
-      - "1080:3090"
+      - "3090:1080"
 
   claim-ui:
     image: claim-ui-lina
@@ -37,7 +41,7 @@ services:
     networks:
       - sudt_faucet_network_lina
     ports:
-      - "1081:3091"
+      - "3091:1081"
 
 networks:
   sudt_faucet_network_lina:
