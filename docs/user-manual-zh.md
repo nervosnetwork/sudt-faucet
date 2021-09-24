@@ -82,27 +82,64 @@ https://sudt.faucet.me/
 
     - Node：v12.18.2 及以上
 
+#### 准备环境
+- 在`sudt-faucet`  目录下存在 `.env.lina` 文件， 设置环境变量
+
+  ```shell
+  ### app-server-issuer
+  # ----------- commons -----------
+  NETWORK=Lina
+  CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
+  CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
+  
+  # ----------- Faucet Server -----------
+  ## A private key hosted by issuer server which is used for transferring automatically.
+  ## Note: Recommend to set when launching server
+  PRIVATE_KEY='0x...'
+  
+  ## The issuer Ethereum address
+  USER_ADDRESS='0x...'
+  
+  MYSQL_HOST=sudt-faucet-mysql
+  MYSQL_PORT=3306
+  MYSQL_ROOT_PASSWORD=123456
+  MYSQL_DATABASE=sudt_faucet
+  
+  SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
+  SENDGRID_VERIFIED_SENDER='MY_SENDGRID_VERIFIED_SENDER'
+  
+  BATCH_TRANSACTION_LIMIT=100
+  BATCH_MAIL_LIMIT=50
+  CLAIM_SUDT_DOMAIN="MY_DOMAIN"
+  
+  # ----------- UI -----------
+  ## Unipass authentication URL
+  UNIPASS_URL=https://unipass.xyz
+  ## Social token wallet URL
+  WALLET_URL=https://tok.social
+  ## Nervosnetwork explorer URL
+  NERVOS_EXPLORER_URL=https://explorer.nervos.org
+  ```
+
 #### 依赖构建
 
 ```shell
 # 下载 submodule
-cd sudt-faucet && rm -rf ckit && git clone https://github.com/homura/ckit.git
+cd sudt-faucet && yarn install && git submodule update --init
 
-# 切换 submodule 分支，并且构建 submodule 代码
-cd ckit && git checkout develop && git pull && cd ../ && yarn install && yarn build:lib 
+export $(grep -v '^#' .env.lina | xargs)
 
 # 构建 app-ui-issuer 代码
-cd packages/app-ui-issuer  && yarn build && cd ../../
+yarn workspace @sudt-faucet/app-ui-issuer run build
 
 # 构建 app-server-issuer 代码。
-cd packages/app-server-issuer &&  yarn build && cd ../../
+yarn workspace @sudt-faucet/app-server-issuer  run build
 
 # 构建 app-ui-claim 代码
-cd packages/app-ui-claim && yarn build && cd ../../
+yarn workspace @sudt-faucet/app-ui-claim  run build
 
 # 构建 app-server-claim 代码
-cd packages/app-server-claim && yarn build && cd ../../
-
+yarn workspace @sudt-faucet/app-server-claim  run build
 
 ```
 
@@ -179,52 +216,10 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 
 #### 服务启动
 
-- 在`packages/app-server-issuer `  目录下存在 `.env` 文件， 设置环境变量
+- 通过 PM2 维护服务
 
   ```shell
-  ### app-server-issuer
-  # ----------- commons -----------
-  NETWORK=Lina
-  CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
-  CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
-  
-  # ----------- Faucet Server -----------
-  ## A private key hosted by issuer server which is used for transferring automatically.
-  ## Note: Recommend to set when launching server
-  PRIVATE_KEY='0x...'
-  
-  ## The issuer Ethereum address
-  USER_ADDRESS='0x...'
-  
-  MYSQL_HOST=sudt-faucet-mysql
-  MYSQL_PORT=3306
-  MYSQL_ROOT_PASSWORD=123456
-  MYSQL_DATABASE=sudt_faucet
-  
-  SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
-  SENDGRID_VERIFIED_SENDER='MY_SENDGRID_VERIFIED_SENDER'
-  
-  BATCH_TRANSACTION_LIMIT=100
-  BATCH_MAIL_LIMIT=50
-  CLAIM_SUDT_DOMAIN="MY_DOMAIN"
-  
-  # ----------- UI -----------
-  ## Unipass authentication URL
-  UNIPASS_URL=https://unipass.xyz
-  ## Social token wallet URL
-  WALLET_URL=https://tok.social
-  ## Nervosnetwork explorer URL
-  NERVOS_EXPLORER_URL=https://explorer.nervos.org
-  ```
-
-
-
-
-
-- 2、通过 PM2 维护服务
-
-  ```shell
-  cd packages/app-server-issuer && pm2 start --name issuer-server "node dist/index.js"
+  cp .env.lina packages/app-server-issuer/.env && cd packages/app-server-issuer  && pm2 start --name issuer-server "node dist/index.js"
   ```
 
 
