@@ -4,12 +4,11 @@
 
 ### Prerequisites
 
-Sign up [SendGrid](https://sendgrid.com/) to get `api_keys` and `verified_sender`, and make `.env` file:
+Sign up [SendGrid](https://sendgrid.com/) to get `api_keys` and `verified_sender`, then config `.env` file:
 
 ```bash
-// .env file
-SENDGRID_API_KEY='your_api_key'
-SENDGRID_VERIFIED_SENDER='your_verified_sender'
+# copy from .env.development, then make .env fields complete
+cp  .env.development .env
 ```
 
 To login with matemask, relase the `USER_ADDRESS`in `.env` file to your matemask address
@@ -18,7 +17,7 @@ To login with matemask, relase the `USER_ADDRESS`in `.env` file to your matemask
 
 ```bash
 // setup mysql
-bash src/db/setup_mysql.sh
+bash src/db/setup_mysql_dev.sh
 
 // build bin
 yarn build

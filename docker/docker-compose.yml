@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+
+  issuer-server:
+    image: issuer-server
+    restart: always
+    depends_on:
+      - mysql
+
+  issuer-ui:
+    restart: always
+    depends_on:
+      - issuer-server
+
+  claim-ui:
+    restart: always
+    depends_on:
+      - issuer-server

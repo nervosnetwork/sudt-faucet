@@ -1,4 +1,6 @@
+import retry from 'async-retry';
 import Knex, { Knex as IKnex } from 'knex';
+import { logger } from '../logger';
 import { ClaimRecord, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
 import knexConfig from './knexfile';
 
@@ -21,9 +23,22 @@ export class DB {
     this.knex = Knex(config);
   }
 
+  public static async init(): Promise<void> {
+    if (DB.instance) throw new Error('DB already init');
+    DB.instance = new DB();
+    return retry(
+      async () => {
+        await DB.instance.knex.migrate.latest({ directory: 'dist/db/migrations', loadExtensions: ['.js'] });
+      },
+      {
+        onRetry: (e, attempt) => logger.warn(`attempt to migrate db to latest failed(retry ${attempt} times): ${e}`),
+      },
+    );
+  }
+
   public static getInstance(): DB {
     if (!DB.instance) {
-      DB.instance = new DB();
+      throw new Error('should init DB first');
     }
     return DB.instance;
   }
