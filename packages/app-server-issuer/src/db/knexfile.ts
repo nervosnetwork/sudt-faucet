@@ -1,23 +1,28 @@
-const password = process.env.MYSQL_PASSWORD;
+import dotenv from 'dotenv';
+import { nonNullable } from '../util';
+
+dotenv.config();
+
 const host = process.env.MYSQL_HOST;
 const port = process.env.MYSQL_PORT;
+const user = process.env.MYSQL_USER;
+const password = process.env.MYSQL_PASSWORD;
+const database = process.env.MYSQL_DATABASE;
 
-function nonNullable(condition: unknown, name = 'The variable'): asserts condition {
-  if (!condition) throw new Error(`${name} cannot be nil`);
-}
-
-nonNullable(password);
-nonNullable(host);
-nonNullable(port);
+nonNullable(host, 'env MYSQL_HOST');
+nonNullable(port, 'env MYSQL_PORT');
+nonNullable(user, 'env MYSQL_USER');
+nonNullable(password, 'env MYSQL_PASSWORD');
+nonNullable(database, 'env MYSQL_DATABASE');
 
 const knexConfig = {
   development: {
     client: 'mysql2',
     connection: {
       host: host,
-      database: 'sudt_faucet',
+      database: database,
       port: port,
-      user: 'root',
+      user: user,
       password: password,
     },
     migrations: {
@@ -27,7 +32,19 @@ const knexConfig = {
 
   staging: {},
 
-  production: {},
+  production: {
+    client: 'mysql2',
+    connection: {
+      host: host,
+      database: database,
+      port: port,
+      user: user,
+      password: password,
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+    },
+  },
 };
 
 export default knexConfig;
