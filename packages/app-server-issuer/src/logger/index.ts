@@ -48,6 +48,9 @@ export const logger = createLogger({
     myFormat,
   ),
   transports: [dailyRotateTransport],
+  exceptionHandlers: [new transports.File({ dirname: './logs', filename: 'exceptions.log' })],
+  // TODO winston not support rejectionHandlers yet: https://github.com/winstonjs/winston/issues/1801
+  // rejectionHandlers: [new transports.File({ dirname: './logs', filename: 'rejections.log' })],
 });
 
 if (process.env.NODE_ENV !== 'production') {
