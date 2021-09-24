@@ -15,7 +15,7 @@ export function useSendClaimableMails(): UseMutationResult<unknown, unknown, Mai
     },
     {
       onSuccess() {
-        void message.success('Email send success');
+        void message.success('Successfully start sending emails');
       },
       onError() {
         void message.error('Email send error');
