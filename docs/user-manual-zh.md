@@ -86,39 +86,44 @@ https://sudt.faucet.me/
 - 在`sudt-faucet/deploy`  目录下存在 `.env.lina` 和 `.env.aggron` 文件， 根据不同网络设置环境变量，此处以主网为例
 
   ```shell
-  ### app-server-issuer
-  # ----------- commons -----------
-  NETWORK=Lina
-  CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
-  CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
-  
-  # ----------- Faucet Server -----------
-  ## A private key hosted by issuer server which is used for transferring automatically.
-  ## Note: Recommend to set when launching server
-  PRIVATE_KEY='0x...'
-  
-  ## The issuer Ethereum address
-  USER_ADDRESS='0x...'
-  
-  MYSQL_HOST=sudt-faucet-mysql
-  MYSQL_PORT=3306
-  MYSQL_ROOT_PASSWORD=123456
-  MYSQL_DATABASE=sudt_faucet
-  
-  SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
-  SENDGRID_VERIFIED_SENDER='MY_SENDGRID_VERIFIED_SENDER'
-  
-  BATCH_TRANSACTION_LIMIT=100
-  BATCH_MAIL_LIMIT=50
-  CLAIM_SUDT_DOMAIN="MY_DOMAIN"
-  
-  # ----------- UI -----------
-  ## Unipass authentication URL
-  UNIPASS_URL=https://unipass.xyz
-  ## Social token wallet URL
-  WALLET_URL=https://tok.social
-  ## Nervosnetwork explorer URL
-  NERVOS_EXPLORER_URL=https://explorer.nervos.org
+    # ----------- commons -----------
+    NETWORK=Lina
+    CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
+    CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
+    
+    # ----------- Faucet Server -----------
+    ## A private key hosted by issuer server which is used for transferring automatically.
+    ## Note: Recommend to set when launching server
+    ## PRIVATE_KEY='0x...'
+    
+    ## The issuer Ethereum address
+    USER_ADDRESS='0x...'
+    
+    MYSQL_HOST=mysql-sudt-faucet
+    MYSQL_PORT=3306
+    MYSQL_ROOT_PASSWORD=
+    MYSQL_DATABASE=sudt_faucet
+    
+    SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
+    SENDGRID_VERIFIED_SENDER='MY_SENDGRID_VERIFIED_SENDER'
+    
+    BATCH_TRANSACTION_LIMIT=100
+    BATCH_MAIL_LIMIT=50
+    CLAIM_SUDT_DOMAIN="MY_DOMAIN"
+    
+    SERVER_LISTEN_PORT=1570
+    
+    # ----------- UI -----------
+    ## Unipass authentication URL
+    REACT_APP_UNIPASS_URL=https://unipass.xyz
+    ## Social token wallet URL
+    REACT_APP_WALLET_URL=https://tok.social
+    ## Nervosnetwork explorer URL
+    REACT_APP_NERVOS_EXPLORER_URL=https://explorer.nervos.org
+    
+    REACT_APP_NETWORK=Lina
+    REACT_APP_CKB_NODE_URL='https://mainnet.ckb.dev/rpc'
+    REACT_APP_CKB_INDEXER_URL='https://mainnet.ckb.dev/indexer'
   ```
 
 #### 依赖构建
@@ -126,6 +131,8 @@ https://sudt.faucet.me/
 ```shell
 # 下载 submodule
 cd sudt-faucet && yarn install && git submodule update --init
+
+yarn run build:lib
 
 export $(grep -v '^#' deploy/.env.lina | xargs)
 
