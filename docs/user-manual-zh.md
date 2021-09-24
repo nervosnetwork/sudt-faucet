@@ -83,7 +83,7 @@ https://sudt.faucet.me/
     - Node：v12.18.2 及以上
 
 #### 准备环境
-- 在`sudt-faucet`  目录下存在 `.env.lina` 文件， 设置环境变量
+- 在`sudt-faucet/deploy`  目录下存在 `.env.lina` 和 `.env.aggron` 文件， 根据不同网络设置环境变量，此处以主网为例
 
   ```shell
   ### app-server-issuer
@@ -127,7 +127,7 @@ https://sudt.faucet.me/
 # 下载 submodule
 cd sudt-faucet && yarn install && git submodule update --init
 
-export $(grep -v '^#' .env.lina | xargs)
+export $(grep -v '^#' deploy/.env.lina | xargs)
 
 # 构建 app-ui-issuer 代码
 yarn workspace @sudt-faucet/app-ui-issuer run build
@@ -219,7 +219,7 @@ cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
 - 通过 PM2 维护服务
 
   ```shell
-  cp .env.lina packages/app-server-issuer/.env && cd packages/app-server-issuer  && pm2 start --name issuer-server "node dist/index.js"
+  export $(grep -v '^#' deploy/.env.lina | xargs) && cd packages/app-server-issuer  && pm2 start --name issuer-server "node dist/index.js"
   ```
 
 
