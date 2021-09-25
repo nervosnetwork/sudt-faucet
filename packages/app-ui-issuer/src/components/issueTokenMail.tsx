@@ -1,11 +1,10 @@
 import { MailIssueInfo, fixedStringToBigint } from '@sudt-faucet/commons';
-import { Form, Input, Button, Modal, DatePicker, message } from 'antd';
+import { Form, Input, Button, Modal, DatePicker } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import client from '../configs/client';
-import { useRcSigner, useGetDecimals } from '../hooks';
+import { useGetDecimals, useSendClaimableMails } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -25,10 +24,10 @@ const IssueTokenMail: React.FC = () => {
   const [mail, setMail] = useState('');
   const [amount, setAmount] = useState('');
   const [expiredDate, setExpiredDate] = useState(0);
-  const { rcIdentity } = useRcSigner();
   const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
   const decimals = useGetDecimals(udtId);
+  const { mutateAsync: sendMails } = useSendClaimableMails();
 
   const showAdditionalModal = () => {
     setIsAdditionalModalVisible(true);
@@ -43,14 +42,10 @@ const IssueTokenMail: React.FC = () => {
       expiredAt: expiredDate,
       additionalMessage,
     };
-    try {
-      await client.send_claimable_mails({ recipients: [user], rcIdentity });
+    sendMails([user]).then(() => {
       setIsAdditionalModalVisible(false);
-      void message.success('Email send success');
       history.push(`/token-management/${udtId}`);
-    } catch (error) {
-      void message.error('Email send error');
-    }
+    });
   };
 
   const handleAdditionalCancel = () => {
