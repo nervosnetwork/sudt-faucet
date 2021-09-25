@@ -14,7 +14,7 @@ import { Request } from 'express';
 import Joi from 'joi';
 import { DB } from '../db';
 import { InsertMailIssue, ServerContext, ClaimRecord } from '../types';
-import { genKeyPair } from '../util/createKey';
+import { genKeyPair } from '../utils/createKey';
 import { claimSudtPayloadSchema, sendMailsPayloadSchema } from './validate';
 
 const keyPair = genKeyPair();

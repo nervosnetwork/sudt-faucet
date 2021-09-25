@@ -6,7 +6,7 @@ import memoize from 'memoizee';
 import { DB } from '../db';
 import { loggerWithModule } from '../logger';
 import { MailToSend, ServerContext } from '../types';
-import { AssetAmount } from '../util';
+import { AssetAmount } from '../utils';
 
 const logger = loggerWithModule('SendGrid');
 
