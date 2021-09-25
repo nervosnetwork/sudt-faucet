@@ -1,13 +1,12 @@
 import { UploadOutlined } from '@ant-design/icons';
 import { MailIssueInfo, fixedStringToBigint } from '@sudt-faucet/commons';
-import { Button, DatePicker, Input, message, Modal, Table } from 'antd';
+import { Button, DatePicker, Input, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import moment, { Moment } from 'moment';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import client from '../configs/client';
-import { useRcSigner, useGetDecimals } from '../hooks';
+import { useGetDecimals, useSendClaimableMails } from '../hooks';
 
 const StyleWrapper = styled.div`
   padding: 20px;
@@ -50,7 +49,6 @@ const StyleWrapper = styled.div`
 `;
 
 const IssueTokenMailBatch: React.FC = () => {
-  const { rcIdentity } = useRcSigner();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isExpiredModalVisible, setIsExpiredModalVisible] = useState(false);
   const [isAdditionalModalVisible, setIsAdditionalModalVisible] = useState(false);
@@ -58,29 +56,10 @@ const IssueTokenMailBatch: React.FC = () => {
   const [expiredDate, setExpired] = useState(0);
   const [additionalMessage, setAdditionalMessage] = useState('');
   const [userList, setUserList] = useState<MailIssueInfo[]>([]);
-  const [isSending, setIsSending] = useState(false);
   const history = useHistory();
   const { udtId } = useParams<{ udtId: string }>();
   const decimals = useGetDecimals(udtId);
-
-  useEffect(() => {
-    const sendMail = async () => {
-      const recipients = userList.map((item) => {
-        return { ...item, ...{ amount: fixedStringToBigint(amount, decimals).toString() } };
-      });
-      if (!isSending) return;
-      try {
-        await client.send_claimable_mails({ recipients, rcIdentity: rcIdentity });
-        setIsAdditionalModalVisible(false);
-        setIsSending(false);
-        void message.success('Email send success');
-        history.push(`/token-management/${udtId}`);
-      } catch (error) {
-        void message.error('Email send error');
-      }
-    };
-    void sendMail();
-  }, [isSending, rcIdentity, userList]);
+  const { mutateAsync: sendMails } = useSendClaimableMails();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -106,7 +85,13 @@ const IssueTokenMailBatch: React.FC = () => {
 
   const handleAdditionalSubmit = async () => {
     updateAdditional(additionalMessage);
-    setIsSending(true);
+    const recipients: MailIssueInfo[] = userList.map((item) => {
+      return { ...item, ...{ amount: fixedStringToBigint(amount, decimals).toString(), additionalMessage } };
+    });
+    sendMails(recipients).then(() => {
+      setIsAdditionalModalVisible(false);
+      history.push(`/token-management/${udtId}`);
+    });
   };
 
   const handleAdditionalCancel = () => {
