@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { nonNullable } from '../util';
+import { nonNullable } from '../utils';
 
 dotenv.config();
 
