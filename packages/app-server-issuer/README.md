@@ -11,7 +11,7 @@ Sign up [SendGrid](https://sendgrid.com/) to get `api_keys` and `verified_sender
 cp  .env.development .env
 ```
 
-To login with matemask, relase the `USER_ADDRESS`in `.env` file to your matemask address
+To login with matemask, relase the `OWNER_PUBKEY_HASH`in `.env` file to your matemask address
 
 ### Start Server
 
