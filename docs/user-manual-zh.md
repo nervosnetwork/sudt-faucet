@@ -83,7 +83,11 @@ https://sudt.faucet.me/
     - Node：v12.18.2 及以上
 
 #### 准备环境
-- 在`sudt-faucet/deploy`  目录下存在 `.env.lina` 和 `.env.aggron` 文件， 根据不同网络设置环境变量，此处以主网为例
+在构建 UI 以及启动 server 前，我们需要配置好相关环境地变量
+
+我们提供了一份模板 env 于[deploy](../deploy) 文件夹下，两个默认配置文件 `.env.aggron` 与 `.env.lina`，分别对应 CKB 测试网与主网。我们可以复制一份 env 变量并修改为符合自己环境的变量
+
+可以先看看 .env.lina 配置都有哪些项目
 
   ```shell
     # ----------- commons -----------
