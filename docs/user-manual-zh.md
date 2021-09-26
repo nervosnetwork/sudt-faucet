@@ -15,6 +15,8 @@
 
 ### 管理
 
+> 私钥极为重要，请注意不要暴露，否则将导致资金被盗
+
 - **Owner** 私钥：用于作为发行者身份进行铸造（mint）token，目前支持使用 [MetaMask](https://metamask.io) 作为签名工具。如果不熟悉 MetaMask 使用可以看看[这个帖子](https://zhuanlan.zhihu.com/p/112285438)。同时，Owner 也是登录 Issuer 相关服务的唯一角色
 - **Hosted** 私钥：托管在 Issuer Server 的私钥。当用户进行 claim 时，服务将使用该私钥进行转账操作
 
@@ -22,13 +24,9 @@
 
 若是完成了上述准备工作，我们可以记录下相关数据，以供部署使用
 
->  私钥信息，将你生成的私钥导入 metamask, 请仔细保管私钥，涉及资金安全，泄露后将导致资金被盗
-
 - Owner 私钥： 0x... 
 - Owner 地址： 0x...
 - Hosted 私钥：0x... 
-
-> SendGrid 邮件信息
 - SENDGRID_API_KEY='SG...'
 - SENDGRID_VERIFIED_SENDER='xxxxx@gmail.com'
 
