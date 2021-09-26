@@ -212,11 +212,10 @@ yarn workspace @sudt-faucet/app-server-claim  run build
 
 #### mysql 启动
 
-> 在 `sudt-faucet/packages/app-ui-issuer/src/db/` 目录下有个脚本，可以通过 docker 安装 mysql，建数据库。
-
+> 初次启动服务前，需要初始化 mysql，我们可以通过 app-server-issuer/src/db 下的脚本进行建表操作
 ```shell
-# 启动mysql.  setup_mysql.sh 脚本会安装一个 mysql docker，该脚本中mysql默认密码123456，默认端口3306
-cd packages/app-server-issuer && npx knex migrate:latest && cd ../../
+cd packages/app-server-issuer
+npx knex migrate:latest --knexfile dist/db/knexfile.js
 ```
 
 
