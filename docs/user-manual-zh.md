@@ -1,63 +1,37 @@
-# SUDT-Faucets 操作手册
+# SUDT Faucets 操作手册
 
-## 一、服务启动准备工作
+## 预备
 
-#### 准备运行环境
+### 环境
 
-1核2G linux 环境即可运行
+- Node.js12+
+- Yarn 1.x
+- PM2(或其他  daemon 进程管理工具)
+- NGINX(或其他 http server)
 
-####  准备2个存有 CKB 的私钥
+### 服务
 
-- 私钥用处：
+- **SendGrid** 账户：Issuer Server 使用 [SendGrid](https://sendgrid.com/) 作为邮件服务，如需要使用邮件进行空投，我们需要先注册 SendGrid [API_KEY](https://docs.sendgrid.com/ui/account-and-settings/api-keys) ，并进行[域名认证](https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication)
 
-    - `Owner` 私钥：用来铸造 ，管理` token`。
-    - `Hosted` 私钥：用来发送 `Token` 给邮件接收者
+### 管理
 
-- 申请方法：
+- **Owner** 私钥：用于作为发行者身份进行铸造（mint）token，目前支持使用 [MetaMask](https://metamask.io) 作为签名工具。如果不熟悉 MetaMask 使用可以看看[这个帖子](https://zhuanlan.zhihu.com/p/112285438)。同时，Owner 也是登录 Issuer 相关服务的唯一角色
+- **Hosted** 私钥：托管在 Issuer Server 的私钥。当用户进行 claim 时，服务将使用该私钥进行转账操作
 
-    - [MetaMask使用教程](https://zhuanlan.zhihu.com/p/112285438) ：
+###  预备好了
 
-        - 若是之前没有过CKB 账户私钥
+若是完成了上述准备工作，我们可以记录下相关数据，以供部署使用
 
-            - 从[metamask.io](https://metamask.io/) 网站安装`Chrome`或`Firefox`浏览器扩展，可以生成账户，导出私钥
+>  私钥信息，将你生成的私钥导入 metamask, 请仔细保管私钥，涉及资金安全，泄露后将导致资金被盗
 
-        - 若是之前有CKB 账户私钥
+- Owner 私钥： 0x... 
+- Owner 地址： 0x...
+- Hosted 私钥：0x... 
 
-            - 安装 [metamask](https://metamask.io/)   ,选择导入`Owner` 私钥，记录下其 `ETH` 地址
+> SendGrid 邮件信息
+- SENDGRID_API_KEY='SG...'
+- SENDGRID_VERIFIED_SENDER='xxxxx@gmail.com'
 
-
-
-#### 准备SendGrid账号
-
-- 账号用处：该系统使用了[SendGrid](https://sendgrid.com/) 代理批量发送邮件，所以需要提供 [SendGrid](https://sendgrid.com/) 账号
-
-- 申请方法：注册一个[SendGrid](https://sendgrid.com/) 账号，获取一个[API_KEY](https://docs.sendgrid.com/ui/account-and-settings/api-keys) ，并进行[认证](https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication)
-
-#### 准备域名
-
-- 若是通过域名对外访问，可自行准备域名，
-
-- 若是通过 IP 对外访问
-
-
-
-#### 章末小结
-
-若是完成了上述准备工作，你应该可以获得类似下面的数据，此处数据均是样例
-
-```shell
-# 私钥信息，将你生成的私钥导入 metamask, 请仔细保管私钥，涉及资金安全，极为重要‼️。
-Owner 私钥： 0x... 
-Owner 地址： 0xxxx
-Hosted 私钥：0x... 
-
-# SendGrid 邮件信息
-SENDGRID_API_KEY='SB.2BiBXG1gQvqr9BfqdkUlSB.2B43jMWnccTmCNHOllfKzAAVjteyduViTHTZrE0UjSB'
-SENDGRID_VERIFIED_SENDER='xxxxx@gmail.com'
-
-# 域名信息
-https://sudt.faucet.me/
-```
 
 
 
