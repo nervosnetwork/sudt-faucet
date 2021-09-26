@@ -136,17 +136,14 @@ yarn run build:lib
 
 export $(grep -v '^#' deploy/.env.lina | xargs)
 
-# 构建 app-ui-issuer 代码
-yarn workspace @sudt-faucet/app-ui-issuer run build
-
 # 构建 app-server-issuer 代码。
 yarn workspace @sudt-faucet/app-server-issuer  run build
 
+# 构建 app-ui-issuer 代码
+yarn workspace @sudt-faucet/app-ui-issuer run build
+
 # 构建 app-ui-claim 代码
 yarn workspace @sudt-faucet/app-ui-claim  run build
-
-# 构建 app-server-claim 代码
-yarn workspace @sudt-faucet/app-server-claim  run build
 
 ```
 
