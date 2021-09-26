@@ -101,7 +101,7 @@ https://sudt.faucet.me/
     
     MYSQL_HOST=mysql-sudt-faucet
     MYSQL_PORT=3306
-    MYSQL_ROOT_PASSWORD=
+    MYSQL_PASSWORD=
     MYSQL_DATABASE=sudt_faucet
     
     SENDGRID_API_KEY='MY_SENDGRID_API_KEY'
@@ -216,7 +216,7 @@ yarn workspace @sudt-faucet/app-server-claim  run build
 
 ```shell
 # 启动mysql.  setup_mysql.sh 脚本会安装一个 mysql docker，该脚本中mysql默认密码123456，默认端口3306
-cd packages/app-server-issuer &&  bash src/db/setup_mysql.sh && cd ../../
+cd packages/app-server-issuer && npx knex migrate:latest && cd ../../
 ```
 
 
