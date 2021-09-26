@@ -72,7 +72,7 @@ async function getSudtInfo(
 
 function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
   if (!process.env.SENDGRID_VERIFIED_SENDER) throw new Error('env SENDGRID_VERIFIED_SENDER not set');
-  if (!process.env.CLAIM_SUDT_DOMAIN) throw new Error('env CLAIM_SUDT_DOMAIN not set');
+  if (!process.env.CLAIM_SUDT_URL) throw new Error('env CLAIM_SUDT_URL not set');
 
   const expireDate = mail.expire_time
     ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' }) + '(UTC Time)'
@@ -82,6 +82,6 @@ function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
     to: mail.mail_address,
     from: process.env.SENDGRID_VERIFIED_SENDER,
     subject: 'You have received some tokens',
-    text: `${mail.mail_message}\n\nClick this link to claim ${mail.amount} ${expireDate}:\n${process.env.CLAIM_SUDT_DOMAIN}?claim_secret=${mail.secret}`,
+    text: `${mail.mail_message}\n\nClick this link to claim ${mail.amount} ${expireDate}:\n${process.env.CLAIM_SUDT_URL}?claim_secret=${mail.secret}`,
   };
 }

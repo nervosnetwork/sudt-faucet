@@ -23,8 +23,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
   constructor(private context: ServerContext) {}
 
   async login(payload: rpc.LoginPayload): Promise<rpc.LoginResponse> {
-    if (!process.env.USER_ADDRESS) throw new Error('USER_ADDRESS not set');
-    const address = process.env.USER_ADDRESS;
+    if (!process.env.OWNER_PUBKEY_HASH) throw new Error('OWNER_PUBKEY_HASH not set');
+    const address = process.env.OWNER_PUBKEY_HASH;
     const { message, sig } = payload;
     const result = await verifyLoginMessage(sig, message, address);
     if (result) {
