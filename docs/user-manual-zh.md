@@ -88,14 +88,12 @@ yarn workspace @sudt-faucet/app-ui-claim run build
   server {
       listen       1080;
       # server_name  sudt.faucet.me;
-
       client_max_body_size 1024M;
       client_body_buffer_size 1024M;
       fastcgi_intercept_errors on;
       location / {
           root /var/lib/sudt-faucet/packages/app-ui-issuer/build;
       }
-
       location /sudt-issuer/api/v1 {
           proxy_pass http://127.0.0.1:1570;
           proxy_redirect     off;
