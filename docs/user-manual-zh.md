@@ -115,15 +115,6 @@ cp sudt_faucet /etc/nginx/sites-enabled/sudt_faucet
 nginx -c /etc/nginx/nginx.conf && nginx -t && nginx -s reload
 ```
 
-### MySQL 启动
-
-> 初次启动服务前，需要初始化 mysql，我们可以通过 app-server-issuer/dist/db 下的脚本进行建表操作
-
-```shell
-cd packages/app-server-issuer
-npx knex migrate:latest --knexfile dist/db/knexfile.js
-```
-
 ### 通过 PM2 启动 Issuer Server
 
 ```shell
@@ -132,11 +123,31 @@ cd packages/app-server-issuer
 pm2 start --name issuer-server "node dist/index.js"
 ```
 
+## 更新(Upgrade)
+
+如果需要更新到最新的代码，可以参考以下命令重新构建并升级程序
+
+```shell
+git pull
+git submodule update
+
+yarn install --fronzen-lockfile
+yarn build:lib
+
+export $(grep -v '^#' deploy/.env | xargs)
+
+yarn workspace @sudt-faucet/app-server-issuer run build
+yarn workspace @sudt-faucet/app-ui-issuer run build
+yarn workspace @sudt-faucet/app-ui-claim run build
+
+pm2 restart issuer-server
+```
+
 ## 使用说明
 
 ### Owner
 
-这是整个系统的拥有者，涉及到
+这是整个系统的拥有者，涉及到资产发行、以及对 Issuer Server 的管理
 
 #### 1、选择登录 Login
 
