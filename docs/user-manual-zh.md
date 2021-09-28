@@ -131,7 +131,7 @@ pm2 start --name issuer-server "node dist/index.js"
 git pull
 git submodule update
 
-yarn install --fronzen-lockfile
+yarn install --frozen-lockfile
 yarn build:lib
 
 export $(grep -v '^#' deploy/.env | xargs)
