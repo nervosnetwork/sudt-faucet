@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon src/index.ts",
-    "build": "npm run build:js && npm run build:types",
+    "build": "npm run build:js",
     "clean": "rimraf -rf ./dist",
     "build:js": "babel --root-mode upward --extensions '.ts' --out-dir dist src",
     "build:types": "tsc -p tsconfig.build.json",
