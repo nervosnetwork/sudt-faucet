@@ -39,7 +39,6 @@ export class TransactionManage {
     return retry<Transaction>(
       async () => {
         const unsignedTx = await txBuilder.build();
-        logger.info(`Build unsigned transfer sudt tx: ${JSON.stringify(unsignedTx.serializeJson())}`);
         return this.signer.seal(unsignedTx);
       },
       {

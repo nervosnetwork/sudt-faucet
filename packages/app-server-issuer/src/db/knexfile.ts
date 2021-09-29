@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import { nonNullable } from '../utils';
-
-dotenv.config();
 
 const host = process.env.MYSQL_HOST;
 const port = process.env.MYSQL_PORT;

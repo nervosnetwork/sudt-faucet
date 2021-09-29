@@ -1,7 +1,9 @@
+import path from 'path';
 import retry from 'async-retry';
 import Knex, { Knex as IKnex } from 'knex';
 import { logger } from '../logger';
 import { ClaimRecord, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
+import { PROJECT_PATH } from '../utils';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -26,9 +28,11 @@ export class DB {
   public static async init(): Promise<void> {
     if (DB.instance) throw new Error('DB already init');
     DB.instance = new DB();
+
+    const migrationFilePath = path.join(PROJECT_PATH, '/dist/db/migrations');
     return retry(
       async () => {
-        await DB.instance.knex.migrate.latest({ directory: 'dist/db/migrations', loadExtensions: ['.js'] });
+        await DB.instance.knex.migrate.latest({ directory: migrationFilePath, loadExtensions: ['.js'] });
       },
       {
         onRetry: (e, attempt) => logger.warn(`attempt to migrate db to latest failed(retry ${attempt} times): ${e}`),
@@ -144,7 +148,7 @@ export class DB {
       if (secretsOfUpdateRows.length > 0)
         await this.knex('mail_issue')
           .whereIn('secret', secretsOfUpdateRows)
-          .update({ status: 'WaitForClaim' })
+          .update({ status: 'WaitForClaim', error: '' })
           .transacting(trx);
     } catch (e) {
       await trx.rollback();
@@ -158,12 +162,17 @@ export class DB {
   }
 
   public async updateTxHashBySecrets(secrets: string[], txHash: string, status: MailIssueStatus): Promise<void> {
-    await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status, error: '' });
   }
 
-  public async updateErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
+  public async updateStatusAndErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
     const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
     await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError, status: status });
+  }
+
+  public async updateErrorBySecrets(secrets: string[], error: string): Promise<void> {
+    const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError });
   }
 
   public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimRecord[]> {

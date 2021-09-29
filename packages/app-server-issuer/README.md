@@ -23,5 +23,5 @@ bash src/db/setup_mysql_dev.sh
 yarn build
 
 // start server
-node ./dist/index.js
+node -r dotenv/config ./dist/index.js dotenv_config_path=./.env
 ```

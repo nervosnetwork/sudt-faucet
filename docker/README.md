@@ -59,4 +59,13 @@ docker-compose -f docker-compose.yml -f docker-compose.lina.yml up -d
 ## Upgrade Applications
 
 1. Rebuild the service image you want to upgrade
-2. Run `cd docker && docker-compose up --no-deps -d ${service_name_you_want_to_upgrade}`
+2. Upgrade service
+```bash
+cd docker
+
+# if aggron
+docker-compose -f docker-compose.yml -f docker-compose.aggron.yml up --no-deps -d ${service_name_you_want_to_upgrade}`
+
+# if lina
+docker-compose -f docker-compose.yml -f docker-compose.lina.yml up --no-deps -d ${service_name_you_want_to_upgrade}`
+```
