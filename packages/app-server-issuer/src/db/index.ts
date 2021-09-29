@@ -148,7 +148,7 @@ export class DB {
       if (secretsOfUpdateRows.length > 0)
         await this.knex('mail_issue')
           .whereIn('secret', secretsOfUpdateRows)
-          .update({ status: 'WaitForClaim' })
+          .update({ status: 'WaitForClaim', error: '' })
           .transacting(trx);
     } catch (e) {
       await trx.rollback();
@@ -162,12 +162,17 @@ export class DB {
   }
 
   public async updateTxHashBySecrets(secrets: string[], txHash: string, status: MailIssueStatus): Promise<void> {
-    await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status });
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ tx_hash: txHash, status: status, error: '' });
   }
 
-  public async updateErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
+  public async updateStatusAndErrorBySecrets(secrets: string[], error: string, status: MailIssueStatus): Promise<void> {
     const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
     await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError, status: status });
+  }
+
+  public async updateErrorBySecrets(secrets: string[], error: string): Promise<void> {
+    const truncatedError = error.length > 1024 ? error.slice(0, 1023) : error;
+    await this.knex('mail_issue').whereIn('secret', secrets).update({ error: truncatedError });
   }
 
   public async getClaimHistoryBySudtId(sudtId: string): Promise<ClaimRecord[]> {

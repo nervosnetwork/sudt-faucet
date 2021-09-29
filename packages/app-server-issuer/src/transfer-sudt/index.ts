@@ -38,14 +38,14 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
           } catch (e) {
             logger.error(`An error caught while send transfer sudt tx: ${e}`);
             const errorString = e instanceof Error ? e.toString() : String(e);
-            await db.updateErrorBySecrets(secrets, errorString, 'SendTransactionError');
+            await db.updateStatusAndErrorBySecrets(secrets, errorString, 'SendTransactionError');
             await utils.sleep(300000);
           }
         } catch (e) {
           logger.error(`An error caught while build transfer sudt tx: ${e}`);
           logger.error(`Gonna sleep 5 mins after build tx failed`);
           const errorString = e instanceof Error ? e.toString() : String(e);
-          await db.updateErrorBySecrets(secrets, errorString, 'BuildTransactionError');
+          await db.updateStatusAndErrorBySecrets(secrets, errorString, 'BuildTransactionError');
           await utils.sleep(300000);
         }
       }
@@ -58,7 +58,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
 
 function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
   if (txes.length === 0) return txes;
-  const selectedSudtTx = txes[0];
+  const selectedSudtTx = txes[txes.length - 1];
   return txes.filter(
     (tx) =>
       tx.sudt_id === selectedSudtTx!.sudt_id &&

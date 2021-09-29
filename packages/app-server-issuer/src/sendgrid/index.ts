@@ -24,28 +24,33 @@ export async function startSendGrid(context: ServerContext): Promise<void> {
     try {
       const unsendMails = await db.getMailsToSend((process.env.BATCH_MAIL_LIMIT as unknown as number) ?? 50);
       logger.info(`New send mails round with records: ${unsendMails.length ? JSON.stringify(unsendMails) : '[]'}`);
+      const secrets = unsendMails.map((value) => value.secret);
       if (unsendMails.length > 0) {
-        for (const unsendMail of unsendMails) {
-          const options = {
-            rcIdentity: {
-              flag: convertToRcIdentityFlag(unsendMail.sudt_issuer_rc_id_flag),
-              pubkeyHash: unsendMail.sudt_issuer_pubkey_hash,
-            },
-            udtId: unsendMail.sudt_id,
-          };
-          const sudtInfo = await getMemoizedSudtInfo(context.rcHelper, options);
-          if (!sudtInfo) throw new Error(`error: sudt info of ${JSON.stringify(options)} not existed`);
-          unsendMail.amount =
-            new AssetAmount(unsendMail.amount, sudtInfo.decimals).toHumanizeString() + ` ${sudtInfo.symbol}`;
+        try {
+          for (const unsendMail of unsendMails) {
+            const options = {
+              rcIdentity: {
+                flag: convertToRcIdentityFlag(unsendMail.sudt_issuer_rc_id_flag),
+                pubkeyHash: unsendMail.sudt_issuer_pubkey_hash,
+              },
+              udtId: unsendMail.sudt_id,
+            };
+            const sudtInfo = await getMemoizedSudtInfo(context.rcHelper, options);
+            if (!sudtInfo) throw new Error(`error: sudt info of ${JSON.stringify(options)} not existed`);
+            unsendMail.amount =
+              new AssetAmount(unsendMail.amount, sudtInfo.decimals).toHumanizeString() + ` ${sudtInfo.symbol}`;
+          }
+          const sgMails = unsendMails.map(toSGMail);
+          logger.info(`Sended mails content: ${JSON.stringify(sgMails)}`);
+          await sgMail.send(sgMails);
+          await db.updateStatusToWaitForClaim(secrets);
+        } catch (e) {
+          logger.error(`An error caught while send mails: ${e}`);
+          await db.updateErrorBySecrets(secrets, String(e));
         }
-        const sgMails = unsendMails.map(toSGMail);
-        logger.info(`Sended mails content: ${JSON.stringify(sgMails)}`);
-        await sgMail.send(sgMails);
-        const secrets = unsendMails.map((value) => value.secret);
-        await db.updateStatusToWaitForClaim(secrets);
       }
     } catch (e) {
-      logger.error(`An error caught while send mails: ${e}`);
+      logger.error(`An error caught from db: ${e}`);
     }
     await utils.sleep(15000);
   }
