@@ -16,6 +16,9 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
       const unsendTransactionsWithMixedSudts = await db.getTransactionsToSend(
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
+      // transfering multiple udt at the same time and mixing acp with non-acp
+      // will cause an ERROR_NO_PAIR error in the acp-lock
+      // so transfer one after another
       const unsendTransactions = selectOneKindSudt(unsendTransactionsWithMixedSudts);
       logger.info(
         `New transfer sudt round with records: ${
@@ -58,11 +61,11 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
 
 function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
   if (txes.length === 0) return txes;
-  const selectedSudtTx = txes[txes.length - 1];
+  const selectedSudtTx = txes[txes.length - 1]!;
   return txes.filter(
     (tx) =>
-      tx.sudt_id === selectedSudtTx!.sudt_id &&
-      tx.sudt_issuer_rc_id_flag === selectedSudtTx!.sudt_issuer_rc_id_flag &&
-      tx.sudt_issuer_pubkey_hash === selectedSudtTx!.sudt_issuer_pubkey_hash,
+      tx.sudt_id === selectedSudtTx.sudt_id &&
+      tx.sudt_issuer_rc_id_flag === selectedSudtTx.sudt_issuer_rc_id_flag &&
+      tx.sudt_issuer_pubkey_hash === selectedSudtTx.sudt_issuer_pubkey_hash,
   );
 }

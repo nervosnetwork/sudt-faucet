@@ -63,9 +63,9 @@ docker-compose -f docker-compose.yml -f docker-compose.lina.yml up -d
 ```bash
 cd docker
 
-// if aggron
+# if aggron
 docker-compose -f docker-compose.yml -f docker-compose.aggron.yml up --no-deps -d ${service_name_you_want_to_upgrade}`
 
-// if lina
+# if lina
 docker-compose -f docker-compose.yml -f docker-compose.lina.yml up --no-deps -d ${service_name_you_want_to_upgrade}`
 ```
