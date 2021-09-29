@@ -1,7 +1,9 @@
+import path from 'path';
 import retry from 'async-retry';
 import Knex, { Knex as IKnex } from 'knex';
 import { logger } from '../logger';
 import { ClaimRecord, InsertMailIssue, MailIssue, MailIssueStatus, MailToSend, TransactionToSend } from '../types';
+import { PROJECT_PATH } from '../utils';
 import knexConfig from './knexfile';
 
 export class DB {
@@ -26,9 +28,11 @@ export class DB {
   public static async init(): Promise<void> {
     if (DB.instance) throw new Error('DB already init');
     DB.instance = new DB();
+
+    const migrationFilePath = path.join(PROJECT_PATH, '/dist/db/migrations');
     return retry(
       async () => {
-        await DB.instance.knex.migrate.latest({ directory: 'dist/db/migrations', loadExtensions: ['.js'] });
+        await DB.instance.knex.migrate.latest({ directory: migrationFilePath, loadExtensions: ['.js'] });
       },
       {
         onRetry: (e, attempt) => logger.warn(`attempt to migrate db to latest failed(retry ${attempt} times): ${e}`),

@@ -25,6 +25,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
       if (unsendTransactions.length > 0) {
         try {
           const signedTx = await txManage.buildTransaction(unsendTransactions);
+          logger.info(`Built signed-transfer-sudt-tx: ${JSON.stringify(signedTx)}`);
           await db.updateStatusBySecrets(secrets, 'SendingTransaction');
           try {
             const txHash = await txManage.sendTransaction(signedTx);
@@ -41,6 +42,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
           }
         } catch (e) {
           logger.error(`An error caught while build transfer sudt tx: ${e}`);
+          logger.error(`Gonna sleep 5 mins after build tx failed`);
           const errorString = e instanceof Error ? e.toString() : String(e);
           await db.updateErrorBySecrets(secrets, errorString, 'BuildTransactionError');
           await utils.sleep(300000);

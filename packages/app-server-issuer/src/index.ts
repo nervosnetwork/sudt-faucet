@@ -1,5 +1,4 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
-import dotenv from 'dotenv';
 import { DB } from './db';
 import { startRpcServer } from './rpc-server';
 import { startSendGrid } from './sendgrid';
@@ -14,7 +13,6 @@ async function main() {
 }
 
 async function initContext(): Promise<ServerContext> {
-  dotenv.config();
   await DB.init();
 
   if (!process.env.CKB_NODE_URL) throw new Error('env CKB_NODE_URL not set');
