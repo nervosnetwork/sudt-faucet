@@ -1,7 +1,7 @@
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
 import { loggerWithModule } from '../logger';
-import { ServerContext } from '../types';
+import { ServerContext, TransactionToSend } from '../types';
 import { TransactionManage } from './TransactionManage';
 
 const logger = loggerWithModule('TransferSudt');
@@ -13,9 +13,10 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
 
   for (;;) {
     try {
-      const unsendTransactions = await db.getTransactionsToSend(
+      const unsendTransactionsWithMixedSudts = await db.getTransactionsToSend(
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
+      const unsendTransactions = selectOneKindSudt(unsendTransactionsWithMixedSudts);
       logger.info(
         `New transfer sudt round with records: ${
           unsendTransactions.length ? JSON.stringify(unsendTransactions) : '[]'
@@ -53,4 +54,15 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
     }
     await utils.sleep(15000);
   }
+}
+
+function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
+  if (txes.length === 0) return txes;
+  const selectedSudtTx = txes[0];
+  return txes.filter(
+    (tx) =>
+      tx.sudt_id === selectedSudtTx!.sudt_id &&
+      tx.sudt_issuer_rc_id_flag === selectedSudtTx!.sudt_issuer_rc_id_flag &&
+      tx.sudt_issuer_pubkey_hash === selectedSudtTx!.sudt_issuer_pubkey_hash,
+  );
 }
