@@ -1,7 +1,7 @@
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
 import { loggerWithModule } from '../logger';
-import { ServerContext } from '../types';
+import { ServerContext, TransactionToSend } from '../types';
 import { TransactionManage } from './TransactionManage';
 
 const logger = loggerWithModule('TransferSudt');
@@ -13,9 +13,13 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
 
   for (;;) {
     try {
-      const unsendTransactions = await db.getTransactionsToSend(
+      const unsendTransactionsWithMixedSudts = await db.getTransactionsToSend(
         (process.env.BATCH_TRANSACTION_LIMIT as unknown as number) ?? 50,
       );
+      // transfering multiple udt at the same time and mixing acp with non-acp
+      // will cause an ERROR_NO_PAIR error in the acp-lock
+      // so transfer one after another
+      const unsendTransactions = selectOneKindSudt(unsendTransactionsWithMixedSudts);
       logger.info(
         `New transfer sudt round with records: ${
           unsendTransactions.length ? JSON.stringify(unsendTransactions) : '[]'
@@ -25,6 +29,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
       if (unsendTransactions.length > 0) {
         try {
           const signedTx = await txManage.buildTransaction(unsendTransactions);
+          logger.info(`Built signed-transfer-sudt-tx: ${JSON.stringify(signedTx)}`);
           await db.updateStatusBySecrets(secrets, 'SendingTransaction');
           try {
             const txHash = await txManage.sendTransaction(signedTx);
@@ -36,13 +41,14 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
           } catch (e) {
             logger.error(`An error caught while send transfer sudt tx: ${e}`);
             const errorString = e instanceof Error ? e.toString() : String(e);
-            await db.updateErrorBySecrets(secrets, errorString, 'SendTransactionError');
+            await db.updateStatusAndErrorBySecrets(secrets, errorString, 'SendTransactionError');
             await utils.sleep(300000);
           }
         } catch (e) {
           logger.error(`An error caught while build transfer sudt tx: ${e}`);
+          logger.error(`Gonna sleep 5 mins after build tx failed`);
           const errorString = e instanceof Error ? e.toString() : String(e);
-          await db.updateErrorBySecrets(secrets, errorString, 'BuildTransactionError');
+          await db.updateStatusAndErrorBySecrets(secrets, errorString, 'BuildTransactionError');
           await utils.sleep(300000);
         }
       }
@@ -51,4 +57,15 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
     }
     await utils.sleep(15000);
   }
+}
+
+function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
+  if (txes.length === 0) return txes;
+  const selectedSudtTx = txes[txes.length - 1]!;
+  return txes.filter(
+    (tx) =>
+      tx.sudt_id === selectedSudtTx.sudt_id &&
+      tx.sudt_issuer_rc_id_flag === selectedSudtTx.sudt_issuer_rc_id_flag &&
+      tx.sudt_issuer_pubkey_hash === selectedSudtTx.sudt_issuer_pubkey_hash,
+  );
 }

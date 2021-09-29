@@ -1,10 +1,9 @@
-import dotenv from 'dotenv';
+import path from 'path';
 import winston, { Logger } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import { PROJECT_PATH } from '../utils';
 
 const { createLogger, format, transports } = winston;
-
-dotenv.config();
 
 const colors = {
   error: 'red',
@@ -32,7 +31,7 @@ const myFormat = format.printf(({ level, message, label, timestamp }) => {
 });
 
 const dailyRotateTransport: DailyRotateFile = new DailyRotateFile({
-  dirname: './logs',
+  dirname: path.join(PROJECT_PATH, '/logs'),
   filename: 'issuer-server-%DATE%.log',
   maxFiles: '30d',
 });
@@ -48,7 +47,7 @@ export const logger = createLogger({
     myFormat,
   ),
   transports: [dailyRotateTransport],
-  exceptionHandlers: [new transports.File({ dirname: './logs', filename: 'exceptions.log' })],
+  exceptionHandlers: [new transports.File({ dirname: path.join(PROJECT_PATH, '/logs'), filename: 'exceptions.log' })],
   // TODO winston not support rejectionHandlers yet: https://github.com/winstonjs/winston/issues/1801
   // rejectionHandlers: [new transports.File({ dirname: './logs', filename: 'rejections.log' })],
 });
