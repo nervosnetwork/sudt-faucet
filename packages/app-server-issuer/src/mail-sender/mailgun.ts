@@ -33,7 +33,7 @@ export class MailgunSender implements MailSender {
 
   batchSend(options: MailOption[]): Promise<unknown> {
     const recipientVariables = options.reduce(
-      (variables, item) => Object.assign(variables, { [item.toEmail]: {} }),
+      (variables, item) => Object.assign(variables, { [item.toEmail]: item }),
       {} as Record<string, MailOption>,
     );
 
