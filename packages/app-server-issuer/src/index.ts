@@ -1,13 +1,13 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
 import { DB } from './db';
+import { startMailSender } from './mail-sender';
 import { startRpcServer } from './rpc-server';
-import { startSendGrid } from './sendgrid';
 import { startTransferSudt } from './transfer-sudt';
 import { ServerContext } from './types';
 
 async function main() {
   const context = await initContext();
-  void startSendGrid(context);
+  void startMailSender(context);
   void startTransferSudt(context);
   startRpcServer(context);
 }

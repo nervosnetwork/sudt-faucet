@@ -1,5 +1,4 @@
 import { convertToRcIdentityFlag, RcIdentity, RcSupplyLockHelper, SudtInfo } from '@ckitjs/ckit';
-import sgMail from '@sendgrid/mail';
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
 import memoize from 'memoizee';
@@ -7,18 +6,24 @@ import { DB } from '../db';
 import { loggerWithModule } from '../logger';
 import { MailToSend, ServerContext } from '../types';
 import { AssetAmount } from '../utils';
+import { SendGrid } from './sendgrid';
+import { MailSender, MailOption } from './types';
 
-const logger = loggerWithModule('SendGrid');
+const logger = loggerWithModule('MailSender');
 
-export async function startSendGrid(context: ServerContext): Promise<void> {
-  if (!process.env.SENDGRID_API_KEY) throw new Error('env SENDGRID_API_KEY not set');
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+export async function startMailSender(context: ServerContext): Promise<void> {
+  // TODO replace with MailGun
+  const mailSender = new SendGrid();
+  return startRoutine(context, mailSender);
+}
+
+async function startRoutine(context: ServerContext, mailSender: MailSender): Promise<void> {
   const db = DB.getInstance();
   const getMemoizedSudtInfo = memoize(getSudtInfo, {
     normalizer: (args) => JSON.stringify(args[1]),
     promise: true,
   });
-  logger.info('Send grid routine started');
+  logger.info('Send mail routine started');
 
   for (;;) {
     try {
@@ -40,9 +45,9 @@ export async function startSendGrid(context: ServerContext): Promise<void> {
             unsendMail.amount =
               new AssetAmount(unsendMail.amount, sudtInfo.decimals).toHumanizeString() + ` ${sudtInfo.symbol}`;
           }
-          const sgMails = unsendMails.map(toSGMail);
-          logger.info(`Sended mails content: ${JSON.stringify(sgMails)}`);
-          await sgMail.send(sgMails);
+          const mailOptions = unsendMails.map(toMailOption);
+          logger.info(`Send mails metadata: ${JSON.stringify(mailOptions)}`);
+          await mailSender.batchSend(mailOptions);
           await db.updateStatusToWaitForClaim(secrets);
         } catch (e) {
           logger.error(`An error caught while send mails: ${e}`);
@@ -75,18 +80,18 @@ async function getSudtInfo(
   return sudtInfos[0];
 }
 
-function toSGMail(mail: MailToSend): sgMail.MailDataRequired {
-  if (!process.env.SENDGRID_VERIFIED_SENDER) throw new Error('env SENDGRID_VERIFIED_SENDER not set');
+function toMailOption(mail: MailToSend): MailOption {
   if (!process.env.CLAIM_SUDT_URL) throw new Error('env CLAIM_SUDT_URL not set');
 
-  const expireDate = mail.expire_time
+  const expireTime = mail.expire_time
     ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' }) + '(UTC Time)'
     : '';
 
   return {
-    to: mail.mail_address,
-    from: process.env.SENDGRID_VERIFIED_SENDER,
-    subject: 'You have received some tokens',
-    text: `${mail.mail_message}\n\nClick this link to claim ${mail.amount} ${expireDate}:\n${process.env.CLAIM_SUDT_URL}?claim_secret=${mail.secret}`,
+    toEmail: mail.mail_address,
+    amountWithSymbol: mail.amount,
+    claimLink: `${process.env.CLAIM_SUDT_URL}?claim_secret=${mail.secret}`,
+    additionalMessage: mail.mail_message,
+    expireTime: expireTime,
   };
 }
