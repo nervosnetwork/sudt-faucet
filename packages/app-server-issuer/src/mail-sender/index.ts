@@ -13,7 +13,6 @@ import { MailSender, MailOption } from './types';
 const logger = loggerWithModule('MailSender');
 
 export async function startMailSender(context: ServerContext): Promise<void> {
-  // TODO replace with MailGun
   const mailSender = new MailgunSender();
   return startRoutine(context, mailSender);
 }
@@ -85,7 +84,7 @@ function toMailOption(mail: MailToSend): MailOption {
   if (!process.env.CLAIM_SUDT_URL) throw new Error('env CLAIM_SUDT_URL not set');
 
   const expireTime = mail.expire_time
-    ? 'before ' + new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' }) + '(UTC Time)'
+    ? new Date(mail.expire_time).toLocaleString('en-US', { timeZone: 'UTC' }) + '(UTC Time)'
     : '';
 
   return {
