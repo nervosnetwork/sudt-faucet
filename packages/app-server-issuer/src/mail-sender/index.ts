@@ -6,14 +6,15 @@ import { DB } from '../db';
 import { loggerWithModule } from '../logger';
 import { MailToSend, ServerContext } from '../types';
 import { AssetAmount } from '../utils';
-import { SendGrid } from './sendgrid';
+// import { SendGrid } from './sendgrid';
+import { MailgunSender } from './mailgun';
 import { MailSender, MailOption } from './types';
 
 const logger = loggerWithModule('MailSender');
 
 export async function startMailSender(context: ServerContext): Promise<void> {
   // TODO replace with MailGun
-  const mailSender = new SendGrid();
+  const mailSender = new MailgunSender();
   return startRoutine(context, mailSender);
 }
 

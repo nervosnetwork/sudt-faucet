@@ -27,8 +27,9 @@
 - Owner 私钥： 0x...
 - Owner 地址： 0x...
 - Hosted 私钥：0x...
-- SENDGRID_API_KEY='SG...'
-- SENDGRID_VERIFIED_SENDER='xxxxx@gmail.com'
+- MAILGUN_API_KEY='...'
+- MAILGUN_DOMAIN='...'
+- MAILGUN_FROM='OrgName <no-reply@org-name.org>'
 
 ## 构建及启动服务
 
