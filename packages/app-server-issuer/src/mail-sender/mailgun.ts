@@ -41,7 +41,7 @@ export class MailgunSender implements MailSender {
       from: this.config.from,
       to: options.map((item) => item.toEmail),
       subject: 'You have received some tokens',
-      html: `<p>%recipient.additionalMessage%</p><p>Click this link to <a href="%recipient.cliamLink%">CLAIM</a> %recipient.amountWithSymbol% before %recipient.expireTime%. If the CLAIM link is not clickable, you can copy the following URL to a new tab to open it </br> %recipient.claimLink% </p>`,
+      html: `<html lang="en"><p>%recipient.additionalMessage%</p><p>Click this link to <a target="_blank" href="%recipient.claimLink%">CLAIM</a> %recipient.amountWithSymbol% before %recipient.expireTime%. If the CLAIM link is not clickable, you can copy the following URL to a new tab to open it </br> %recipient.claimLink% </p></html>`,
       'recipient-variables': JSON.stringify(recipientVariables),
     });
   }
