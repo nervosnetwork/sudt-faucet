@@ -9,14 +9,14 @@ import {
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
 import { loggerWithModule } from '../logger';
-import { TransactionToSend } from '../types';
+import { TransactionToSendWithCapacity } from '../types';
 
 const logger = loggerWithModule('TransferSudt');
 
 export class TransactionManage {
   constructor(private provider: CkitProvider, private signer: EntrySigner, private rcHelper: RcSupplyLockHelper) {}
 
-  public async buildTransaction(txs: TransactionToSend[]): Promise<Transaction> {
+  public async buildTransaction(txs: TransactionToSendWithCapacity[]): Promise<Transaction> {
     const builderOptions = txs.map((tx) => {
       const rcIdentity = {
         flag: convertToRcIdentityFlag(tx.sudt_issuer_rc_id_flag),
@@ -28,6 +28,7 @@ export class TransactionManage {
         sudt: sudtScript,
         amount: tx.amount,
         policy: 'findOrCreate' as const,
+        additionalCapacity: tx.capacity,
       };
     });
     const txBuilder = new AcpTransferSudtBuilder(
