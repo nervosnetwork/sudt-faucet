@@ -70,10 +70,39 @@ export class DB {
 
   public async getTransactionsToSend(limit: number): Promise<TransactionToSend[]> {
     return this.knex
-      .select('sudt_issuer_pubkey_hash', 'sudt_issuer_rc_id_flag', 'sudt_id', 'amount', 'claim_address', 'secret')
+      .select(
+        'id',
+        'mail_address',
+        'sudt_issuer_pubkey_hash',
+        'sudt_issuer_rc_id_flag',
+        'sudt_id',
+        'amount',
+        'claim_address',
+        'secret',
+      )
       .from<MailIssue>('mail_issue')
       .whereIn('status', ['WaitForTransfer', 'BuildTransactionError'])
       .limit(limit);
+  }
+
+  public async firstRecordId(
+    mail_address: string,
+    sudt_id: string,
+    sudt_issuer_pubkey_hash: string,
+    sudt_issuer_rc_id_flag: number,
+  ): Promise<number | undefined> {
+    const rows = await this.knex
+      .select('id')
+      .from<MailIssue>('mail_issue')
+      .where({
+        mail_address: mail_address,
+        sudt_id: sudt_id,
+        sudt_issuer_pubkey_hash: sudt_issuer_pubkey_hash,
+        sudt_issuer_rc_id_flag: sudt_issuer_rc_id_flag,
+      })
+      .orderBy('id')
+      .limit(1);
+    return rows[0]?.id;
   }
 
   public async disableSecret(secret: string): Promise<void> {

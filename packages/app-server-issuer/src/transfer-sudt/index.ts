@@ -1,7 +1,7 @@
 import { utils } from '@sudt-faucet/commons';
 import { DB } from '../db';
 import { loggerWithModule } from '../logger';
-import { ServerContext, TransactionToSend } from '../types';
+import { ServerContext, TransactionToSend, TransactionToSendWithCapacity } from '../types';
 import { TransactionManage } from './TransactionManage';
 
 const logger = loggerWithModule('TransferSudt');
@@ -19,7 +19,7 @@ export async function startTransferSudt(context: ServerContext): Promise<void> {
       // transfering multiple udt at the same time and mixing acp with non-acp
       // will cause an ERROR_NO_PAIR error in the acp-lock
       // so transfer one after another
-      const unsendTransactions = selectOneKindSudt(unsendTransactionsWithMixedSudts);
+      const unsendTransactions = await addTransferCapacity(selectOneKindSudt(unsendTransactionsWithMixedSudts));
       logger.info(
         `New transfer sudt round with records: ${
           unsendTransactions.length ? JSON.stringify(unsendTransactions) : '[]'
@@ -68,4 +68,23 @@ function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
       tx.sudt_issuer_rc_id_flag === selectedSudtTx.sudt_issuer_rc_id_flag &&
       tx.sudt_issuer_pubkey_hash === selectedSudtTx.sudt_issuer_pubkey_hash,
   );
+}
+
+async function addTransferCapacity(txes: TransactionToSend[]): Promise<TransactionToSendWithCapacity[]> {
+  if (!process.env.TRANSFER_CAPACITY_FIRST) throw new Error('env TRANSFER_CAPACITY_FIRST not set');
+  if (!process.env.TRANSFER_CAPACITY_LATER) throw new Error('env TRANSFER_CAPACITY_LATER not set');
+
+  const ret: TransactionToSendWithCapacity[] = [];
+  for (const tx of txes) {
+    const firstRecordId = await DB.getInstance().firstRecordId(
+      tx.mail_address,
+      tx.sudt_id,
+      tx.sudt_issuer_pubkey_hash,
+      tx.sudt_issuer_rc_id_flag,
+    );
+    if (!firstRecordId) throw new Error('exception: can not find first record when addTransferCapacity');
+    const capacity = firstRecordId < tx.id ? process.env.TRANSFER_CAPACITY_LATER : process.env.TRANSFER_CAPACITY_FIRST;
+    ret.push({ ...tx, capacity });
+  }
+  return ret;
 }
