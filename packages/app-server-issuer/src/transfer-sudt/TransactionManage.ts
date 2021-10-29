@@ -28,6 +28,7 @@ export class TransactionManage {
         sudt: sudtScript,
         amount: tx.amount,
         policy: 'findOrCreate' as const,
+        additionalCapacity: tx.capacity,
       };
     });
     const txBuilder = new AcpTransferSudtBuilder(

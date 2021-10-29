@@ -71,8 +71,10 @@ function selectOneKindSudt(txes: TransactionToSend[]): TransactionToSend[] {
 }
 
 async function addTransferCapacity(txes: TransactionToSend[]): Promise<TransactionToSendWithCapacity[]> {
-  if (!process.env.TRANSFER_CAPACITY_FIRST) throw new Error('env TRANSFER_CAPACITY_FIRST not set');
-  if (!process.env.TRANSFER_CAPACITY_LATER) throw new Error('env TRANSFER_CAPACITY_LATER not set');
+  if (!process.env.TRANSFER_ADDITIONAL_CAPACITY_FIRST)
+    throw new Error('env TRANSFER_ADDITIONAL_CAPACITY_FIRST  not set');
+  if (!process.env.TRANSFER_ADDITIONAL_CAPACITY_LATER)
+    throw new Error('env TRANSFER_ADDITIONAL_CAPACITY_LATER not set');
 
   const ret: TransactionToSendWithCapacity[] = [];
   for (const tx of txes) {
@@ -83,7 +85,10 @@ async function addTransferCapacity(txes: TransactionToSend[]): Promise<Transacti
       tx.sudt_issuer_rc_id_flag,
     );
     if (!firstRecordId) throw new Error('exception: can not find first record when addTransferCapacity');
-    const capacity = firstRecordId < tx.id ? process.env.TRANSFER_CAPACITY_LATER : process.env.TRANSFER_CAPACITY_FIRST;
+    const capacity =
+      firstRecordId < tx.id
+        ? process.env.TRANSFER_ADDITIONAL_CAPACITY_LATER
+        : process.env.TRANSFER_ADDITIONAL_CAPACITY_FIRST;
     ret.push({ ...tx, capacity });
   }
   return ret;
