@@ -18,6 +18,10 @@ async function initContext(): Promise<ServerContext> {
   if (!process.env.CKB_NODE_URL) throw new Error('env CKB_NODE_URL not set');
   if (!process.env.CKB_INDEXER_URL) throw new Error('env CKB_INDEXER_URL not set');
   if (!process.env.PRIVATE_KEY) throw new Error('env PRIVATE_KEY not set');
+  if (!process.env.TRANSFER_ADDITIONAL_CAPACITY_FIRST)
+    throw new Error('env TRANSFER_ADDITIONAL_CAPACITY_FIRST  not set');
+  if (!process.env.TRANSFER_ADDITIONAL_CAPACITY_LATER)
+    throw new Error('env TRANSFER_ADDITIONAL_CAPACITY_LATER not set');
   const ckitProvider = new CkitProvider(process.env.CKB_INDEXER_URL, process.env.CKB_NODE_URL);
   const networkConfig = process.env.NETWORK === 'Lina' ? predefined.Lina : predefined.Aggron;
   await ckitProvider.init(networkConfig);
