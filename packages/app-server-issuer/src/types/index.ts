@@ -75,7 +75,8 @@ export type TransactionToSend = Pick<
   | 'secret'
 >;
 
-export type TransactionToSendWithCapacity = TransactionToSend & { capacity: string };
+type ExtraCapacity = { additionalCapacity?: string; createCapacity?: string };
+export type TransactionToSendWithCapacity = TransactionToSend & ExtraCapacity;
 
 export type ClaimRecord = Pick<
   MailIssue,

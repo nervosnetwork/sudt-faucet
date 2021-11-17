@@ -5,6 +5,7 @@ import {
   convertToRcIdentityFlag,
   EntrySigner,
   RcSupplyLockHelper,
+  RecipientOption,
 } from '@ckitjs/ckit';
 import { utils } from '@sudt-faucet/commons';
 import retry from 'async-retry';
@@ -17,7 +18,7 @@ export class TransactionManage {
   constructor(private provider: CkitProvider, private signer: EntrySigner, private rcHelper: RcSupplyLockHelper) {}
 
   public async buildTransaction(txs: TransactionToSendWithCapacity[]): Promise<Transaction> {
-    const builderOptions = txs.map((tx) => {
+    const builderOptions = txs.map<RecipientOption>((tx) => {
       const rcIdentity = {
         flag: convertToRcIdentityFlag(tx.sudt_issuer_rc_id_flag),
         pubkeyHash: tx.sudt_issuer_pubkey_hash,
@@ -28,7 +29,8 @@ export class TransactionManage {
         sudt: sudtScript,
         amount: tx.amount,
         policy: 'findOrCreate' as const,
-        additionalCapacity: tx.capacity,
+        // send a lock-only cell to transfer CKB in a transfer sudt tx
+        createCapacity: tx.createCapacity,
       };
     });
     const txBuilder = new AcpTransferSudtBuilder(
