@@ -68,9 +68,18 @@ export class TransactionManage {
   }
 
   public async waitForCommit(txHash: Hash): Promise<Transaction> {
-    const tx = await this.provider.waitForTransactionCommitted(txHash, { timeoutMs: 300000 });
-    if (!tx) throw new Error('wait for tx commit timeout');
-    return tx;
+    return retry<Transaction>(
+      async () => {
+        return this.provider.waitForTransactionCommitted(txHash);
+      },
+      {
+        retries: 10,
+        maxTimeout: 10000,
+        onRetry: (e, attempt) => {
+          logger.warn(`(retry ${attempt} times) query tx status error: ${e}`);
+        },
+      },
+    );
   }
 
   // TODO impl
