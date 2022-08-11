@@ -1,5 +1,6 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
 import { DB } from './db';
+import { ExchangeProviderManager } from './exchange-provider/ExchangeProviderManager';
 import { startMailSender } from './mail-sender';
 import { startRpcServer } from './rpc-server';
 import { startTransferSudt } from './transfer-sudt';
@@ -9,6 +10,15 @@ async function main() {
   const context = await initContext();
   void startMailSender(context);
   void startTransferSudt(context);
+  await ExchangeProviderManager.getInstance().initiateConfig(
+    {
+      cellAmount: parseInt(process.env.CELL_AMOUNT!, 10),
+      sudtArgs: process.env.SUDT_ARGS!,
+      initCapacity: parseInt(process.env.INIT_CAPACITY!),
+      sudtExchangeRate: parseInt(process.env.SUDT_EXCHANGE_RATE!),
+    },
+    context,
+  );
   startRpcServer(context);
 }
 
@@ -26,11 +36,8 @@ async function initContext(): Promise<ServerContext> {
   const networkConfig = process.env.NETWORK === 'Lina' ? predefined.Lina : predefined.Aggron;
   await ckitProvider.init(networkConfig);
   // TODO get private key from keystore
-  const txSigner = new internal.Secp256k1Signer(
-    process.env.PRIVATE_KEY,
-    ckitProvider,
-    ckitProvider.newScript('ANYONE_CAN_PAY'),
-  );
+  const privateKey = process.env.PRIVATE_KEY;
+  const txSigner = new internal.Secp256k1Signer(privateKey, ckitProvider, ckitProvider.newScript('ANYONE_CAN_PAY'));
   const rcHelper = new RcSupplyLockHelper(ckitProvider.mercury, {
     rcLock: {
       code_hash: ckitProvider.getScriptConfig('RC_LOCK').CODE_HASH,
@@ -41,7 +48,7 @@ async function initContext(): Promise<ServerContext> {
       hash_type: ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
     },
   });
-  return { ckitProvider, txSigner, rcHelper };
+  return { ckitProvider, txSigner, rcHelper, privateKey };
 }
 
 void main();
