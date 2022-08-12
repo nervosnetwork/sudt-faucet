@@ -1,6 +1,5 @@
-import { hd, Cell, Indexer, helpers, Address, HexString, HexNumber } from '@ckb-lumos/lumos';
-import { AcpTransferSudtBuilder, CkitProvider } from '@ckitjs/ckit';
-import { Secp256k1Signer } from 'ckit/packages/ckit/src/wallets/Secp256k1Wallet';
+import { hd, Cell, Indexer, helpers, Address, HexString } from '@ckb-lumos/lumos';
+import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
 import { BigNumber } from 'ethers';
 import { ServerContext } from '../types';
 
@@ -25,7 +24,7 @@ export class ExchangeProviderManager {
     this.initiated = false;
   }
 
-  private shouldInitiated() {
+  shouldInitiated(): void {
     if (!this.initiated) {
       throw new Error('ExchangeProviderManager is not initiated');
     }
@@ -43,8 +42,8 @@ export class ExchangeProviderManager {
     ).objects;
 
     if (cells.length < this.config.cellAmount) {
-      this.createProviderCells();
-      this.refreshCells();
+      await this.createProviderCells();
+      await this.refreshCells();
     } else {
       this.cells = cells.sort((a, b) => BigNumber.from(b.block_number).sub(BigNumber.from(a.block_number)).toNumber());
     }
@@ -73,11 +72,7 @@ export class ExchangeProviderManager {
       this.providerAddress,
     );
     const unsignedTx = await builder.build();
-    const signer = new Secp256k1Signer(this.context.privateKey!, this.context.ckitProvider, {
-      code_hash: this.context.ckitProvider.config.SCRIPTS.SECP256K1_BLAKE160.CODE_HASH,
-      hash_type: this.context.ckitProvider.config.SCRIPTS.SECP256K1_BLAKE160.HASH_TYPE,
-    });
-    const tx = await signer.seal(unsignedTx);
+    const tx = await this.context.txSigner.seal(unsignedTx);
     const hash = await this.context.ckitProvider.sendTransaction(tx);
     await this.context.ckitProvider.waitForTransactionCommitted(hash);
   }
@@ -93,18 +88,22 @@ export class ExchangeProviderManager {
     await this.refreshCells();
   }
 
+  exchangeAmount(sudtAmount: HexString): BigNumber {
+    return BigNumber.from(sudtAmount).mul(this.config.sudtExchangeRate);
+  }
+
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
     this.shouldInitiated();
 
     let cells: Cell[] = [];
-    const needCapacity = BigNumber.from(sudtAmount).mul(this.config.sudtExchangeRate);
+    const needCapacity = this.exchangeAmount(sudtAmount);
     let capacity = BigNumber.from(0);
 
     while (capacity.lt(needCapacity)) {
       const cell = this.cells.shift();
 
       if (cell == undefined) {
-        this.refreshCells();
+        await this.refreshCells();
         capacity = BigNumber.from(0);
         cells = [];
       } else {
