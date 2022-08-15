@@ -93,13 +93,8 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
       this.context.ckitProvider,
     );
     const unsignedTx = await builder.build();
-    const signer = new internal.Secp256k1Signer(
-      this.context.privateKey!,
-      this.context.ckitProvider,
-      this.context.ckitProvider.newScript('SECP256K1_BLAKE160'),
-    );
 
-    const partialSignedTx = await signer.seal(unsignedTx);
+    const partialSignedTx = await this.context.exchangeSigner!.seal(unsignedTx);
 
     return {
       transaction: AbstractTransactionBuilder.serde.serialize(partialSignedTx),

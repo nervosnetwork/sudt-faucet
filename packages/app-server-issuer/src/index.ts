@@ -42,6 +42,11 @@ async function initContext(): Promise<ServerContext> {
   // TODO get private key from keystore
   const privateKey = process.env.PRIVATE_KEY;
   const txSigner = new internal.Secp256k1Signer(privateKey, ckitProvider, ckitProvider.newScript('ANYONE_CAN_PAY'));
+  const exchangeSigner = new internal.Secp256k1Signer(
+    privateKey,
+    ckitProvider,
+    ckitProvider.newScript('SECP256K1_BLAKE160'),
+  );
   const rcHelper = new RcSupplyLockHelper(ckitProvider.mercury, {
     rcLock: {
       code_hash: ckitProvider.getScriptConfig('RC_LOCK').CODE_HASH,
@@ -52,7 +57,7 @@ async function initContext(): Promise<ServerContext> {
       hash_type: ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
     },
   });
-  return { ckitProvider, txSigner, rcHelper, privateKey };
+  return { ckitProvider, txSigner, rcHelper, exchangeSigner };
 }
 
 void main();
