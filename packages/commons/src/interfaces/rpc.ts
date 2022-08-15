@@ -1,5 +1,5 @@
 import { Address, HexNumber, HexString, Script } from '@ckb-lumos/base';
-import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo, SerializedTx } from './types';
+import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
  * client and server are the same interface
@@ -138,5 +138,5 @@ export interface GenerateDepositToGodWokenPayload {
 }
 
 export interface GenerateDepositToGodWokenResponse {
-  transaction: SerializedTx;
+  transaction: unknown;
 }
