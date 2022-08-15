@@ -1,4 +1,5 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
+import { BigNumber } from 'ethers';
 import { DB } from './db';
 import { ExchangeProviderManager } from './exchange-provider/ExchangeProviderManager';
 import { startMailSender } from './mail-sender';
@@ -15,7 +16,10 @@ async function main() {
       cellAmount: parseInt(process.env.CELL_AMOUNT!, 10),
       sudtArgs: process.env.SUDT_ARGS!,
       initCapacity: parseInt(process.env.INIT_CAPACITY!),
-      sudtExchangeRate: parseInt(process.env.SUDT_EXCHANGE_RATE!),
+      exchange: {
+        sUDT: BigNumber.from(process.env.SUDT_EXCHANGE_AMOUNT),
+        CKB: BigNumber.from(process.env.CKB_EXCHANGE_AMOUNT),
+      },
     },
     context,
   );

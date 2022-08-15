@@ -2,6 +2,7 @@ import { hd, Cell, Indexer, helpers, Address, HexString } from '@ckb-lumos/lumos
 import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
 import { BigNumber } from 'ethers';
 import { ServerContext } from '../types';
+import { Config } from './config';
 
 export class ExchangeProviderManager {
   private cells: Cell[] = [];
@@ -96,7 +97,7 @@ export class ExchangeProviderManager {
   }
 
   exchangeAmount(sudtAmount: HexString): BigNumber {
-    return BigNumber.from(sudtAmount).mul(this.config.sudtExchangeRate);
+    return BigNumber.from(sudtAmount).mul(this.config.exchange.CKB).div(this.config.exchange.sUDT);
   }
 
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
