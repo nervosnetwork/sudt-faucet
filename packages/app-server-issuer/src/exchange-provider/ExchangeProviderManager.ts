@@ -37,7 +37,7 @@ export class ExchangeProviderManager {
     const cells = (
       await indexer.getCells({
         script_type: 'lock',
-        script: helpers.parseAddress(this.providerAddress),
+        script: this.context.ckitProvider.parseToScript(this.providerAddress),
       })
     ).objects;
 
