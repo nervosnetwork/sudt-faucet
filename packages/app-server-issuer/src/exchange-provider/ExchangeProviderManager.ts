@@ -25,14 +25,14 @@ export class ExchangeProviderManager {
     this.initiated = false;
   }
 
-  shouldInitiated(): void {
+  assertInitiated(): void {
     if (!this.initiated) {
       throw new Error('ExchangeProviderManager is not initiated');
     }
   }
 
   private async refreshCells(): Promise<void> {
-    this.shouldInitiated();
+    this.assertInitiated();
 
     const indexer = new Indexer(this.context.ckitProvider.mercuryUrl, this.context.ckitProvider.rpcUrl);
     const cells = (
@@ -40,16 +40,12 @@ export class ExchangeProviderManager {
         script_type: 'lock',
         script: this.context.ckitProvider.parseToScript(this.providerAddress),
         filter: {
-          script: {
-            hash_type: this.context.ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
-            code_hash: this.context.ckitProvider.getScriptConfig('SUDT').CODE_HASH,
-            args: this.config.sudtArgs,
-          },
+          script: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
         },
       })
     ).objects;
 
-    if (cells.length < this.config.cellAmount) {
+    if (cells.length < this.config.exchangeCellCount) {
       await this.createProviderCells();
       await this.refreshCells();
     } else {
@@ -58,11 +54,11 @@ export class ExchangeProviderManager {
   }
 
   private async createProviderCells(): Promise<void> {
-    this.shouldInitiated();
+    this.assertInitiated();
 
     const builder = new AcpTransferSudtBuilder(
       {
-        recipients: Array.from({ length: this.config.cellAmount }).map(() => {
+        recipients: Array.from({ length: this.config.exchangeCellCount }).map(() => {
           return {
             recipient: this.providerAddress,
             sudt: {
@@ -101,7 +97,7 @@ export class ExchangeProviderManager {
   }
 
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
-    this.shouldInitiated();
+    this.assertInitiated();
 
     let cells: Cell[] = [];
     const needCapacity = this.exchangeAmount(sudtAmount);

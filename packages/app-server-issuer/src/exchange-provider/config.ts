@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 
 export interface Config {
-  cellAmount: number;
+  exchangeCellCount: number;
   sudtArgs: string;
   initCapacity: number;
   exchange: ExchangeConfig;
