@@ -1,3 +1,4 @@
 [submodule "ckit"]
 	path = ckit
-	url = https://github.com/nervosnetwork/ckit.git
+	url = https://github.com/felicityin/ckit.git
+	branch = exchange-sudt-for-ckb-builder

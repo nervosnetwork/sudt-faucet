@@ -1,4 +1,4 @@
-import { AbstractTransactionBuilder, ExchangeSudtForCkbBuilder, internal } from '@ckitjs/ckit';
+import { AbstractTransactionBuilder, ExchangeSudtForCkbBuilder } from '@ckitjs/ckit';
 import {
   rpc,
   utils,
