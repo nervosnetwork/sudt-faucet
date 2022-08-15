@@ -13,7 +13,7 @@ async function main() {
   void startTransferSudt(context);
   await ExchangeProviderManager.getInstance().initiateConfig(
     {
-      cellAmount: parseInt(process.env.CELL_AMOUNT!, 10),
+      exchangeCellCount: parseInt(process.env.CELL_AMOUNT!, 10),
       sudtArgs: process.env.SUDT_ARGS!,
       initCapacity: parseInt(process.env.INIT_CAPACITY!),
       exchange: {
