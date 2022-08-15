@@ -38,6 +38,13 @@ export class ExchangeProviderManager {
       await indexer.getCells({
         script_type: 'lock',
         script: this.context.ckitProvider.parseToScript(this.providerAddress),
+        filter: {
+          script: {
+            hash_type: this.context.ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
+            code_hash: this.context.ckitProvider.getScriptConfig('SUDT').CODE_HASH,
+            args: this.config.sudtArgs,
+          },
+        },
       })
     ).objects;
 
