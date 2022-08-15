@@ -1,5 +1,6 @@
 import { HexString, HexNumber, Address } from '@ckb-lumos/base';
 import { RcIdentity } from '@ckitjs/rc-lock';
+import { SerializedTx } from '@ckitjs/ckit';
 
 /* primitive */
 /**
@@ -11,7 +12,7 @@ export type Timestamp = number;
  */
 export type TypeId = HexString;
 
-export { RcIdentity };
+export { RcIdentity, SerializedTx };
 
 export interface SudtStaticInfo {
   name: string;

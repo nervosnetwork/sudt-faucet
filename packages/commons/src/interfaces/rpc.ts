@@ -1,6 +1,5 @@
 import { Address, HexNumber, HexString, Script } from '@ckb-lumos/base';
-import { SerializedTx } from '@ckitjs/ckit';
-import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
+import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo, SerializedTx } from './types';
 
 /**
  * client and server are the same interface
