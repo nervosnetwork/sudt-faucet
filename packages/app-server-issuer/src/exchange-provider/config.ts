@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BI as BigNumber } from '@ckb-lumos/lumos';
 
 export interface Config {
   exchangeCellCount: number;

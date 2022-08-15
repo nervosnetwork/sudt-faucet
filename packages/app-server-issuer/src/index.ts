@@ -1,5 +1,5 @@
 import { CkitProvider, internal, predefined, RcSupplyLockHelper } from '@ckitjs/ckit';
-import { BigNumber } from 'ethers';
+import { BI as BigNumber } from '@ckb-lumos/lumos';
 import { DB } from './db';
 import { ExchangeProviderManager } from './exchange-provider/ExchangeProviderManager';
 import { startMailSender } from './mail-sender';
