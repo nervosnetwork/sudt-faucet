@@ -94,7 +94,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     );
     const unsignedTx = await builder.build();
 
-    const partialSignedTx = await this.context.exchangeSigner!.seal(unsignedTx);
+    const partialSignedTx = await this.context.exchangeSigner!.partialSeal(unsignedTx);
 
     return {
       transaction: AbstractTransactionBuilder.serde.serialize(partialSignedTx),
