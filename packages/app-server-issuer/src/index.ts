@@ -17,8 +17,8 @@ async function main() {
       sudtArgs: process.env.SUDT_ARGS!,
       initCapacity: parseInt(process.env.INIT_CAPACITY!),
       exchange: {
-        sUDT: BigNumber.from(process.env.SUDT_EXCHANGE_AMOUNT),
-        CKB: BigNumber.from(process.env.CKB_EXCHANGE_AMOUNT),
+        sUDT: BigNumber.from(process.env.EXCHANGE_SUDT_AMOUNT),
+        CKB: BigNumber.from(process.env.EXCHANGE_CKB_AMOUNT),
       },
     },
     context,
