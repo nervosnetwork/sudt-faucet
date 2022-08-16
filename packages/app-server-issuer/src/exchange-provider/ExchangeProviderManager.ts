@@ -8,7 +8,6 @@ export class ExchangeProviderManager {
   private initiated: boolean;
   private config!: Config;
   private context!: ServerContext;
-  private providerAddress!: Address;
 
   private static sigleton: ExchangeProviderManager | undefined;
 
@@ -37,7 +36,7 @@ export class ExchangeProviderManager {
     const cells = (
       await indexer.getCells({
         script_type: 'lock',
-        script: this.context.ckitProvider.parseToScript(this.providerAddress),
+        script: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
         filter: {
           script: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
         },
@@ -59,7 +58,7 @@ export class ExchangeProviderManager {
       {
         recipients: Array.from({ length: this.config.exchangeCellCount }).map(() => {
           return {
-            recipient: this.providerAddress,
+            recipient: this.context.exchangeSigner!.getAddress(),
             sudt: {
               code_hash: this.context.ckitProvider.getScriptConfig('SUDT').CODE_HASH,
               hash_type: 'type',
@@ -72,19 +71,20 @@ export class ExchangeProviderManager {
         }),
       },
       this.context.ckitProvider,
-      this.providerAddress,
+      this.context.txSigner!.getAddress(),
     );
-    const unsignedTx = await builder.build();
-    const tx = await this.context.txSigner.seal(unsignedTx);
-    const hash = await this.context.ckitProvider.sendTransaction(tx);
-    await this.context.ckitProvider.waitForTransactionCommitted(hash);
+    try {
+      const unsignedTx = await builder.build();
+      const tx = await this.context.txSigner.seal(unsignedTx);
+      const hash = await this.context.ckitProvider.sendTransaction(tx);
+      await this.context.ckitProvider.waitForTransactionCommitted(hash);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async initiateConfig(config: Config, context: ServerContext): Promise<void> {
     this.config = config;
-    this.providerAddress = helpers.generateSecp256k1Blake160Address(
-      hd.key.privateKeyToBlake160(this.context.ckitProvider.rpcUrl),
-    );
     this.context = context;
     this.initiated = true;
 
@@ -92,7 +92,10 @@ export class ExchangeProviderManager {
   }
 
   exchangeAmount(sudtAmount: HexString): BigNumber {
-    return BigNumber.from(sudtAmount).mul(this.config.exchange.CKB).div(this.config.exchange.sUDT);
+    return BigNumber.from(sudtAmount)
+      .mul(this.config.exchange.CKB)
+      .div(this.config.exchange.sUDT)
+      .mul(BigNumber.from(10).pow(9));
   }
 
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
