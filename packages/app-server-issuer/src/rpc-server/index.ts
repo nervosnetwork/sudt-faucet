@@ -23,6 +23,9 @@ export function startRpcServer(context: ServerContext): void {
     rpcHandler.disable_claim_secret(params as rpc.DisableClaimSecretPayload),
   );
   rpcServer.addMethod('get_claimable_account_address', () => rpcHandler.get_claimable_account_address());
+  rpcServer.addMethod('generate_deposit_to_godwoken_tx', (params) =>
+    rpcHandler.generate_deposit_to_godwoken_tx(params as rpc.GenerateDepositToGodWokenPayload),
+  );
   rpcServer.addMethod('claim_sudt', (params) => rpcHandler.claim_sudt(params as rpc.ClaimSudtPayload));
   rpcServer.addMethod('list_claim_history', (params) =>
     rpcHandler.list_claim_history(params as rpc.ListClaimHistoryPayload),
@@ -32,7 +35,12 @@ export function startRpcServer(context: ServerContext): void {
     rpcHandler.get_claim_history(params as rpc.GetClaimHistoryPayload),
   );
 
-  const permissionlessMethods = new Set(['login', 'claim_sudt', 'get_claim_history']);
+  const permissionlessMethods = new Set([
+    'login',
+    'claim_sudt',
+    'get_claim_history',
+    'generate_deposit_to_godwoken_tx',
+  ]);
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
