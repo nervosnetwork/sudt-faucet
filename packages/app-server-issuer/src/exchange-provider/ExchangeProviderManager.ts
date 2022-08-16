@@ -1,4 +1,4 @@
-import { hd, Cell, Indexer, helpers, Address, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
+import { Cell, Indexer, helpers, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
 import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
 import { ServerContext } from '../types';
 import { Config } from './config';
