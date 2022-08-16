@@ -102,7 +102,16 @@ export class ExchangeProviderManager {
     this.assertInitiated();
 
     let cells: Cell[] = [];
-    const needCapacity = this.exchangeAmount(sudtAmount);
+    const needCapacity = this.exchangeAmount(sudtAmount).add(
+      helpers.minimalCellCapacity({
+        cell_output: {
+          capacity: '0x10',
+          lock: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
+          type: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
+        },
+        data: '0x10',
+      }),
+    );
     let capacity = BigNumber.from(0);
 
     while (capacity.lt(needCapacity)) {
