@@ -92,10 +92,7 @@ export class ExchangeProviderManager {
   }
 
   exchangeAmount(sudtAmount: HexString): BigNumber {
-    return BigNumber.from(sudtAmount)
-      .mul(this.config.exchange.CKB)
-      .div(this.config.exchange.sUDT)
-      .mul(BigNumber.from(10).pow(9));
+    return BigNumber.from(sudtAmount).mul(this.config.exchange.CKB).div(this.config.exchange.sUDT);
   }
 
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
