@@ -19,6 +19,7 @@ async function main() {
       exchange: {
         sUDT: BigNumber.from(process.env.EXCHANGE_SUDT_AMOUNT),
         CKB: BigNumber.from(process.env.EXCHANGE_CKB_AMOUNT),
+        limitation: BigNumber.from(process.env.EXCHANGE_CKB_LIMIT ?? 0),
       },
     },
     context,

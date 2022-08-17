@@ -96,6 +96,10 @@ export class ExchangeProviderManager {
     return BigNumber.from(sudtAmount).mul(this.config.exchange.CKB).div(this.config.exchange.sUDT);
   }
 
+  exchangeAmountReachLimitation(amount: BigNumber): boolean {
+    return amount.gt(this.config.exchange.limitation) && this.config.exchange.limitation.gt(0);
+  }
+
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
     this.assertInitiated();
 
@@ -110,6 +114,11 @@ export class ExchangeProviderManager {
         data: bytes.hexify(number.Uint128.pack(0)),
       }),
     );
+
+    if (this.exchangeAmountReachLimitation(needCapacity)) {
+      throw new Error('exchange CKB reach limitation');
+    }
+
     let capacity = BigNumber.from(0);
 
     while (capacity.lt(needCapacity)) {

@@ -10,4 +10,5 @@ export interface Config {
 export interface ExchangeConfig {
   sUDT: BigNumber;
   CKB: BigNumber;
+  limitation: BigNumber;
 }
