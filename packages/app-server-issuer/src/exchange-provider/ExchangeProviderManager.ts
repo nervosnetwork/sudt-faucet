@@ -1,3 +1,4 @@
+import { number, bytes } from '@ckb-lumos/codec';
 import { Cell, Indexer, helpers, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
 import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
 import { ServerContext } from '../types';
@@ -106,7 +107,7 @@ export class ExchangeProviderManager {
           lock: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
           type: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
         },
-        data: '0x10',
+        data: bytes.hexify(number.Uint128.pack(0)),
       }),
     );
     let capacity = BigNumber.from(0);
