@@ -1,3 +1,4 @@
 [submodule "ckit"]
 	path = ckit
-	url = https://github.com/nervosnetwork/ckit.git
+	url = https://github.com/Daryl-L/ckit.git
+	branch = feature/acp_builder_allow_duplicate_recipient

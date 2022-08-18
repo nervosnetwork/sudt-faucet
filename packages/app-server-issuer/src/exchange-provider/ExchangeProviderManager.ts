@@ -45,27 +45,24 @@ export class ExchangeProviderManager {
     ).objects;
 
     if (cells.length < this.config.exchangeCellCount) {
-      await this.createProviderCells();
+      await this.createProviderCells(this.config.exchangeCellCount - cells.length);
       await this.refreshCells();
     } else {
       this.cells = cells.sort((a, b) => BigNumber.from(b.block_number).sub(BigNumber.from(a.block_number)).toNumber());
     }
   }
 
-  private async createProviderCells(): Promise<void> {
+  private async createProviderCells(amount: number): Promise<void> {
     this.assertInitiated();
 
     const builder = new AcpTransferSudtBuilder(
       {
-        recipients: Array.from({ length: this.config.exchangeCellCount }).map(() => {
+        allowDuplicateRecipient: true,
+        recipients: Array.from({ length: amount }).map(() => {
           return {
             recipient: this.context.exchangeSigner!.getAddress(),
-            sudt: {
-              code_hash: this.context.ckitProvider.getScriptConfig('SUDT').CODE_HASH,
-              hash_type: 'type',
-              args: this.config.sudtArgs,
-            },
-            amount: BigNumber.from(0).toHexString(),
+            sudt: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
+            amount: bytes.hexify(number.Uint128.pack(0)),
             policy: 'createCell',
             additionalCapacity: BigNumber.from(this.config.initCapacity).toHexString(),
           };
