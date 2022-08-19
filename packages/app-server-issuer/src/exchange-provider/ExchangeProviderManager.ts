@@ -1,6 +1,7 @@
 import { number, bytes } from '@ckb-lumos/codec';
 import { Cell, helpers, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
 import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
+import { loggerWithModule } from '../logger';
 import { ServerContext } from '../types';
 import { Config } from './config';
 
@@ -9,6 +10,7 @@ export class ExchangeProviderManager {
   private initiated: boolean;
   private config!: Config;
   private context!: ServerContext;
+  private readonly logger = loggerWithModule('ExchangeProviderManager');
 
   private static sigleton: ExchangeProviderManager | undefined;
 
@@ -45,7 +47,6 @@ export class ExchangeProviderManager {
       },
       () => true,
     );
-    console.log(cells);
 
     if (cells.length < this.config.exchangeCellCount) {
       await this.createProviderCells(this.config.exchangeCellCount - cells.length);
@@ -80,7 +81,7 @@ export class ExchangeProviderManager {
       const hash = await this.context.ckitProvider.sendTransaction(tx);
       await this.context.ckitProvider.waitForTransactionCommitted(hash);
     } catch (e) {
-      console.log(e);
+      this.logger.error(e);
     }
   }
 
