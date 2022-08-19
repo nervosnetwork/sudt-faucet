@@ -1,4 +1,5 @@
-import { AbstractTransactionBuilder, ExchangeSudtForCkbBuilder } from '@ckitjs/ckit';
+import { ExchangeSudtForCkbBuilder } from '@ckitjs/ckit';
+import { serialize } from '@ckitjs/ckit/dist/helpers/pw.serde';
 import {
   rpc,
   utils,
@@ -97,7 +98,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     const partialSignedTx = await this.context.exchangeSigner!.partialSeal(unsignedTx);
 
     return {
-      transaction: AbstractTransactionBuilder.serde.serialize(partialSignedTx),
+      transaction: serialize(partialSignedTx),
     };
   }
 
