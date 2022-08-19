@@ -13,13 +13,13 @@ async function main() {
   void startTransferSudt(context);
   await ExchangeProviderManager.getInstance().initiateConfig(
     {
-      exchangeCellCount: parseInt(process.env.CELL_AMOUNT!, 10),
-      sudtArgs: process.env.SUDT_ARGS!,
-      initCapacity: parseInt(process.env.INIT_CAPACITY!),
+      exchangeCellCount: parseInt(process.env.EXCHANGE_CELL_AMOUNT!, 10),
+      sudtArgs: process.env.EXCHANGE_SUDT_ARGS!,
+      initCapacity: parseInt(process.env.EXCHANGE_INIT_CAPACITY!),
       exchange: {
         sUDT: BigNumber.from(process.env.EXCHANGE_SUDT_AMOUNT),
         CKB: BigNumber.from(process.env.EXCHANGE_CKB_AMOUNT),
-        limitation: BigNumber.from(process.env.EXCHANGE_CKB_LIMIT ?? 0),
+        limitation: BigNumber.from(process.env.EXCHANGE_CKB_LIMIT_EACH_TRANSACTION ?? 0),
       },
     },
     context,
