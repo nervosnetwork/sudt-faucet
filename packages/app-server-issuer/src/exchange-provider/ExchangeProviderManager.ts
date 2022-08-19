@@ -1,5 +1,5 @@
 import { number, bytes } from '@ckb-lumos/codec';
-import { Cell, Indexer, helpers, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
+import { Cell, helpers, HexString, BI as BigNumber } from '@ckb-lumos/lumos';
 import { AcpTransferSudtBuilder } from '@ckitjs/ckit';
 import { ServerContext } from '../types';
 import { Config } from './config';
@@ -33,16 +33,19 @@ export class ExchangeProviderManager {
   private async refreshCells(): Promise<void> {
     this.assertInitiated();
 
-    const indexer = new Indexer(this.context.ckitProvider.mercuryUrl, this.context.ckitProvider.rpcUrl);
-    const cells = (
-      await indexer.getCells({
-        script_type: 'lock',
-        script: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
-        filter: {
-          script: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
+    const cells = await this.context.ckitProvider.collectCells(
+      {
+        searchKey: {
+          script_type: 'lock',
+          script: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
+          filter: {
+            script: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
+          },
         },
-      })
-    ).objects;
+      },
+      () => true,
+    );
+    console.log(cells);
 
     if (cells.length < this.config.exchangeCellCount) {
       await this.createProviderCells(this.config.exchangeCellCount - cells.length);
