@@ -1,5 +1,5 @@
 import { Address, HexNumber, HexString, Script } from '@ckb-lumos/base';
-import { SerializedTx } from '@ckitjs/ckit/dist/helpers/pw.serde';
+import { SerializedTx } from './pw.serde';
 import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
