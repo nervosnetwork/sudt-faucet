@@ -41,12 +41,11 @@ async function initContext(): Promise<ServerContext> {
   const networkConfig = process.env.NETWORK === 'Lina' ? predefined.Lina : predefined.Aggron;
   await ckitProvider.init(networkConfig);
   // TODO get private key from keystore
-  const privateKey = process.env.PRIVATE_KEY;
-  const txSigner = new internal.Secp256k1Signer(privateKey, ckitProvider, ckitProvider.newScript('ANYONE_CAN_PAY'));
-  const exchangeSigner = new internal.Secp256k1Signer(
-    privateKey,
+  const exchangePrivateKey = process.env.EXCHANGE_PRIVATE_KEY!;
+  const txSigner = new internal.Secp256k1Signer(
+    process.env.PRIVATE_KEY,
     ckitProvider,
-    ckitProvider.newScript('SECP256K1_BLAKE160'),
+    ckitProvider.newScript('ANYONE_CAN_PAY'),
   );
   const rcHelper = new RcSupplyLockHelper(ckitProvider.mercury, {
     rcLock: {
@@ -58,7 +57,23 @@ async function initContext(): Promise<ServerContext> {
       hash_type: ckitProvider.getScriptConfig('SUDT').HASH_TYPE,
     },
   });
-  return { ckitProvider, txSigner, rcHelper, exchangeSigner };
+  return {
+    ckitProvider,
+    txSigner,
+    rcHelper,
+    exchangeSigners: {
+      ANYONE_CAN_PAY: new internal.Secp256k1Signer(
+        exchangePrivateKey,
+        ckitProvider,
+        ckitProvider.newScript('ANYONE_CAN_PAY'),
+      ),
+      SECP256K1_BLAKE160: new internal.Secp256k1Signer(
+        exchangePrivateKey,
+        ckitProvider,
+        ckitProvider.newScript('SECP256K1_BLAKE160'),
+      ),
+    },
+  };
 }
 
 void main();

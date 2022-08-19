@@ -39,7 +39,7 @@ export class ExchangeProviderManager {
       {
         searchKey: {
           script_type: 'lock',
-          script: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
+          script: this.context.ckitProvider.parseToScript(this.context.exchangeSigners!.ANYONE_CAN_PAY!.getAddress()),
           filter: {
             script: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
           },
@@ -64,7 +64,7 @@ export class ExchangeProviderManager {
         allowDuplicateRecipient: true,
         recipients: Array.from({ length: amount }).map(() => {
           return {
-            recipient: this.context.exchangeSigner!.getAddress(),
+            recipient: this.context.exchangeSigners!.ANYONE_CAN_PAY!.getAddress(),
             sudt: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
             amount: bytes.hexify(number.Uint128.pack(0)),
             policy: 'createCell',
@@ -73,11 +73,11 @@ export class ExchangeProviderManager {
         }),
       },
       this.context.ckitProvider,
-      this.context.txSigner!.getAddress(),
+      this.context.exchangeSigners!.SECP256K1_BLAKE160!.getAddress(),
     );
     try {
       const unsignedTx = await builder.build();
-      const tx = await this.context.txSigner.seal(unsignedTx);
+      const tx = await this.context.exchangeSigners!.SECP256K1_BLAKE160!.seal(unsignedTx);
       const hash = await this.context.ckitProvider.sendTransaction(tx);
       await this.context.ckitProvider.waitForTransactionCommitted(hash);
     } catch (e) {
@@ -109,7 +109,7 @@ export class ExchangeProviderManager {
       helpers.minimalCellCapacity({
         cell_output: {
           capacity: '0x10',
-          lock: this.context.ckitProvider.parseToScript(this.context.exchangeSigner!.getAddress()),
+          lock: this.context.ckitProvider.parseToScript(this.context.exchangeSigners!.ANYONE_CAN_PAY!.getAddress()),
           type: this.context.ckitProvider.newScript('SUDT', this.config.sudtArgs),
         },
         data: bytes.hexify(number.Uint128.pack(0)),

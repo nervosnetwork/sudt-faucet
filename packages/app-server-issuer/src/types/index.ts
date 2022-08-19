@@ -1,10 +1,14 @@
-import { CkitProvider, internal, RcSupplyLockHelper } from '@ckitjs/ckit';
+import { CkitConfigKeys, CkitProvider, internal, RcSupplyLockHelper } from '@ckitjs/ckit';
 
 export interface ServerContext {
   ckitProvider: CkitProvider;
   txSigner: InstanceType<typeof internal['Secp256k1Signer']>;
   rcHelper: RcSupplyLockHelper;
-  exchangeSigner?: InstanceType<typeof internal['Secp256k1Signer']>;
+  exchangeSigners?: Partial<
+    {
+      [field in CkitConfigKeys]: InstanceType<typeof internal['Secp256k1Signer']>;
+    }
+  >;
 }
 
 export interface MailIssue {
