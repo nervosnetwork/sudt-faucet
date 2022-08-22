@@ -15,7 +15,7 @@ async function main() {
     {
       exchangeCellCount: parseInt(process.env.EXCHANGE_CELL_AMOUNT!, 10),
       sudtArgs: process.env.EXCHANGE_SUDT_ARGS!,
-      initCapacity: parseInt(process.env.EXCHANGE_INIT_CAPACITY!),
+      initCapacity: BigNumber.from(process.env.EXCHANGE_INIT_CAPACITY!),
       exchange: {
         sUDT: BigNumber.from(process.env.EXCHANGE_SUDT_AMOUNT),
         CKB: BigNumber.from(process.env.EXCHANGE_CKB_AMOUNT),

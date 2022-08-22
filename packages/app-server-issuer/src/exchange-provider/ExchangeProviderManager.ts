@@ -32,7 +32,7 @@ export class ExchangeProviderManager {
     }
   }
 
-  private async refreshCells(): Promise<void> {
+  private async refreshCells(needCapacity?: BigNumber): Promise<void> {
     this.assertInitiated();
 
     const cells = await this.context.ckitProvider.collectCells(
@@ -52,7 +52,33 @@ export class ExchangeProviderManager {
       await this.createProviderCells(this.config.exchangeCellCount - cells.length);
       await this.refreshCells();
     } else {
-      this.cells = cells.sort((a, b) => BigNumber.from(b.block_number).sub(BigNumber.from(a.block_number)).toNumber());
+      if (needCapacity) {
+        let currentCapacity = BigNumber.from(0);
+
+        for (const cell of cells) {
+          currentCapacity = currentCapacity.add(cell.cell_output.capacity);
+          if (currentCapacity.gte(needCapacity)) {
+            break;
+          }
+        }
+
+        if (currentCapacity.lt(needCapacity)) {
+          try {
+            await this.createProviderCells(
+              needCapacity.sub(currentCapacity).div(this.config.initCapacity).add(1).toNumber(),
+            );
+          } catch (e) {
+            this.logger.error(e);
+            throw e;
+          }
+
+          await this.refreshCells();
+        }
+      } else {
+        this.cells = cells.sort((a, b) =>
+          BigNumber.from(b.block_number).sub(BigNumber.from(a.block_number)).toNumber(),
+        );
+      }
     }
   }
 
@@ -82,6 +108,7 @@ export class ExchangeProviderManager {
       await this.context.ckitProvider.waitForTransactionCommitted(hash);
     } catch (e) {
       this.logger.error(e);
+      throw e;
     }
   }
 
@@ -126,7 +153,7 @@ export class ExchangeProviderManager {
       const cell = this.cells.shift();
 
       if (cell == undefined) {
-        await this.refreshCells();
+        await this.refreshCells(needCapacity);
         capacity = BigNumber.from(0);
         cells = [];
       } else {

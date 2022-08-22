@@ -3,7 +3,7 @@ import { BI as BigNumber } from '@ckb-lumos/lumos';
 export interface Config {
   exchangeCellCount: number;
   sudtArgs: string;
-  initCapacity: number;
+  initCapacity: BigNumber;
   exchange: ExchangeConfig;
 }
 
