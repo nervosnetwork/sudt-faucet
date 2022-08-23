@@ -1,4 +1,4 @@
 [submodule "ckit"]
 	path = ckit
-	url = https://github.com/Daryl-L/ckit.git
-	branch = feature/acp_builder_allow_duplicate_recipient
+	url = https://github.com/felicityin/ckit.git
+	branch = fix-exchange-builder
