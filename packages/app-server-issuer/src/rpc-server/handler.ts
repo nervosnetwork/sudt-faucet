@@ -87,7 +87,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
         sudtAmountForRecipient: payload.amountForRecipient,
         exchangeProvider: cells,
         ckbAmountForRecipient: ExchangeProviderManager.getInstance()
-          .exchangeAmount(payload.amountForExchangeWithCkb)
+          .calcExchangableCkbAmount(payload.amountForExchangeWithCkb)
           .toHexString(),
         exchangeRecipient: payload.exchangeRecipient,
       },

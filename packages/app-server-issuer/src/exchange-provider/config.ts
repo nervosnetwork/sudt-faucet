@@ -8,7 +8,7 @@ export interface Config {
 }
 
 export interface ExchangeConfig {
-  sUDT: BigNumber;
-  CKB: BigNumber;
-  limitation: BigNumber;
+  pairedBaseSUDTPrice: BigNumber;
+  pairedQuoteCKBPrice: BigNumber;
+  maxCapacityPerExchange: BigNumber;
 }

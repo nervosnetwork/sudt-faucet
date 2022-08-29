@@ -120,19 +120,21 @@ export class ExchangeProviderManager {
     await this.refreshCells();
   }
 
-  exchangeAmount(sudtAmount: HexString): BigNumber {
-    return BigNumber.from(sudtAmount).mul(this.config.exchange.CKB).div(this.config.exchange.sUDT);
+  calcExchangableCkbAmount(sudtAmount: HexString): BigNumber {
+    return BigNumber.from(sudtAmount)
+      .mul(this.config.exchange.pairedQuoteCKBPrice)
+      .div(this.config.exchange.pairedBaseSUDTPrice);
   }
 
   exchangeAmountReachLimitation(amount: BigNumber): boolean {
-    return amount.gt(this.config.exchange.limitation) && this.config.exchange.limitation.gt(0);
+    return amount.gt(this.config.exchange.maxCapacityPerExchange) && this.config.exchange.maxCapacityPerExchange.gt(0);
   }
 
   async getLeagalCells(sudtAmount: HexString): Promise<Cell[]> {
     this.assertInitiated();
 
     let cells: Cell[] = [];
-    const needCapacity = this.exchangeAmount(sudtAmount).add(
+    const needCapacity = this.calcExchangableCkbAmount(sudtAmount).add(
       helpers.minimalCellCapacity({
         cell_output: {
           capacity: '0x10',
