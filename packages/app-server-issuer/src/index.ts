@@ -11,6 +11,13 @@ async function main() {
   const context = await initContext();
   void startMailSender(context);
   void startTransferSudt(context);
+  if (context.exchangeSigner) {
+    await initiateExchangeProvider(context);
+  }
+  startRpcServer(context);
+}
+
+async function initiateExchangeProvider(context: ServerContext): Promise<void> {
   await ExchangeProviderManager.getInstance().initiateConfig(
     {
       exchangeCellCount: parseInt(process.env.EXCHANGE_CELL_COUNT!, 10),
@@ -24,7 +31,6 @@ async function main() {
     },
     context,
   );
-  startRpcServer(context);
 }
 
 async function initContext(): Promise<ServerContext> {
@@ -41,7 +47,7 @@ async function initContext(): Promise<ServerContext> {
   const networkConfig = process.env.NETWORK === 'Lina' ? predefined.Lina : predefined.Aggron;
   await ckitProvider.init(networkConfig);
   // TODO get private key from keystore
-  const exchangePrivateKey = process.env.EXCHANGE_PRIVATE_KEY!;
+  const exchangePrivateKey = process.env.EXCHANGE_PRIVATE_KEY;
   const txSigner = new internal.Secp256k1Signer(
     process.env.PRIVATE_KEY,
     ckitProvider,
@@ -61,18 +67,9 @@ async function initContext(): Promise<ServerContext> {
     ckitProvider,
     txSigner,
     rcHelper,
-    exchangeSigners: {
-      ANYONE_CAN_PAY: new internal.Secp256k1Signer(
-        exchangePrivateKey,
-        ckitProvider,
-        ckitProvider.newScript('ANYONE_CAN_PAY'),
-      ),
-      SECP256K1_BLAKE160: new internal.Secp256k1Signer(
-        exchangePrivateKey,
-        ckitProvider,
-        ckitProvider.newScript('SECP256K1_BLAKE160'),
-      ),
-    },
+    exchangeSigner: exchangePrivateKey
+      ? new internal.Secp256k1Signer(exchangePrivateKey, ckitProvider, ckitProvider.newScript('ANYONE_CAN_PAY'))
+      : undefined,
   };
 }
 

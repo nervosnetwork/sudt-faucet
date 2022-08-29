@@ -95,7 +95,7 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     );
     const unsignedTx = await builder.build();
 
-    const partialSignedTx = await this.context.exchangeSigners!.ANYONE_CAN_PAY!.partialSeal(unsignedTx);
+    const partialSignedTx = await this.context.exchangeSigner!.partialSeal(unsignedTx);
 
     return {
       transaction: serialize(partialSignedTx),
