@@ -1,3 +1,5 @@
+import { ExchangeSudtForCkbBuilder } from '@ckitjs/ckit';
+import { serialize } from '@ckitjs/ckit/dist/helpers/pw.serde';
 import {
   rpc,
   utils,
@@ -12,7 +14,12 @@ import {
 } from '@sudt-faucet/commons';
 import { Request } from 'express';
 import Joi from 'joi';
+import {
+  GenerateDepositToGodWokenPayload,
+  GenerateDepositToGodWokenResponse,
+} from '../../../commons/src/interfaces/rpc';
 import { DB } from '../db';
+import { ExchangeProviderManager } from '../exchange-provider/ExchangeProviderManager';
 import { InsertMailIssue, ServerContext, ClaimRecord } from '../types';
 import { genKeyPair } from '../utils/createKey';
 import { claimSudtPayloadSchema, sendMailsPayloadSchema } from './validate';
@@ -66,6 +73,33 @@ export class IssuerRpcHandler implements rpc.IssuerRpc {
     _payload: rpc.GetClaimableSudtBalancePayload,
   ): Promise<rpc.GetClaimableSudtBalanceResponse> {
     utils.unimplemented();
+  }
+
+  async generate_deposit_to_godwoken_tx(
+    payload: GenerateDepositToGodWokenPayload,
+  ): Promise<GenerateDepositToGodWokenResponse> {
+    const cells = await ExchangeProviderManager.getInstance().getLeagalCells(payload.amountForExchangeWithCkb);
+    const builder = new ExchangeSudtForCkbBuilder(
+      {
+        sudt: payload.sudt,
+        sudtSender: payload.sudtSender,
+        sudtAmountForExchange: payload.amountForExchangeWithCkb,
+        sudtAmountForRecipient: payload.amountForRecipient,
+        exchangeProvider: cells,
+        ckbAmountForRecipient: ExchangeProviderManager.getInstance()
+          .calcExchangableCkbAmount(payload.amountForExchangeWithCkb)
+          .toHexString(),
+        exchangeRecipient: payload.exchangeRecipient,
+      },
+      this.context.ckitProvider,
+    );
+    const unsignedTx = await builder.build();
+
+    const partialSignedTx = await this.context.exchangeSigner!.partialSeal(unsignedTx);
+
+    return {
+      transaction: serialize(partialSignedTx),
+    };
   }
 
   async list_claim_history(payload: rpc.ListClaimHistoryPayload): Promise<rpc.ListClaimHistoryResponse> {

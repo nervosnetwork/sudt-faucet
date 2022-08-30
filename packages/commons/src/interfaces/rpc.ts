@@ -1,4 +1,5 @@
-import { Address, HexNumber, HexString } from '@ckb-lumos/base';
+import { Address, HexNumber, HexString, Script } from '@ckb-lumos/base';
+import { SerializedTx } from './pw.serde';
 import { ClaimHistory, MailIssueInfo, RcIdentity, SudtInfo } from './types';
 
 /**
@@ -127,4 +128,16 @@ export interface DisableClaimSecretPayload {
    * {@link ListClaimHistoryResponse.claimSecret}
    */
   claimSecret: string;
+}
+
+export interface GenerateDepositToGodWokenPayload {
+  sudt: Script;
+  sudtSender: Address;
+  amountForExchangeWithCkb: HexNumber;
+  amountForRecipient: HexNumber;
+  exchangeRecipient: Address;
+}
+
+export interface GenerateDepositToGodWokenResponse {
+  transaction: SerializedTx;
 }

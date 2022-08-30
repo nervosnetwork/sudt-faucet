@@ -13,6 +13,7 @@
     "watch": "yarn run build:js --watch & yarn run build:types --watch"
   },
   "dependencies": {
+    "@ckb-lumos/codec": "^0.18.0",
     "@sendgrid/mail": "^7.4.6",
     "@sudt-faucet/commons": "*",
     "@types/async-retry": "^1.4.3",

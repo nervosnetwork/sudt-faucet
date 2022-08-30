@@ -4,6 +4,7 @@ export interface ServerContext {
   ckitProvider: CkitProvider;
   txSigner: InstanceType<typeof internal['Secp256k1Signer']>;
   rcHelper: RcSupplyLockHelper;
+  exchangeSigner?: InstanceType<typeof internal['Secp256k1Signer']>;
 }
 
 export interface MailIssue {

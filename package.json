@@ -45,5 +45,8 @@
   },
   "resolutions": {
     "buffer": "^6.0.3"
+  },
+  "dependencies": {
+    "@ckb-lumos/lumos": "^0.17.0-rc9"
   }
 }
