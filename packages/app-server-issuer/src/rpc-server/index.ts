@@ -1,5 +1,6 @@
 import { rpc } from '@sudt-faucet/commons';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import { JSONRPCServer } from 'json-rpc-2.0';
 import { loggerWithModule } from '../logger';
@@ -41,6 +42,16 @@ export function startRpcServer(context: ServerContext): void {
     'get_claim_history',
     'generate_deposit_to_godwoken_tx',
   ]);
+
+  const allowedCorsMethods = new Set(['generate_deposit_to_godwoken_tx']);
+
+  app.use(
+    cors((req, cb) => {
+      if (req.method === 'OPTIONS' || allowedCorsMethods.has(req.body.method)) {
+        cb(null, { origin: true });
+      }
+    }),
+  );
 
   app.post('/sudt-issuer/api/v1', (req, res) => {
     const jsonRpcRequest = req.body;
