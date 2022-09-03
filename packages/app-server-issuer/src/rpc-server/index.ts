@@ -16,6 +16,10 @@ export function startRpcServer(context: ServerContext): void {
   const rpcServer = new JSONRPCServer();
   const rpcHandler = new IssuerRpcHandler(context);
 
+  app.get('/ping', (req, res) => {
+    res.send('pong');
+  });
+
   rpcServer.addMethod('login', (params) => rpcHandler.login(params as rpc.LoginPayload));
   rpcServer.addMethod('send_claimable_mails', (params) =>
     rpcHandler.send_claimable_mails(params as rpc.SendClaimableMailsPayload),
@@ -50,6 +54,7 @@ export function startRpcServer(context: ServerContext): void {
       if (req.method === 'OPTIONS' || allowedCorsMethods.has(req.body.method)) {
         cb(null, { origin: true });
       }
+      cb(null, { origin: false });
     }),
   );
 
