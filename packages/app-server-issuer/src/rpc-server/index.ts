@@ -53,8 +53,9 @@ export function startRpcServer(context: ServerContext): void {
     cors((req, cb) => {
       if (req.method === 'OPTIONS' || allowedCorsMethods.has(req.body.method)) {
         cb(null, { origin: true });
+      } else {
+        cb(null, { origin: false });
       }
-      cb(null, { origin: false });
     }),
   );
 
@@ -77,7 +78,11 @@ export function startRpcServer(context: ServerContext): void {
         if (jsonRpcResponse.error) {
           logger.http(`Response: ${JSON.stringify(jsonRpcResponse)}`);
         }
-        res.json(jsonRpcResponse);
+        try {
+          res.json(jsonRpcResponse);
+        } catch (e) {
+          logger.error(e);
+        }
         return;
       }
       res.sendStatus(204);
