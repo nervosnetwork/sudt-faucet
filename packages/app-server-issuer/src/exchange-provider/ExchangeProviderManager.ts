@@ -71,9 +71,9 @@ export class ExchangeProviderManager {
             this.logger.error(e);
             throw e;
           }
-
-          await this.refreshCells();
         }
+
+        await this.refreshCells();
       } else {
         this.cells = cells.sort((a, b) =>
           BigNumber.from(b.block_number).sub(BigNumber.from(a.block_number)).toNumber(),
